@@ -69,7 +69,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
-                'django.template.context_processors.request',
+                'django.template.context_processors.request', # Requerido por allauth
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -107,6 +107,8 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+SITE_ID = 1
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -128,7 +130,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # ALLAUTH CONFIGURATION
 # ==================================
 
-SITE_ID = 1
 
 # Configuración de autenticación
 ACCOUNT_AUTHENTICATION_METHOD = config('ACCOUNT_AUTHENTICATION_METHOD', default='username_email')
