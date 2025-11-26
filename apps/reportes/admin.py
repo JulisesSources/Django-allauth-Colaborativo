@@ -1,3 +1,4 @@
 from django.contrib import admin
 
-# Register your models here.
+# Esta app no tiene modelos para registrar en el admin
+# Los reportes se generarán mediante vistas personalizadas
