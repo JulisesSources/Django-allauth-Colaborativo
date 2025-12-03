@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Listado de Trabajadores</h1>
+
+    <a href="{% url 'trabajadores:crear' %}"
+       class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+        + Agregar Trabajador
+    </a>
+</div>
+
+<!-- Tabla -->
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="py-2 px-3 text-left text-sm font-semibold">No. Empleado</th>
+                <th class="py-2 px-3 text-left text-sm font-semibold">Nombre</th>
+                <th class="py-2 px-3 text-left text-sm font-semibold">Unidad Administrativa</th>
+                <th class="py-2 px-3 text-left text-sm font-semibold">Puesto</th>
+                <th class="py-2 px-3 text-left text-sm font-semibold">Nombramiento</th>
+                <th class="py-2 px-3 text-left text-sm font-semibold">RFC</th>
+                <th class="py-2 px-3 text-left text-sm font-semibold">CURP</th>
+                <th class="py-2 px-3 text-center text-sm font-semibold">Activo</th>
+                <th class="py-2 px-3 text-center text-sm font-semibold">Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-200">
+            {% for trabajador in trabajadores %}
+            <tr>
+                <td class="py-2 px-3">{{ trabajador.numero_empleado }}</td>
+
+                <td class="py-2 px-3">
+                    {{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}
+                </td>
+
+                <td class="py-2 px-3">{{ trabajador.id_unidad.nombre }}</td>
+
+                <td class="py-2 px-3">{{ trabajador.id_puesto.nombre_puesto }}</td>
+
+                <td class="py-2 px-3">{{ trabajador.id_tipo_nombramiento.descripcion }}</td>
+
+                <td class="py-2 px-3">{{ trabajador.rfc }}</td>
+
+                <td class="py-2 px-3">{{ trabajador.curp }}</td>
+
+                <td class="py-2 px-3 text-center">
+                    {% if trabajador.activo %}
+                        <span class="text-green-600 font-semibold">Activo</span>
+                    {% else %}
+                        <span class="text-red-600 font-semibold">Inactivo</span>
+                    {% endif %}
+                </td>
+
+                <td class="py-2 px-3 text-center space-x-2">
+                    <a href="{% url 'trabajadores:editar' trabajador.id_trabajador %}"
+                       class="text-blue-600 hover:underline">
+                        Editar
+                    </a>
+
+                    <a href="{% url 'trabajadores:eliminar' trabajador.id_trabajador %}"
+                       class="text-red-600 hover:underline">
+                        Eliminar
+                    </a>
+                </td>
+            </tr>
+
+            {% empty %}
+            <tr>
+                <td colspan="9" class="py-4 px-3 text-center text-gray-500">
+                    No hay trabajadores registrados.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+</div>
+
+{% endblock %}

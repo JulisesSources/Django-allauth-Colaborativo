@@ -1,0 +1,10 @@
+<h1>{{ view.object|default:"Nuevo Trabajador" }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+    <button type="button" onclick="window.location.href='{% url 'trabajadores:index' %}'">
+        Cancelar
+    </button>
+</form>
