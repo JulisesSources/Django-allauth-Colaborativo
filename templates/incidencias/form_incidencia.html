@@ -1,0 +1,169 @@
+<!-- templates/incidencias/form_incidencia.html -->
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - SCA-B123{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <!-- Botón Volver -->
+    <div class="mb-6">
+        <a href="{% url 'incidencias:lista_incidencias' %}" 
+           class="inline-flex items-center text-blue-600 hover:text-blue-800">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Volver a la lista
+        </a>
+    </div>
+    
+    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-green-600 px-6 py-4">
+            <h2 class="text-2xl font-bold text-white">
+                <i class="fas fa-calendar-plus mr-2"></i>
+                {{ titulo }}
+            </h2>
+        </div>
+        
+        <!-- Formulario -->
+        <div class="p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    <ul class="list-disc list-inside">
+                        {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <!-- Campo Trabajador -->
+                <div>
+                    <label for="{{ form.id_trabajador.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-user mr-1"></i> {{ form.id_trabajador.label }}
+                    </label>
+                    {{ form.id_trabajador }}
+                    {% if form.id_trabajador.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.id_trabajador.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Campo Tipo de Incidencia -->
+                <div>
+                    <label for="{{ form.id_tipo_incidencia.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-list mr-1"></i> {{ form.id_tipo_incidencia.label }}
+                    </label>
+                    {{ form.id_tipo_incidencia }}
+                    {% if form.id_tipo_incidencia.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.id_tipo_incidencia.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Fechas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="{{ form.fecha_inicio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calendar-day mr-1"></i> {{ form.fecha_inicio.label }}
+                        </label>
+                        {{ form.fecha_inicio }}
+                        {% if form.fecha_inicio.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.fecha_inicio.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <label for="{{ form.fecha_fin.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-calendar-check mr-1"></i> {{ form.fecha_fin.label }}
+                        </label>
+                        {{ form.fecha_fin }}
+                        {% if form.fecha_fin.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.fecha_fin.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Observaciones -->
+                <div>
+                    <label for="{{ form.observaciones.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-comment mr-1"></i> {{ form.observaciones.label }}
+                    </label>
+                    {{ form.observaciones }}
+                    {% if form.observaciones.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.observaciones.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Información adicional -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-blue-800">
+                                Información importante
+                            </h3>
+                            <div class="mt-2 text-sm text-blue-700">
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>Asegúrate de que las fechas no se solapen con otras incidencias</li>
+                                    <li>La fecha de fin no puede ser anterior a la fecha de inicio</li>
+                                    <li>Las incidencias que requieren autorización quedarán pendientes hasta ser aprobadas</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botones -->
+                <div class="flex space-x-4 pt-4">
+                    <button type="submit" 
+                            class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                        <i class="fas fa-save mr-2"></i>
+                        {{ boton }}
+                    </button>
+                    <a href="{% url 'incidencias:lista_incidencias' %}" 
+                       class="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 text-center">
+                        <i class="fas fa-times mr-2"></i>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Script para calcular automáticamente los días
+document.addEventListener('DOMContentLoaded', function() {
+    const fechaInicio = document.querySelector('input[name="fecha_inicio"]');
+    const fechaFin = document.querySelector('input[name="fecha_fin"]');
+    
+    function calcularDias() {
+        if (fechaInicio.value && fechaFin.value) {
+            const inicio = new Date(fechaInicio.value);
+            const fin = new Date(fechaFin.value);
+            const diferencia = Math.ceil((fin - inicio) / (1000 * 60 * 60 * 24)) + 1;
+            
+            if (diferencia > 0) {
+                // Mostrar mensaje con los días calculados
+                const mensaje = document.getElementById('mensaje-dias') || document.createElement('div');
+                mensaje.id = 'mensaje-dias';
+                mensaje.className = 'mt-2 text-sm text-blue-600 font-semibold';
+                mensaje.innerHTML = `<i class="fas fa-calendar-alt mr-1"></i> Duración: ${diferencia} día(s)`;
+                
+                if (!document.getElementById('mensaje-dias')) {
+                    fechaFin.parentElement.appendChild(mensaje);
+                }
+            }
+        }
+    }
+    
+    if (fechaInicio && fechaFin) {
+        fechaInicio.addEventListener('change', calcularDias);
+        fechaFin.addEventListener('change', calcularDias);
+        calcularDias(); // Calcular al cargar si hay valores
+    }
+});
+</script>
+{% endblock %}
