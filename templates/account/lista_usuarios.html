@@ -1,0 +1,205 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Usuarios - SCA-B123{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">
+                    <i class="fas fa-users-cog text-blue-600 mr-2"></i>
+                    Gestión de Usuarios
+                </h1>
+                <p class="text-gray-600 mt-1">Administra los usuarios del sistema</p>
+            </div>
+            <div class="text-right">
+                <p class="text-2xl font-bold text-blue-600">{{ usuarios.count }}</p>
+                <p class="text-sm text-gray-500">Total de usuarios</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtros y Búsqueda -->
+    <div class="bg-white shadow rounded-lg p-6">
+        <form method="get" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                    <label for="q" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-search mr-1"></i> Buscar Usuario
+                    </label>
+                    <input type="text" 
+                           name="q" 
+                           id="q" 
+                           value="{{ query }}"
+                           placeholder="Buscar por username o email..."
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label for="rol" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-filter mr-1"></i> Filtrar por Rol
+                    </label>
+                    <select name="rol" 
+                            id="rol"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Todos los roles</option>
+                        {% for codigo, nombre in roles %}
+                        <option value="{{ codigo }}" {% if rol_filtro == codigo %}selected{% endif %}>
+                            {{ nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex space-x-2">
+                <button type="submit" 
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <i class="fas fa-search mr-2"></i>
+                    Buscar
+                </button>
+                <a href="{% url 'accounts:lista_usuarios' %}" 
+                   class="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">
+                    <i class="fas fa-times mr-2"></i>
+                    Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- TEST: mostrar rol y es_admin -->
+    <p>Tu rol: {{ request.user.perfil.rol }}</p>
+    <p>es_admin: {{ es_admin }}</p>
+
+    <!-- Tabla de Usuarios -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+        {% if usuarios %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Usuario
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Rol
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Trabajador
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Estado
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Registro
+                        </th>
+                        <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for usuario in usuarios %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    <div class="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
+                                        {{ usuario.username|first|upper|default:"?" }}
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">
+                                        {{ usuario.username }}
+                                    </div>
+                                    <div class="text-sm text-gray-500">
+                                        {{ usuario.email }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if usuario.perfil.rol == 'admin' %}bg-purple-100 text-purple-800
+                                {% elif usuario.perfil.rol == 'jefe' %}bg-blue-100 text-blue-800
+                                {% else %}bg-green-100 text-green-800{% endif %}">
+                                {{ usuario.perfil.get_rol_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {% if usuario.perfil.id_trabajador %}
+                                <i class="fas fa-check text-green-500 mr-1"></i>
+                                {{ usuario.perfil.id_trabajador.numero_empleado }}
+                            {% else %}
+                                <i class="fas fa-times text-gray-400 mr-1"></i>
+                                No asignado
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if usuario.is_active %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    <i class="fas fa-check-circle mr-1"></i> Activo
+                                </span>
+                            {% else %}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                    <i class="fas fa-times-circle mr-1"></i> Inactivo
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ usuario.date_joined|date:"d/m/Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                            <div class="flex items-center justify-center space-x-2">
+                                {% if es_admin %}
+                                <!-- Botón de editar rol visible -->
+                                <a href="{% url 'accounts:asignar_rol' usuario.id %}" 
+                                   style="color:white; font-weight:bold; background:blue; padding:2px 6px; border-radius:4px;"
+                                   title="Editar rol">
+                                    Editar Rol
+                                </a>
+                                {% endif %}
+                                
+                                {% if usuario.is_active %}
+                                <form method="post" action="{% url 'accounts:desactivar_usuario' usuario.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="text-red-600 hover:text-red-900"
+                                            title="Desactivar usuario"
+                                            onclick="return confirm('¿Estás seguro de desactivar este usuario?')">
+                                        <i class="fas fa-user-slash"></i>
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form method="post" action="{% url 'accounts:activar_usuario' usuario.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="text-green-600 hover:text-green-900"
+                                            title="Activar usuario">
+                                        <i class="fas fa-user-check"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-users text-gray-400 text-6xl mb-4"></i>
+            <p class="text-gray-500 text-lg">No se encontraron usuarios</p>
+            {% if query or rol_filtro %}
+            <a href="{% url 'accounts:lista_usuarios' %}" class="text-blue-600 hover:text-blue-800 mt-2 inline-block">
+                Ver todos los usuarios
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
