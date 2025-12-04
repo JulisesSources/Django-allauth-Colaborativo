@@ -2,11 +2,13 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Trabajador
 
-
 class TrabajadorListView(ListView):
     model = Trabajador
     template_name = 'trabajadores/index.html'
     context_object_name = 'trabajadores'
+
+    def get_queryset(self):
+        return Trabajador.objects.select_related('id_unidad', 'id_puesto', 'id_tipo_nombramiento').all()
 
 
 class TrabajadorCreateView(CreateView):

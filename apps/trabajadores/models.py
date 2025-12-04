@@ -88,7 +88,7 @@ class Trabajador(models.Model):
 
     nombre = models.CharField(max_length=150, verbose_name="Nombre(s)")
     apellido_paterno = models.CharField(max_length=150, verbose_name="Apellido Paterno")
-    apellido_materno = models.CharField(max_length=150, verbose_name="Apellido Matereno")
+    apellido_materno = models.CharField(max_length=150, verbose_name="Apellido Materno")
 
     rfc = models.CharField(max_length=13, verbose_name="RFC")
     curp = models.CharField(max_length=18, verbose_name="CURP")
