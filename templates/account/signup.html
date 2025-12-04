@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load account %}
+
+{% block content %}
+
+<div class="signup-container">
+    <h2>Crear cuenta</h2>
+
+    <form method="POST" action="{% url 'account_signup' %}">
+        {% csrf_token %}
+
+        <!-- EMAIL -->
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">Correo electrónico</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+                <div class="error">{{ form.email.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- USERNAME -->
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Usuario</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="error">{{ form.username.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- PASSWORD 1 -->
+        <div class="form-group">
+            <label for="{{ form.password1.id_for_label }}">Contraseña</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+                <div class="error">{{ form.password1.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- PASSWORD 2 -->
+        <div class="form-group">
+            <label for="{{ form.password2.id_for_label }}">Confirmar contraseña</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+                <div class="error">{{ form.password2.errors }}</div>
+            {% endif %}
+        </div>
+
+        <!-- ERRORES GENERALES -->
+        {% if form.non_field_errors %}
+            <div class="error">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <button type="submit" class="btn">Crear cuenta</button>
+
+        <p class="login-link">
+            ¿Ya tienes cuenta?
+            <a href="{% url 'account_login' %}">Iniciar sesión</a>
+        </p>
+    </form>
+</div>
+
+{% endblock %}

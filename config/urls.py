@@ -9,12 +9,11 @@ from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
+    path('accounts/', include('allauth.urls')),
+     path('accounts/', include('apps.accounts.urls')),
+    # URLs de Allauth
     # Admin de Django
     path('admin/', admin.site.urls),
-    
-    # URLs de Allauth
-    path('accounts/', include('allauth.urls')),
-    
     # URLs de las apps del proyecto
     path('trabajadores/', include('apps.trabajadores.urls')),
     path('unidades/', include('apps.unidades.urls')),
@@ -24,7 +23,7 @@ urlpatterns = [
     path('reportes/', include('apps.reportes.urls')),
     
     # Ruta para la home page usando home.html
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('', RedirectView.as_view(url='/accounts/login/', permanent=False), name='home'),
     
     # Redirección para accounts/profile (común en allauth)
     path('accounts/profile/', RedirectView.as_view(url='/', permanent=True)),
