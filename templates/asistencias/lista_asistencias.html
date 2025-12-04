@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}Registros de Asistencia - SCA-B123{% endblock %}
+
+{% block page_title %}Registros de Asistencia{% endblock %}
+{% block page_subtitle %}Control y seguimiento de asistencias diarias{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    
+    <!-- Estadísticas del día -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Asistencias Hoy</p>
+                    <p class="text-3xl font-bold text-green-600 mt-2">{{ asistencias_hoy }}</p>
+                </div>
+                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                    <span class="text-2xl">✅</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Retardos Hoy</p>
+                    <p class="text-3xl font-bold text-yellow-600 mt-2">{{ retardos_hoy }}</p>
+                </div>
+                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <span class="text-2xl">🟡</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Faltas Hoy</p>
+                    <p class="text-3xl font-bold text-red-600 mt-2">{{ faltas_hoy }}</p>
+                </div>
+                <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                    <span class="text-2xl">🔴</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="font-semibold text-blue-900">Acciones Rápidas</h3>
+                <p class="text-sm text-blue-700">Registra asistencias de forma rápida</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{% url 'asistencias:registro_rapido' %}" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                    ⚡ Registro Rápido
+                </a>
+                <a href="{% url 'asistencias:registrar' %}" 
+                   class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+                    + Registro Completo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow-sm border p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Filtrar Registros</h3>
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {{ filtro_form.as_p }}
+            <div class="flex items-end">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                    Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de registros -->
+    <div class="bg-white rounded-lg shadow-sm border">
+        <div class="p-6 border-b">
+            <h2 class="text-xl font-semibold text-gray-800">Lista de Registros</h2>
+            <p class="text-sm text-gray-600 mt-1">Mostrando registros de los últimos 7 días</p>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trabajador</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Entrada</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Salida</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estatus</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for registro in registros %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">
+                                {{ registro.id_trabajador.nombre_completo }}
+                            </div>
+                            <div class="text-xs text-gray-500">
+                                {{ registro.id_trabajador.numero_empleado }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            {{ registro.fecha|date:"d/m/Y" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            {{ registro.hora_entrada|time:"H:i"|default:"-" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            {{ registro.hora_salida|time:"H:i"|default:"-" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% if registro.estatus == 'ASI' %}
+                            <span class="px-3 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                ✅ {{ registro.get_estatus_display }}
+                            </span>
+                            {% elif registro.estatus == 'RET' %}
+                            <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-800">
+                                🟡 {{ registro.get_estatus_display }}
+                            </span>
+                            {% elif registro.estatus == 'FAL' %}
+                            <span class="px-3 py-1 text-xs rounded-full bg-red-100 text-red-800">
+                                🔴 {{ registro.get_estatus_display }}
+                            </span>
+                            {% else %}
+                            <span class="px-3 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                🔵 {{ registro.get_estatus_display }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <a href="{% url 'asistencias:detalle' registro.pk %}" 
+                               class="text-blue-600 hover:text-blue-900">
+                                Ver detalle
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            No hay registros para mostrar
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if is_paginated %}
+        <div class="px-6 py-4 border-t flex items-center justify-between">
+            <div class="text-sm text-gray-700">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </div>
+            <div class="flex space-x-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 border rounded hover:bg-gray-100">Anterior</a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 border rounded hover:bg-gray-100">Siguiente</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Asistencia - SCA-B123{% endblock %}
+
+{% block page_title %}Registrar Asistencia{% endblock %}
+{% block page_subtitle %}Formulario completo de registro{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+    
+    <!-- Botón volver -->
+    <div>
+        <a href="{% url 'asistencias:lista' %}" 
+           class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+            ← Volver a lista de asistencias
+        </a>
+    </div>
+
+    <!-- Formulario -->
+    <div class="bg-white rounded-lg shadow-sm border p-6">
+        <h2 class="text-xl font-semibold text-gray-800 mb-6">Datos del Registro</h2>
+        
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <!-- Trabajador -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Trabajador *
+                </label>
+                {{ form.id_trabajador }}
+                {% if form.id_trabajador.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.id_trabajador.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Fecha -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Fecha *
+                </label>
+                {{ form.fecha }}
+                {% if form.fecha.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.fecha.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Horas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Hora de Entrada
+                    </label>
+                    {{ form.hora_entrada }}
+                    {% if form.hora_entrada.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.hora_entrada.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Hora de Salida
+                    </label>
+                    {{ form.hora_salida }}
+                    {% if form.hora_salida.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.hora_salida.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Estatus -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Estatus (opcional - se calcula automáticamente)
+                </label>
+                {{ form.estatus }}
+                {% if form.estatus.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ form.estatus.errors.0 }}</p>
+                {% endif %}
+                <p class="mt-1 text-xs text-gray-500">
+                    Si no se especifica, el sistema calculará el estatus automáticamente
+                </p>
+            </div>
+
+            <!-- Errores generales -->
+            {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <!-- Botones -->
+            <div class="flex space-x-4">
+                <button type="submit" 
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                    Guardar Registro
+                </button>
+                <a href="{% url 'asistencias:lista' %}" 
+                   class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-3 rounded-lg font-medium text-center transition-colors">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Ayuda -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <h3 class="font-semibold text-blue-900 mb-2">💡 Ayuda</h3>
+        <ul class="text-sm text-blue-800 space-y-1">
+            <li>• El estatus se calcula automáticamente según la hora de entrada y la jornada del trabajador</li>
+            <li>• Se considera retardo si llega más de 10 minutos después de la hora de entrada</li>
+            <li>• Si no hay hora de entrada, se marca como falta</li>
+        </ul>
+    </div>
+
+</div>
+{% endblock %}

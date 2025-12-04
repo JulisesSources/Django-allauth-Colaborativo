@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Registro Rápido - SCA-B123{% endblock %}
+
+{% block page_title %}Registro Rápido de Asistencia{% endblock %}
+{% block page_subtitle %}Ingresa tu número de empleado{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+    
+    <!-- Reloj en tiempo real -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg shadow-lg p-8 text-center">
+        <div class="text-6xl font-bold mb-2" id="reloj">{{ hora_actual }}</div>
+        <div class="text-2xl">{{ fecha_actual|date:"l, d \d\e F \d\e Y" }}</div>
+    </div>
+
+    <!-- Formulario de registro -->
+    <div class="bg-white rounded-lg shadow-lg border p-8">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            <div>
+                <label class="block text-gray-700 text-lg font-semibold mb-4 text-center">
+                    Ingresa tu número de empleado
+                </label>
+                {{ form.numero_empleado }}
+                {% if form.numero_empleado.errors %}
+                <p class="mt-2 text-red-600 text-sm text-center">{{ form.numero_empleado.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <button type="submit" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white text-xl font-bold py-4 rounded-lg transition-colors">
+                ✅ Registrar Entrada/Salida
+            </button>
+        </form>
+    </div>
+
+    <!-- Últimos registros -->
+    {% if ultimos_registros %}
+    <div class="bg-white rounded-lg shadow-sm border p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Últimos Registros</h3>
+        <div class="space-y-3">
+            {% for registro in ultimos_registros %}
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                    <p class="font-medium">{{ registro.id_trabajador.nombre_completo }}</p>
+                    <p class="text-sm text-gray-600">
+                        Entrada: {{ registro.hora_entrada|time:"H:i"|default:"-" }} | 
+                        Salida: {{ registro.hora_salida|time:"H:i"|default:"-" }}
+                    </p>
+                </div>
+                <span class="px-3 py-1 text-xs rounded-full 
+                    {% if registro.estatus == 'ASI' %}bg-green-100 text-green-800
+                    {% elif registro.estatus == 'RET' %}bg-yellow-100 text-yellow-800
+                    {% else %}bg-red-100 text-red-800{% endif %}">
+                    {{ registro.get_estatus_display }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Link a lista -->
+    <div class="text-center">
+        <a href="{% url 'asistencias:lista' %}" 
+           class="text-blue-600 hover:text-blue-800 font-medium">
+            ← Ver todos los registros
+        </a>
+    </div>
+
+</div>
+
+<script>
+// Actualizar reloj cada segundo
+function actualizarReloj() {
+    const ahora = new Date();
+    const horas = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    const segundos = String(ahora.getSeconds()).padStart(2, '0');
+    document.getElementById('reloj').textContent = `${horas}:${minutos}:${segundos}`;
+}
+setInterval(actualizarReloj, 1000);
+actualizarReloj();
+</script>
+{% endblock %}
