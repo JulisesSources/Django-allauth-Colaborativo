@@ -1,114 +1,241 @@
 {% extends "base.html" %}
 
-{% block title %}Inicio - SCA-B123{% endblock %}
-
-{% block page_title %}Dashboard Principal{% endblock %}
-{% block page_subtitle %}Resumen del sistema de control de asistencia{% endblock %}
+{% block title %}Dashboard - SCA-B123{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
-    
-    <!-- Tarjetas de resumen -->
+
+    <!-- Stats Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Tarjeta Trabajadores -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-            <div class="flex items-center justify-between">
+        <!-- Total Trabajadores -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">Total Trabajadores</p>
-                    <p class="text-3xl font-bold text-gray-800 mt-2">0</p>
-                    <p class="text-xs text-gray-500 mt-1">Activos en el sistema</p>
+                    <div
+                        class="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center text-blue-500 mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">0</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Total Trabajadores</p>
                 </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span class="text-2xl">👥</span>
-                </div>
+                <span
+                    class="bg-blue-100 text-blue-600 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                    Activos
+                </span>
             </div>
-            <a href="{% url 'trabajadores:index' %}" class="inline-block mt-4 text-sm text-blue-600 hover:text-blue-800 font-medium">
-                Ver todos →
-            </a>
         </div>
 
-        <!-- Tarjeta Asistencias Hoy -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-            <div class="flex items-center justify-between">
+        <!-- Asistencias Hoy -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">Asistencias Hoy</p>
-                    <p class="text-3xl font-bold text-gray-800 mt-2">0</p>
-                    <p class="text-xs text-gray-500 mt-1">{% now "d/m/Y" %}</p>
+                    <div
+                        class="w-10 h-10 bg-green-50 dark:bg-green-900/20 rounded-lg flex items-center justify-center text-green-500 mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">0</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Asistencias Hoy</p>
                 </div>
-                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <span class="text-2xl">✅</span>
-                </div>
+                <span
+                    class="bg-green-100 text-green-600 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                    {% now "d/m/Y" %}
+                </span>
             </div>
-            <a href="{% url 'asistencias:index' %}" class="inline-block mt-4 text-sm text-green-600 hover:text-green-800 font-medium">
-                Registrar asistencia →
-            </a>
         </div>
 
-        <!-- Tarjeta Incidencias -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-            <div class="flex items-center justify-between">
+        <!-- Incidencias Activas -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">Incidencias Activas</p>
-                    <p class="text-3xl font-bold text-gray-800 mt-2">0</p>
-                    <p class="text-xs text-gray-500 mt-1">Este mes</p>
+                    <div
+                        class="w-10 h-10 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg flex items-center justify-center text-yellow-500 mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">0</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Incidencias Activas</p>
                 </div>
-                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <span class="text-2xl">📝</span>
-                </div>
+                <span
+                    class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                    Atención
+                </span>
             </div>
-            <a href="{% url 'incidencias:index' %}" class="inline-block mt-4 text-sm text-yellow-600 hover:text-yellow-800 font-medium">
-                Gestionar incidencias →
-            </a>
         </div>
 
-        <!-- Tarjeta Reportes -->
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-            <div class="flex items-center justify-between">
+        <!-- Retardos/Faltas -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:shadow-md transition-shadow">
+            <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-sm font-medium text-gray-600">Reportes Generados</p>
-                    <p class="text-3xl font-bold text-gray-800 mt-2">0</p>
-                    <p class="text-xs text-gray-500 mt-1">Este trimestre</p>
+                    <div
+                        class="w-10 h-10 bg-red-50 dark:bg-red-900/20 rounded-lg flex items-center justify-center text-red-500 mb-4">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">0</h3>
+                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Retardos/Faltas</p>
                 </div>
-                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <span class="text-2xl">📈</span>
-                </div>
+                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                    Hoy
+                </span>
             </div>
-            <a href="{% url 'reportes:index' %}" class="inline-block mt-4 text-sm text-purple-600 hover:text-purple-800 font-medium">
-                Generar reportes →
-            </a>
         </div>
     </div>
 
-    <!-- Información del sistema -->
-    <div class="bg-white rounded-lg shadow-sm border p-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">Estado del Sistema</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span class="text-gray-700">Base de datos:</span>
-                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                    Conectada
-                </span>
+    <!-- Middle Section: Banner & Quick Actions -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Banner -->
+        <div
+            class="lg:col-span-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-8 text-white relative overflow-hidden">
+            <div class="relative z-10">
+                <h2 class="text-2xl font-bold mb-2">Bienvenido, {{ user.first_name|default:user.username }}!</h2>
+                <p class="text-blue-100 mb-6 max-w-md">Sistema de Control de Asistencia - Apartado B del Artículo 123
+                    Constitucional.</p>
+
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <span class="text-sm">Base de datos conectada</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <span class="text-sm">Sistema operativo</span>
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span class="text-gray-700">Servidor:</span>
-                <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                    En línea
-                </span>
+            <!-- Illustration placeholder -->
+            <div class="absolute right-0 bottom-0 w-64 h-64 opacity-20 transform translate-x-10 translate-y-10">
+                <svg class="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                </svg>
             </div>
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span class="text-gray-700">Versión:</span>
-                <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                    v0.1-dev
-                </span>
+        </div>
+
+        <!-- Quick Actions / Status -->
+        <div class="space-y-6">
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+                <h3 class="font-bold text-gray-800 dark:text-gray-100 mb-4">Accesos Rápidos</h3>
+                <div class="space-y-3">
+                    <a href="{% url 'asistencias:index' %}"
+                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4"></path>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Registrar
+                                Asistencia</span>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </a>
+
+                    <a href="{% url 'incidencias:index' %}"
+                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 rounded-lg flex items-center justify-center group-hover:bg-yellow-200 dark:group-hover:bg-yellow-800/50">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Nueva Incidencia</span>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </a>
+
+                    <a href="{% url 'reportes:index' %}"
+                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Generar Reporte</span>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </a>
+                </div>
             </div>
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <span class="text-gray-700">Última actualización:</span>
-                <span class="text-gray-900 text-sm font-medium">
-                    {% now "d/m/Y H:i" %}
-                </span>
+        </div>
+    </div>
+
+    <!-- Recent Activity / Placeholder for Charts -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">Resumen de Actividad</h3>
+            <div class="flex gap-2">
+                <button class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Placeholder for future charts/tables -->
+        <div
+            class="h-64 flex items-center justify-center bg-gray-50 dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-600">
+            <div class="text-center text-gray-400">
+                <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                    </path>
+                </svg>
+                <p>Gráficos de asistencia e incidencias se mostrarán aquí</p>
+                <p class="text-xs mt-1">Requiere integración con modelos de datos</p>
             </div>
         </div>
     </div>
 
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<!-- Scripts para gráficos futuros -->
 {% endblock %}
