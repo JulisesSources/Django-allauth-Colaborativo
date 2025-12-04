@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmar Email</title>
+</head>
+<body>
+    {% if confirmation %}
+        <h1>Confirmar Email</h1>
+        <p>Confirma este email: {{ confirmation.email_address.email }}</p>
+        <form method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+            {% csrf_token %}
+            <button type="submit">Confirmar mi email</button>
+        </form>
+    {% else %}
+        <h1>Enlace inválido o expirado</h1>
+        <p>Este enlace de confirmación no es válido o ha expirado.</p>
+        <a href="{% url 'account_email' %}">Solicitar nuevo enlace</a>
+    {% endif %}
+
+    <p><a href="{% url 'account_login' %}">Ir al Login</a></p>
+</body>
+</html>

@@ -183,6 +183,40 @@
                         </ul>
                     </div>
 
+            
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li>
+                        <a href="{% url 'accounts:dashboard' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
+                            <span>📊</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'trabajadores:index' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
+                            <span>👥</span>
+                            <span>Trabajadores</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'asistencias:index' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
+                            <span>✅</span>
+                            <span>Asistencias</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'incidencias:index' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
+                            <span>📝</span>
+                            <span>Incidencias</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'reportes:index' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
+                            <span>📈</span>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
+                    
                     {% if user.is_staff %}
                     <!-- Administración -->
                     <div>
