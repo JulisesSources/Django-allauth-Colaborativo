@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Unidades Administrativas</h1>
+
+<a href="{% url 'unidades:crear' %}">Crear Unidad</a>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Unidad Padre</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for unidad in unidades %}
+        <tr>
+            <td>{{ unidad.nombre }}</td>
+            <td>{{ unidad.descripcion }}</td>
+            <td>{{ unidad.id_unidad_padre }}</td>
+            <td>
+                <a href="{% url 'unidades:editar' unidad.id_unidad %}">Editar</a> |
+                <a href="{% url 'unidades:eliminar' unidad.id_unidad %}">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">No hay unidades registradas.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

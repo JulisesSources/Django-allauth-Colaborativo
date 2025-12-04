@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ form.instance.pk|yesno:"Editar Unidad,Crear Unidad" }}</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">Guardar</button>
+    <a href="{% url 'unidades:lista' %}">Cancelar</a>
+</form>
+
+{% endblock %}

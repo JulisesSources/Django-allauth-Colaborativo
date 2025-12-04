@@ -1,0 +1,15 @@
+<h1>Eliminar Unidad Administrativa</h1>
+
+{% if messages %}
+    {% for message in messages %}
+        <p style="color:red;">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+<p>¿Estás seguro que deseas eliminar la unidad <strong>{{ object.nombre }}</strong>?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Sí, eliminar</button>
+    <a href="{% url 'unidades:lista' %}">Cancelar</a>
+</form>
