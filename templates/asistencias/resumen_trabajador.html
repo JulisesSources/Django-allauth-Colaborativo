@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Resumen de Asistencias - SCA-B123{% endblock %}
+
+{% block page_title %}Resumen de Asistencia{% endblock %}
+{% block page_subtitle %}{{ trabajador.nombre_completo }} ({{ trabajador.numero_empleado }}){% endblock %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto space-y-6">
+
+    <!-- Botón volver -->
+    <div>
+        <a href="{% url 'accounts:dashboard' %}"
+           class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+            ← Volver a lista
+        </a>
+    </div>
+
+    <!-- Tarjeta principal -->
+    <div class="bg-white shadow-sm border rounded-lg p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Estadísticas Generales</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div class="bg-green-50 p-4 rounded-lg border">
+                <p class="text-sm text-green-700 font-medium">Asistencias</p>
+                <p class="text-3xl font-bold text-green-700">{{ asistencias }}</p>
+                <p class="text-sm text-green-600">{{ porcentaje_asistencia }} %</p>
+            </div>
+
+            <div class="bg-yellow-50 p-4 rounded-lg border">
+                <p class="text-sm text-yellow-700 font-medium">Retardos</p>
+                <p class="text-3xl font-bold text-yellow-700">{{ retardos }}</p>
+                <p class="text-sm text-yellow-600">{{ porcentaje_retardos }} %</p>
+            </div>
+
+            <div class="bg-red-50 p-4 rounded-lg border">
+                <p class="text-sm text-red-700 font-medium">Faltas</p>
+                <p class="text-3xl font-bold text-red-700">{{ faltas }}</p>
+                <p class="text-sm text-red-600">{{ porcentaje_faltas }} %</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Resumen semanal -->
+    <div class="bg-white shadow-sm border rounded-lg p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Resumen de la Semana</h2>
+
+        <table class="w-full">
+            <thead class="bg-gray-50 border-b">
+                <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium">Fecha</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium">Entrada</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium">Salida</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium">Estatus</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for a in resumen_semana %}
+                <tr>
+                    <td class="px-4 py-2 text-sm">{{ a.fecha|date:"d/m/Y" }}</td>
+                    <td class="px-4 py-2 text-sm">{{ a.hora_entrada|default:"-" }}</td>
+                    <td class="px-4 py-2 text-sm">{{ a.hora_salida|default:"-" }}</td>
+                    <td class="px-4 py-2 text-sm">
+                        {{ a.get_estatus_display }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-4 text-gray-500">Sin registros esta semana</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

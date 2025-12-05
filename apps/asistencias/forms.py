@@ -63,23 +63,20 @@ class RegistroRapidoForm(forms.Form):
     """
     Formulario simplificado para registro rápido (solo entrada)
     """
-    numero_empleado = forms.CharField(
-        max_length=20,
-        widget=forms.TextInput(attrs={
-            'class': 'w-full px-4 py-3 text-2xl text-center border-2 border-blue-500 rounded-lg focus:ring-2 focus:ring-blue-500',
-            'placeholder': 'Número de empleado',
+    numero_empleado = forms.ModelChoiceField(
+        queryset=Trabajador.objects.filter(activo=True),
+        widget=forms.Select(attrs={
+            'class': 'w-full px-4 py-3 text-lg border-2 border-blue-500 rounded-lg focus:ring-2 focus:ring-blue-500',
             'autofocus': True
         }),
-        label='Número de Empleado'
+        label='Selecciona el trabajador',
+        empty_label='-- Selecciona un trabajador --'
     )
     
-    def clean_numero_empleado(self):
-        numero = self.cleaned_data.get('numero_empleado')
-        try:
-            trabajador = Trabajador.objects.get(numero_empleado=numero, activo=True)
-            return trabajador
-        except Trabajador.DoesNotExist:
-            raise forms.ValidationError("Número de empleado no encontrado o trabajador inactivo")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Personalizar cómo se muestra cada trabajador en el combo
+        self.fields['numero_empleado'].label_from_instance = lambda obj: f"{obj.numero_empleado} - {obj.nombre} {obj.apellido_paterno} {obj.apellido_materno}"
 
 
 class FiltroAsistenciaForm(forms.Form):
