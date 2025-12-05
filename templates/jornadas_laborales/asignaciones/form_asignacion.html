@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Asignar Jornada{% endblock %}
+{% block page_title %}Asignar Jornada{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded shadow p-6 max-w-lg mx-auto">
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Trabajador</label>
+            {{ form.id_trabajador }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Jornada</label>
+            {{ form.id_jornada }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Fecha de inicio</label>
+            {{ form.fecha_inicio }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium mb-1">Fecha de fin</label>
+            {{ form.fecha_fin }}
+        </div>
+
+        <div class="mt-4 flex justify-between">
+            <a href="{% url 'jornadas:asignaciones' %}" class="text-gray-500">Cancelar</a>
+            <button class="bg-primary-600 text-white px-4 py-2 rounded">
+                Guardar
+            </button>
+        </div>
+    </form>
+
+</div>
+{% endblock %}

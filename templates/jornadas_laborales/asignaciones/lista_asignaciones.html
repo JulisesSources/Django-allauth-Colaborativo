@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Asignaciones de Jornadas{% endblock %}
+{% block page_title %}Asignaciones de Jornadas{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold">Asignaciones de Jornadas</h2>
+
+    {% if user.perfil.es_admin or user.perfil.es_jefe %}
+    <a href="{% url 'jornadas:asignacion_crear' %}"
+       class="bg-primary-500 text-white px-4 py-2 rounded">
+        Nueva Asignación
+    </a>
+    {% endif %}
+</div>
+
+<div class="bg-white shadow rounded p-4">
+    <table class="w-full table-auto text-sm">
+        <thead>
+            <tr class="border-b text-gray-600">
+                <th class="p-2">Trabajador</th>
+                <th class="p-2">Jornada</th>
+                <th class="p-2">Inicio</th>
+                <th class="p-2">Fin</th>
+                <th class="p-2">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in asignaciones %}
+            <tr class="border-b">
+                <td class="p-2">{{ a.id_trabajador.nombre_completo }}</td>
+                <td class="p-2">{{ a.id_jornada.get_descripcion_display }}</td>
+                <td class="p-2">{{ a.fecha_inicio }}</td>
+                <td class="p-2">
+                    {% if a.fecha_fin %}{{ a.fecha_fin }}{% else %}<span class="text-green-600">Vigente</span>{% endif %}
+                </td>
+                <td class="p-2">
+                    {% if user.perfil.es_admin or user.perfil.es_jefe %}
+                    <a href="{% url 'jornadas:asignacion_editar' a.pk %}" class="text-yellow-600">Editar</a>
+                    <a href="{% url 'jornadas:asignacion_eliminar' a.pk %}" class="text-red-600 ml-2">Eliminar</a>
+                    {% else %}
+                    <span class="text-gray-500">-</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="p-4 text-center text-gray-500">
+                    No hay asignaciones registradas.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

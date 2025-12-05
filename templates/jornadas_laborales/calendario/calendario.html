@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Calendario Laboral{% endblock %}
+{% block page_title %}Calendario Laboral{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+    <h2 class="text-lg font-semibold">Calendario Laboral</h2>
+
+   {% if user.perfil.es_admin or user.perfil.es_jefe %}
+    <a href="{% url 'jornadas:calendario_crear' %}" 
+       class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm">
+        ➕ Nuevo día
+    </a>
+    {% endif %}
+</div>
+
+<div class="bg-white rounded shadow p-4">
+    <table class="w-full table-auto">
+        <thead>
+            <tr class="text-left text-sm text-gray-600 border-b">
+                <th class="p-2">Fecha</th>
+                <th class="p-2">Tipo</th>
+                <th class="p-2">Descripción</th>
+                {% if user.perfil.es_admin or user.perfil.es_jefe %}
+                <th class="p-2 text-center">Acciones</th>
+                {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for dia in dias_calendario %}
+            <tr class="border-b hover:bg-gray-50">
+                <td class="p-2">{{ dia.fecha|date:"d/m/Y" }}</td>
+
+                <td class="p-2">
+                    {% if dia.es_inhabil %}
+                        <span class="px-2 py-1 bg-red-100 text-red-700 rounded">Inhábil</span>
+                    {% else %}
+                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Hábil</span>
+                    {% endif %}
+                </td>
+
+                <td class="p-2">{{ dia.descripcion|default:"—" }}</td>
+
+                {% if user.perfil.es_admin or user.perfil.es_jefe %}
+                <td class="p-2 text-center">
+                    <a href="{% url 'jornadas:calendario_editar' dia.pk %}" 
+                       class="text-yellow-600 hover:underline text-sm mr-4">Editar</a>
+
+                    <a href="{% url 'jornadas:calendario_eliminar' dia.pk %}" 
+                       class="text-red-600 hover:underline text-sm">Eliminar</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="p-4 text-center text-gray-500">
+                    No hay eventos en el calendario.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

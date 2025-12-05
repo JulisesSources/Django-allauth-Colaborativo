@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Eliminar Jornada{% endblock %}
+{% block page_title %}Eliminar Jornada{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded shadow p-6 max-w-2xl">
+    <h3 class="text-lg font-semibold">Confirmar eliminación</h3>
+    <p class="mt-2 text-gray-700">Vas a eliminar la jornada <strong>{{ object.get_descripcion_display }}</strong>. Esta acción es irreversible.</p>
+
+    <form method="post" class="mt-4">
+        {% csrf_token %}
+        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded">Eliminar definitivamente</button>
+        <a href="{% url 'jornadas:detail' object.pk %}" class="ml-4 text-gray-600">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

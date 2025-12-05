@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Eliminar Asignación{% endblock %}
+{% block page_title %}Eliminar Asignación{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded shadow p-6 max-w-lg mx-auto">
+
+    <p class="mb-4">
+        ¿Seguro que deseas eliminar esta asignación?
+    </p>
+
+    <p class="mb-4">
+        <strong>{{ object.id_trabajador.nombre_completo }}</strong><br>
+        Jornada: {{ object.id_jornada.get_descripcion_display }}<br>
+        Inicio: {{ object.fecha_inicio }}
+    </p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="flex justify-between">
+            <a href="{% url 'jornadas:asignaciones' %}" class="text-gray-600">Cancelar</a>
+            <button class="bg-red-600 text-white px-4 py-2 rounded">Eliminar</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

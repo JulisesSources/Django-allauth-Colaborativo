@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Eliminar Día{% endblock %}
+{% block page_title %}Eliminar Día del Calendario{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded shadow p-6 max-w-xl mx-auto text-center">
+
+    <p class="text-lg">¿Seguro que deseas eliminar este día?</p>
+
+    <p class="mt-3 text-gray-700">
+        <strong>{{ object.fecha|date:"d/m/Y" }}</strong> — 
+        {% if object.es_inhabil %}Inhábil{% else %}Hábil{% endif %}
+    </p>
+
+    <p class="text-gray-600 mt-2">{{ object.descripcion|default:"(sin descripción)" }}</p>
+
+    <form method="post" class="mt-6">
+        {% csrf_token %}
+        
+        <div class="flex justify-center gap-4">
+            <a href="{% url 'jornadas:calendario' %}"
+               class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">
+                Cancelar
+            </a>
+
+            <button type="submit"
+                    class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
+                Eliminar
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

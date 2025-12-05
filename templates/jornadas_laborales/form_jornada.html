@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-8 mt-8">
+    
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">
+        {% if object %}
+            Editar Jornada Laboral
+        {% else %}
+            Registrar Nueva Jornada Laboral
+        {% endif %}
+    </h2>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- Campo: Tipo de Jornada -->
+        <div>
+            <label class="block text-gray-700 font-semibold mb-2">Tipo de Jornada</label>
+            {{ form.descripcion }}
+            {% if form.descripcion.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.descripcion.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Campo: Hora de Entrada -->
+        <div>
+            <label class="block text-gray-700 font-semibold mb-2">Hora de Entrada</label>
+            {{ form.hora_entrada }}
+            {% if form.hora_entrada.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.hora_entrada.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Campo: Hora de Salida -->
+        <div>
+            <label class="block text-gray-700 font-semibold mb-2">Hora de Salida</label>
+            {{ form.hora_salida }}
+            {% if form.hora_salida.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.hora_salida.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Campo: Días Laborables -->
+        <div>
+            <label class="block text-gray-700 font-semibold mb-2">Días Laborables</label>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {% for checkbox in form.dias %}
+                    <label class="flex items-center space-x-2 bg-gray-100 p-2 rounded">
+                        {{ checkbox.tag }}
+                        <span class="text-gray-700">{{ checkbox.choice_label }}</span>
+                    </label>
+                {% endfor %}
+            </div>
+
+            {% if form.dias.errors %}
+                <p class="text-red-600 text-sm mt-1">{{ form.dias.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Botones -->
+        <div class="flex justify-between mt-6">
+            <a href="{% url 'jornadas:list' %}"
+               class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded">
+                Cancelar
+            </a>
+
+            <button type="submit"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+                Guardar
+            </button>
+        </div>
+
+    </form>
+</div>
+{% endblock %}

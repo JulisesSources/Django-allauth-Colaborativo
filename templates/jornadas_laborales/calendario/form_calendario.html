@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{{ form.instance.pk|yesno:"Editar Día,Nuevo Día" }}{% endblock %}
+{% block page_title %}{{ form.instance.pk|yesno:"Editar Día del Calendario,Nuevo Día del Calendario" }}{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded shadow max-w-xl mx-auto">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-4">
+            <label class="block font-medium mb-1">Fecha:</label>
+            {{ form.fecha }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-medium mb-1">¿Es inhábil?</label>
+            {{ form.es_inhabil }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block font-medium mb-1">Descripción:</label>
+            {{ form.descripcion }}
+        </div>
+
+        <div class="flex justify-between mt-6">
+            <a href="{% url 'jornadas:calendario' %}" class="text-gray-600 hover:underline">
+                ← Cancelar
+            </a>
+
+            <button type="submit" 
+                    class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded">
+                Guardar
+            </button>
+        </div>
+    </form>
+
+</div>
+{% endblock %}

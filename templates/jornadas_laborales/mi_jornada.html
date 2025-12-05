@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Mi Jornada{% endblock %}
+{% block page_title %}Mi Jornada Laboral{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded shadow p-6">
+
+    {% if not jornada_asignada %}
+        <p class="text-gray-600">Aún no tienes una jornada asignada.</p>
+        <a href="{% url 'accounts:dashboard' %}" class="text-primary-600 underline mt-4 block">Volver</a>
+    {% else %}
+        <h3 class="text-xl font-semibold mb-4">
+            {{ jornada_asignada.id_jornada.get_descripcion_display }}
+        </h3>
+
+        <p><strong>Horario:</strong> {{ jornada_asignada.id_jornada.hora_entrada }} - {{ jornada_asignada.id_jornada.hora_salida }}</p>
+
+        <p class="mt-2">
+            <strong>Días laborales:</strong> {{ jornada_asignada.id_jornada.dias_texto }}
+        </p>
+
+        <p class="mt-2">
+            <strong>Asignada desde:</strong> {{ jornada_asignada.fecha_inicio }}
+        </p>
+
+        {% if jornada_asignada.fecha_fin %}
+            <p><strong>Finalizó:</strong> {{ jornada_asignada.fecha_fin }}</p>
+        {% endif %}
+
+        <a href="{% url 'accounts:dashboard' %}" class="block mt-6 text-primary-600 underline">← Volver al panel</a>
+    {% endif %}
+</div>
+{% endblock %}
