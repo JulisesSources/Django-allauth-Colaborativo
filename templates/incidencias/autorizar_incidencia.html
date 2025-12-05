@@ -84,21 +84,21 @@
                     <div class="space-y-3">
                         {% for radio in form.accion %}
                         <div class="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 
-                                    {% if radio.choice_value == 'autorizar' %}border-green-200 hover:border-green-400
+                                    {% if radio.data.value == 'autorizar' %}border-green-200 hover:border-green-400
                                     {% else %}border-red-200 hover:border-red-400{% endif %}">
                             {{ radio.tag }}
                             <label for="{{ radio.id_for_label }}" class="ml-3 cursor-pointer flex-1">
                                 <span class="block text-sm font-medium 
-                                      {% if radio.choice_value == 'autorizar' %}text-green-700
+                                      {% if radio.data.value == 'autorizar' %}text-green-700
                                       {% else %}text-red-700{% endif %}">
-                                    {% if radio.choice_value == 'autorizar' %}
+                                    {% if radio.data.value == 'autorizar' %}
                                         <i class="fas fa-check-circle mr-1"></i> Autorizar Incidencia
                                     {% else %}
                                         <i class="fas fa-times-circle mr-1"></i> Rechazar Incidencia
                                     {% endif %}
                                 </span>
                                 <span class="block text-xs text-gray-500 mt-1">
-                                    {% if radio.choice_value == 'autorizar' %}
+                                    {% if radio.data.value == 'autorizar' %}
                                         La incidencia será aprobada y se registrará en el sistema
                                     {% else %}
                                         La incidencia será rechazada y no tendrá efecto
