@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-4">
+    {% if form.instance.pk %}
+        Editar Puesto
+    {% else %}
+        Nuevo Puesto
+    {% endif %}
+</h1>
+
+<form method="post">
+    {% csrf_token %}
+
+    <p>
+        <label>Nombre del Puesto:</label><br>
+        {{ form.nombre_puesto }}
+    </p>
+
+    <p>
+        <label>Nivel:</label><br>
+        {{ form.nivel }}
+    </p>
+
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+        Guardar
+    </button>
+
+    <a href="{% url 'trabajadores:puestos-lista' %}"
+       class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg ml-2">
+        Cancelar
+    </a>
+
+</form>
+
+{% endblock %}

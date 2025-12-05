@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-6">Tipos de Nombramiento</h1>
+
+<a href="{% url 'trabajadores:nombramientos-crear' %}"
+   class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg mb-4 inline-block">
+    + Agregar Nombramiento
+</a>
+
+<table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg">
+    <thead class="bg-gray-100">
+        <tr>
+            <th class="py-2 px-3 text-left text-sm font-semibold">Descripción</th>
+            <th class="py-2 px-3 text-center text-sm font-semibold">Acciones</th>
+        </tr>
+    </thead>
+
+    <tbody class="divide-y divide-gray-200">
+        {% for item in nombramientos %}
+            <tr>
+                <td class="py-2 px-3">{{ item.descripcion }}</td>
+
+                <td class="py-2 px-3 text-center">
+                    <a href="{% url 'trabajadores:nombramientos-editar' item.id_tipo_nombramiento %}"
+                       class="text-blue-600 hover:underline">Editar</a>
+                    |
+                    <a href="{% url 'trabajadores:nombramientos-eliminar' item.id_tipo_nombramiento %}"
+                       class="text-red-600 hover:underline">Eliminar</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="2" class="py-4 px-3 text-center text-gray-500">
+                    No hay tipos de nombramientos registrados.
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+
+</table>
+
+{% endblock %}

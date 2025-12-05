@@ -1,15 +1,22 @@
+import re
 from django.db import models
 from django.contrib.auth.models import User
+from django.forms import ValidationError
 
 
 # ------------------------------
 #   PUESTO
 # ------------------------------
 class Puesto(models.Model):
+    NIVEL_CHOICES = [
+        ('Docente', 'Docente'),
+        ('Administrativo', 'Administrativo'),
+        ('Directivo', 'Directivo'),
+    ]
+
     id_puesto = models.AutoField(primary_key=True)
-    nombre_puesto = models.CharField(max_length=200, verbose_name="Nombre del Puesto")
-    nivel = models.CharField(max_length=100, verbose_name="Nivel",
-                             help_text="Ej: Docente, Administrativo, Directivo")
+    nombre_puesto = models.CharField(max_length=200)
+    nivel = models.CharField(max_length=100, choices=NIVEL_CHOICES)
 
     # Auditoría
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Creación")
@@ -143,6 +150,15 @@ class Trabajador(models.Model):
 
     def __str__(self):
         return f"{self.numero_empleado} - {self.nombre} {self.apellido_paterno} {self.apellido_materno}"
+    
+    def clean(self):
+        # Validar RFC (13 caracteres, formato general)
+        if not re.match(r'^[A-ZÑ&]{3,4}\d{6}[A-Z0-9]{3}$', self.rfc.upper()):
+            raise ValidationError({"rfc": "El RFC no tiene un formato válido."})
+
+        # Validar CURP (18 caracteres, formato oficial)
+        if not re.match(r'^[A-Z]{1}[AEIOUX]{1}[A-Z]{2}\d{6}[HM]{1}[A-Z]{5}[A-Z0-9]{2}$', self.curp.upper()):
+            raise ValidationError({"curp": "El CURP no tiene un formato válido."})
 
     @property
     def nombre_completo(self):

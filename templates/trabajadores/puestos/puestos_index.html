@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Listado de Puestos</h1>
+
+    <a href="{% url 'trabajadores:puestos-crear' %}"
+       class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+        + Agregar Puesto
+    </a>
+</div>
+
+<div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg">
+        <thead class="bg-gray-100">
+            <tr>
+                <th class="py-2 px-3 text-left text-sm font-semibold">Nombre del Puesto</th>
+                <th class="py-2 px-3 text-left text-sm font-semibold">Nivel</th>
+                <th class="py-2 px-3 text-center text-sm font-semibold">Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody class="divide-y divide-gray-200">
+            {% for p in puestos %}
+            <tr>
+                <td class="py-2 px-3">{{ p.nombre_puesto }}</td>
+                <td class="py-2 px-3">{{ p.nivel }}</td>
+
+                <td class="py-2 px-3 text-center space-x-2">
+                    <a href="{% url 'trabajadores:puestos-editar' p.id_puesto %}"
+                       class="text-blue-600 hover:underline">Editar</a>
+
+                    <a href="{% url 'trabajadores:puestos-eliminar' p.id_puesto %}"
+                       class="text-red-600 hover:underline">Eliminar</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" class="py-4 text-center text-gray-500">No hay puestos registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
