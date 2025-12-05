@@ -12,6 +12,9 @@ from .forms import IncidenciaForm, AutorizarIncidenciaForm, FiltroIncidenciaForm
 from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from .forms import TipoIncidenciaForm
+from apps.accounts.decorators import admin_requerido
+from django.db import IntegrityError
 
 @login_required
 def index(request):
@@ -137,8 +140,8 @@ def detalle_incidencia(request, pk):
     
     context = {
         'incidencia': incidencia,
-        'puede_autorizar': perfil.puede_autorizar_incidencias() and incidencia.puede_ser_autorizada(),
-        'puede_editar': perfil.puede_autorizar_incidencias() and incidencia.puede_ser_editada(),
+        'puede_autorizar': perfil.puede_autorizar_incidencias and incidencia.puede_ser_autorizada,
+        'puede_editar': perfil.puede_autorizar_incidencias and incidencia.puede_ser_editada,
     }
     return render(request, 'incidencias/detalle_incidencia.html', context)
 
@@ -185,12 +188,14 @@ def editar_incidencia(request, pk):
     # Verificar permisos
     puede_editar = False
     if perfil.es_admin():
-        puede_editar = incidencia.puede_ser_editada()
+        puede_editar = incidencia.puede_ser_editada
     elif perfil.es_jefe():
-        puede_editar = incidencia.puede_ser_editada()
+        puede_editar = incidencia.puede_ser_editada
     else:
-        puede_editar = (perfil.id_trabajador == incidencia.id_trabajador and 
-                       incidencia.puede_ser_editada())
+        puede_editar = (
+            perfil.id_trabajador == incidencia.id_trabajador and 
+            incidencia.puede_ser_editada
+        )
     
     if not puede_editar:
         messages.error(request, 'No puedes editar esta incidencia.')
@@ -224,7 +229,7 @@ def autorizar_incidencia(request, pk):
     """Vista para autorizar o rechazar una incidencia"""
     incidencia = get_object_or_404(Incidencia, pk=pk)
     
-    if not incidencia.puede_ser_autorizada():
+    if not incidencia.puede_ser_autorizada:
         messages.error(request, 'Esta incidencia no puede ser autorizada.')
         return redirect('incidencias:detalle_incidencia', pk=pk)
     
@@ -287,7 +292,7 @@ def mis_incidencias(request):
     
     if not perfil.id_trabajador:
         messages.error(request, 'No tienes un trabajador asociado a tu cuenta.')
-        return redirect('dashboard')
+        return redirect('accounts:dashboard')
     
     incidencias = Incidencia.objects.filter(
         id_trabajador=perfil.id_trabajador
@@ -310,3 +315,87 @@ def mis_incidencias(request):
         'perfil': perfil,
     }
     return render(request, 'incidencias/mis_incidencias.html', context)
+
+@login_required
+def autorizar_incidencias(request):
+    """
+    Lista de incidencias para autorización.
+    - ADMIN: ve incidencias de todos.
+    - JEFE: ve solo incidencias de su unidad.
+    En la tabla se listan solo las 'pendientes',
+    pero las estadísticas se calculan sobre todas las incidencias de su alcance.
+    """
+    perfil = request.user.perfil
+
+    # Solo ADMIN o JEFE pueden entrar
+    if not (perfil.es_admin() or perfil.es_jefe()):
+        messages.error(request, 'No tienes permiso para acceder a esta página.')
+        return redirect('incidencias:lista_incidencias')
+
+    # Base de incidencias según alcance
+    if perfil.es_admin():
+        base_qs = Incidencia.objects.all()
+    else:
+        # JEFE: solo su unidad
+        if perfil.id_trabajador and perfil.id_trabajador.id_unidad:
+            base_qs = Incidencia.objects.filter(
+                id_trabajador__id_unidad=perfil.id_trabajador.id_unidad
+            )
+        else:
+            base_qs = Incidencia.objects.none()
+
+    # Estadísticas dentro del alcance del usuario
+    estadisticas = {
+        'total': base_qs.count(),
+        'pendientes': base_qs.filter(estado='pendiente').count(),
+        'autorizadas': base_qs.filter(estado='autorizada').count(),
+        'rechazadas': base_qs.filter(estado='rechazada').count(),
+    }
+
+    # Incidencias que se muestran en la tabla: solo pendientes
+    incidencias = base_qs.select_related(
+        'id_trabajador',
+        'id_tipo_incidencia',
+        'autorizada_por'
+    ).order_by('-fecha_inicio', '-created_at')
+
+    context = {
+        'incidencias': incidencias,
+        'estadisticas': estadisticas,
+        'perfil': perfil,
+    }
+    return render(request, 'incidencias/autorizar_incidencias.html', context)
+
+
+@admin_requerido
+def crear_tipo_incidencia(request):
+    """Vista para registrar un nuevo tipo de incidencia (solo admin)"""
+
+    if request.method == 'POST':
+        form = TipoIncidenciaForm(request.POST)
+
+        if form.is_valid():
+            try:
+                tipo = form.save(commit=False)
+                tipo.created_by = request.user
+                tipo.updated_by = request.user
+                tipo.save()
+
+                messages.success(request, "Tipo de incidencia registrado correctamente.")
+                return redirect('incidencias:lista_incidencias')
+
+            except IntegrityError as e:
+                messages.error(request, "Error al guardar: ya existe un tipo de incidencia o la base de datos rechazó el registro.")
+                # no redirigimos para que el usuario vea el error en el mismo form
+
+            except Exception as e:
+                messages.error(request, f"Error inesperado: {str(e)}")
+
+    else:
+        form = TipoIncidenciaForm()
+
+    return render(request, 'incidencias/tipo_incidencia_form.html', {
+        'form': form,
+        'titulo': 'Registrar Tipo de Incidencia',
+        'boton': 'Guardar',
+    })
