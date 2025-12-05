@@ -1,200 +1,246 @@
-# incidencias/models.py
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 
+# ============================================================
+#   MODELO: TipoIncidencia
+# ============================================================
 class TipoIncidencia(models.Model):
     """
-    Modelo para tipos de incidencias
+    Catálogo de tipos de incidencias.
     """
     id_tipo_incidencia = models.AutoField(primary_key=True)
+
     descripcion = models.CharField(
-        max_length=200, 
+        max_length=200,
         verbose_name="Descripción",
-        help_text="Ej: Incapacidad, Permiso con goce, Comisión sindical"
+        help_text="Ej: Incapacidad, Permiso con goce, etc."
     )
+
     requiere_autorizacion = models.BooleanField(
         default=True,
-        verbose_name="Requiere Autorización",
-        help_text="Define si este tipo de incidencia requiere autorización de un superior"
+        verbose_name="Requiere autorización"
     )
-    activo = models.BooleanField(
-        default=True,
-        verbose_name="Activo"
-    )
-    
+
+    activo = models.BooleanField(default=True)
+
     # Auditoría
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Creación")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Última Actualización")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
-        User, 
-        null=True, 
-        blank=True, 
-        on_delete=models.SET_NULL, 
-        related_name='tipos_incidencia_creados',
-        verbose_name="Creado por"
+        User, null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="tipos_incidencia_creados"
     )
     updated_by = models.ForeignKey(
-        User, 
-        null=True, 
-        blank=True, 
-        on_delete=models.SET_NULL, 
-        related_name='tipos_incidencia_modificados',
-        verbose_name="Modificado por"
+        User, null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="tipos_incidencia_modificados"
     )
-    
+
     class Meta:
-        db_table = 'tipo_incidencia'
-        verbose_name = 'Tipo de Incidencia'
-        verbose_name_plural = 'Tipos de Incidencias'
-        ordering = ['descripcion']
-    
+        db_table = "tipo_incidencia"
+        verbose_name = "Tipo de Incidencia"
+        verbose_name_plural = "Tipos de Incidencia"
+        ordering = ["descripcion"]
+
     def __str__(self):
         return self.descripcion
 
 
+# ============================================================
+#   MODELO: Incidencia
+# ============================================================
 class Incidencia(models.Model):
     """
-    Modelo para registrar incidencias de trabajadores
+    Registro de incidencias de trabajadores.
     """
+
     ESTADO_CHOICES = [
-        ('pendiente', 'Pendiente de Autorización'),
-        ('autorizada', 'Autorizada'),
-        ('rechazada', 'Rechazada'),
+        ("pendiente", "Pendiente de Autorización"),
+        ("autorizada", "Autorizada"),
+        ("rechazada", "Rechazada"),
     ]
-    
+
     id_incidencia = models.AutoField(primary_key=True)
-    
-    # Foreign Keys
+
     id_trabajador = models.ForeignKey(
-        'trabajadores.Trabajador',
+        "trabajadores.Trabajador",
         on_delete=models.CASCADE,
-        verbose_name="Trabajador",
-        related_name='incidencias'
+        related_name="incidencias",
+        verbose_name="Trabajador"
     )
+
     id_tipo_incidencia = models.ForeignKey(
         TipoIncidencia,
         on_delete=models.PROTECT,
-        verbose_name="Tipo de Incidencia",
-        related_name='incidencias'
+        related_name="incidencias",
+        verbose_name="Tipo de Incidencia"
     )
-    
-    fecha_inicio = models.DateField(verbose_name="Fecha de Inicio")
-    fecha_fin = models.DateField(verbose_name="Fecha de Fin")
-    observaciones = models.TextField(blank=True, verbose_name="Observaciones")
-    
-    # Estado de la incidencia
+
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    observaciones = models.TextField(blank=True)
+
     estado = models.CharField(
         max_length=20,
         choices=ESTADO_CHOICES,
-        default='pendiente',
-        verbose_name="Estado"
+        default="pendiente"
     )
-    
-    # Usuario que autorizó la incidencia
+
     autorizada_por = models.ForeignKey(
-        User,
-        null=True,
-        blank=True,
+        User, null=True, blank=True,
         on_delete=models.SET_NULL,
-        related_name='incidencias_autorizadas',
-        verbose_name="Autorizada por"
+        related_name="incidencias_autorizadas"
     )
-    fecha_autorizacion = models.DateTimeField(
-        null=True,
-        blank=True,
-        verbose_name="Fecha de Autorización"
-    )
-    comentario_autorizacion = models.TextField(
-        blank=True,
-        verbose_name="Comentario de Autorización"
-    )
-    
+
+    fecha_autorizacion = models.DateTimeField(null=True, blank=True)
+    comentario_autorizacion = models.TextField(blank=True)
+
     # Auditoría
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de Creación")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="Última Actualización")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
-        User, 
-        null=True, 
-        blank=True, 
-        on_delete=models.SET_NULL, 
-        related_name='incidencias_creadas',
-        verbose_name="Creado por"
+        User, null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="incidencias_creadas"
     )
     updated_by = models.ForeignKey(
-        User, 
-        null=True, 
-        blank=True, 
-        on_delete=models.SET_NULL, 
-        related_name='incidencias_modificadas',
-        verbose_name="Modificado por"
+        User, null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name="incidencias_modificadas"
     )
-    
+
     class Meta:
-        db_table = 'incidencia'
-        verbose_name = 'Incidencia'
-        verbose_name_plural = 'Incidencias'
-        ordering = ['-fecha_inicio', '-created_at']
-    
+        db_table = "incidencia"
+        verbose_name = "Incidencia"
+        verbose_name_plural = "Incidencias"
+        ordering = ["-fecha_inicio", "-created_at"]
+
     def __str__(self):
-        return f"{self.id_trabajador.nombre_completo} - {self.id_tipo_incidencia.descripcion} ({self.fecha_inicio.strftime('%d/%m/%Y')})"
-    
+        return f"{self.id_trabajador.nombre_completo} - {self.id_tipo_incidencia.descripcion}"
+
+    # ============================================================
+    #   PERMISOS DE ACCESO
+    # ============================================================
+
+    def usuario_puede_ver(self, user):
+        perfil = user.perfil
+
+        if perfil.es_admin():
+            return True
+
+        if perfil.es_jefe():
+            return self.id_trabajador.id_unidad == perfil.id_trabajador.id_unidad
+
+        if perfil.es_trabajador():
+            return self.id_trabajador == perfil.id_trabajador
+
+        return False
+
+    def usuario_puede_editar(self, user):
+        perfil = user.perfil
+
+        if self.estado != "pendiente":
+            return False
+
+        if perfil.es_admin():
+            return True
+
+        if perfil.es_jefe():
+            return self.id_trabajador.id_unidad == perfil.id_trabajador.id_unidad
+
+        if perfil.es_trabajador():
+            return self.id_trabajador == perfil.id_trabajador
+
+        return False
+
+    def usuario_puede_autorizar(self, user):
+        perfil = user.perfil
+
+        if self.estado != "pendiente":
+            return False
+
+        if perfil.es_admin():
+            return True
+
+        if perfil.es_jefe():
+            return self.id_trabajador.id_unidad == perfil.id_trabajador.id_unidad
+
+        return False
+
+    def usuario_puede_eliminar(self, user):
+        perfil = user.perfil
+
+        if perfil.es_admin():
+            return True
+
+        if perfil.es_trabajador() and self.created_by == user and self.estado == "pendiente":
+            return True
+
+        return False
+
+    # ============================================================
+    #   VALIDACIONES DEL MODELO
+    # ============================================================
+
     def clean(self):
-        """Validaciones personalizadas"""
+        # Validar fechas
         if self.fecha_fin < self.fecha_inicio:
-            raise ValidationError('La fecha de fin no puede ser anterior a la fecha de inicio.')
-        
-        # Validar que no haya solapamiento de fechas para el mismo trabajador
-        if self.id_trabajador:
-            incidencias_existentes = Incidencia.objects.filter(
-                id_trabajador=self.id_trabajador,
-                estado__in=['pendiente', 'autorizada']
-            ).exclude(id_incidencia=self.id_incidencia)
-            
-            for inc in incidencias_existentes:
-                if (self.fecha_inicio <= inc.fecha_fin and self.fecha_fin >= inc.fecha_inicio):
-                    raise ValidationError(
-                        f'Ya existe una incidencia para este trabajador en el periodo seleccionado: '
-                        f'{inc.id_tipo_incidencia.descripcion} ({inc.fecha_inicio} - {inc.fecha_fin})'
-                    )
-    
+            raise ValidationError("La fecha final no puede ser anterior a la fecha inicial.")
+
+        # Solapamiento
+        qs = Incidencia.objects.filter(
+            id_trabajador=self.id_trabajador,
+            estado__in=["pendiente", "autorizada"]
+        ).exclude(id_incidencia=self.id_incidencia)
+
+        for inc in qs:
+            if self.fecha_inicio <= inc.fecha_fin and self.fecha_fin >= inc.fecha_inicio:
+                raise ValidationError(
+                    f"Ya existe una incidencia en el periodo {inc.fecha_inicio} → {inc.fecha_fin}."
+                )
+
+        # Seguridad: jefe no puede registrar incidencias fuera de su unidad
+        if self.created_by and hasattr(self.created_by, "perfil"):
+            perfil = self.created_by.perfil
+            if perfil.es_jefe():
+                if perfil.id_trabajador and perfil.id_trabajador.id_unidad:
+                    if self.id_trabajador.id_unidad != perfil.id_trabajador.id_unidad:
+                        raise ValidationError("No puedes registrar incidencias para trabajadores fuera de tu unidad.")
+
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)
-    
+
+    # ============================================================
+    #   FUNCIONES DE ESTADO
+    # ============================================================
+
     @property
     def duracion_dias(self):
-        """Calcula la duración de la incidencia en días"""
         return (self.fecha_fin - self.fecha_inicio).days + 1
-    
+
     @property
-    def nombre_completo(self):
-        """Alias para compatibilidad"""
-        return self.id_trabajador.nombre_completo if self.id_trabajador else "Sin trabajador"
-    
     def puede_ser_autorizada(self):
-        """Verifica si la incidencia puede ser autorizada"""
-        return self.estado == 'pendiente'
-    
+        return self.estado == "pendiente"
+
+    @property
     def puede_ser_editada(self):
-        """Verifica si la incidencia puede ser editada"""
-        return self.estado == 'pendiente'
-    
-    def autorizar(self, usuario, comentario=''):
-        """Autoriza la incidencia"""
-        self.estado = 'autorizada'
+        return self.estado == "pendiente"
+
+    def autorizar(self, usuario, comentario=""):
+        self.estado = "autorizada"
         self.autorizada_por = usuario
         self.fecha_autorizacion = timezone.now()
         self.comentario_autorizacion = comentario
         self.updated_by = usuario
         self.save()
-    
-    def rechazar(self, usuario, comentario=''):
-        """Rechaza la incidencia"""
-        self.estado = 'rechazada'
+
+    def rechazar(self, usuario, comentario=""):
+        self.estado = "rechazada"
         self.autorizada_por = usuario
         self.fecha_autorizacion = timezone.now()
         self.comentario_autorizacion = comentario
