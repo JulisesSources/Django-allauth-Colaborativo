@@ -37,12 +37,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 
     # Local apps
+	'apps.incidencias',
+    'apps.accounts',
     'apps.trabajadores',
     'apps.unidades',
     'apps.jornadas_laborales',
     'apps.asistencias',
-    'apps.incidencias',
-    'apps.accounts',
     'apps.reportes',
 ]
 
