@@ -1,37 +1,54 @@
+<!-- apps/unidades/templates/unidades/index.html -->
 {% extends "base.html" %}
+
+{% block title %}Unidades Administrativas{% endblock %}
+{% block page_title %}Unidades Administrativas{% endblock %}
+
 {% block content %}
+<div class="bg-white rounded-lg shadow p-6">
 
-<h1>Unidades Administrativas</h1>
+    <div class="flex justify-between mb-4">
+        <h2 class="text-lg font-semibold">Lista de Unidades</h2>
 
-<a href="{% url 'unidades:crear' %}">Crear Unidad</a>
+        {% if request.user.perfil.rol == 'admin' %}
+        <a href="{% url 'unidades:crear' %}"
+           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            Nueva Unidad
+        </a>
+        {% endif %}
+    </div>
 
-<table border="1" cellpadding="5" cellspacing="0">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Unidad Padre</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
+    <table class="w-full table-auto border">
+        <thead class="bg-gray-100 border-b">
+            <tr>
+                <th class="p-2 text-left">Nombre</th>
+                <th class="p-2 text-left">Descripción</th>
+                <th class="p-2 text-center">Última actualización</th>
+                <th class="p-2 text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in unidades %}
+            <tr class="border-b">
+                <td class="p-2">{{ u.nombre }}</td>
+                <td class="p-2">{{ u.descripcion|default:"-" }}</td>
+                <td class="p-2 text-center">{{ u.updated_at|date:"d/m/Y H:i" }}</td>
 
-    <tbody>
-        {% for unidad in unidades %}
-        <tr>
-            <td>{{ unidad.nombre }}</td>
-            <td>{{ unidad.descripcion }}</td>
-            <td>{{ unidad.id_unidad_padre }}</td>
-            <td>
-                <a href="{% url 'unidades:editar' unidad.id_unidad %}">Editar</a> |
-                <a href="{% url 'unidades:eliminar' unidad.id_unidad %}">Eliminar</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="4">No hay unidades registradas.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+                <td class="p-2 text-center space-x-2">
+                    {% if request.user.perfil.rol == 'admin' %}
+                    <a href="{% url 'unidades:editar' u.id_unidad %}" class="text-blue-600 hover:text-blue-800">Editar</a>
+                    <a href="{% url 'unidades:eliminar' u.id_unidad %}" class="text-red-600 hover:text-red-800">Eliminar</a>
+                    {% else %}
+                    <span class="text-gray-400 text-sm">Sin permisos</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td class="p-3 text-center text-gray-500" colspan="6">No hay unidades registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
