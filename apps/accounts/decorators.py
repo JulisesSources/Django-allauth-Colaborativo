@@ -56,7 +56,7 @@ def puede_autorizar_incidencias(view_func):
             messages.error(request, 'Tu usuario no tiene un perfil asignado.')
             return redirect('account_logout')
 
-        if not request.user.perfil.puede_autorizar_incidencias():
+        if not request.user.perfil.puede_autorizar_incidencias:
             messages.error(request, 'No tienes permisos para autorizar incidencias.')
             return redirect('no_autorizado')
 
