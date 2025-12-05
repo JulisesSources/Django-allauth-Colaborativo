@@ -26,7 +26,7 @@ def rol_requerido(*roles_permitidos):
             # 3️⃣ Verificar rol
             if request.user.perfil.rol not in roles_permitidos:
                 messages.error(request, 'No tienes permisos para acceder aquí.')
-                return redirect('no_autorizado')  # vista segura sin decoradores
+                return redirect(request.META.get("HTTP_REFERER", "/"))
 
             return view_func(request, *args, **kwargs)
         return wrapper
