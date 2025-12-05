@@ -63,7 +63,7 @@ def lista_usuarios(request):
     query = request.GET.get('q', '')
     rol_filtro = request.GET.get('rol', '')
     
-    usuarios = User.objects.select_related('perfil').filter(is_active=True)
+    usuarios = User.objects.select_related('perfil').all()
     
     if query:
         usuarios = usuarios.filter(
