@@ -3,23 +3,28 @@
 {% block page_title %}Eliminar Asignación{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded shadow p-6 max-w-lg mx-auto">
+<div class="bg-gray-800 border border-gray-700 max-w-lg mx-auto rounded-lg p-6 shadow">
 
-    <p class="mb-4">
+    <p class="text-gray-300 mb-4">
         ¿Seguro que deseas eliminar esta asignación?
     </p>
 
-    <p class="mb-4">
+    <div class="mb-4 text-gray-200">
         <strong>{{ object.id_trabajador.nombre_completo }}</strong><br>
         Jornada: {{ object.id_jornada.get_descripcion_display }}<br>
         Inicio: {{ object.fecha_inicio }}
-    </p>
+    </div>
 
     <form method="post">
         {% csrf_token %}
         <div class="flex justify-between">
-            <a href="{% url 'jornadas:asignaciones' %}" class="text-gray-600">Cancelar</a>
-            <button class="bg-red-600 text-white px-4 py-2 rounded">Eliminar</button>
+            <a href="{% url 'jornadas:asignaciones' %}" class="text-gray-400 hover:text-gray-200">
+                Cancelar
+            </a>
+
+            <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                Eliminar
+            </button>
         </div>
     </form>
 </div>

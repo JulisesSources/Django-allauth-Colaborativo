@@ -11,10 +11,7 @@ from apps.trabajadores.models import Trabajador
 # =========================================================
 
 class JornadaLaboralForm(forms.ModelForm):
-    """
-    Formulario para crear/editar jornadas laborales
-    Incluye selección de días laborales mediante MultipleChoiceField
-    """
+
     DIAS_CHOICES = [
         (1, 'Lunes'),
         (2, 'Martes'),
@@ -24,7 +21,7 @@ class JornadaLaboralForm(forms.ModelForm):
         (6, 'Sábado'),
         (7, 'Domingo'),
     ]
-    
+
     dias = forms.MultipleChoiceField(
         choices=DIAS_CHOICES,
         widget=forms.CheckboxSelectMultiple(attrs={
@@ -32,16 +29,15 @@ class JornadaLaboralForm(forms.ModelForm):
         }),
         label='Días Laborales',
         required=True,
-        help_text='Selecciona los días en que aplica esta jornada'
     )
-    
+
     class Meta:
         model = JornadaLaboral
         fields = ['descripcion', 'hora_entrada', 'hora_salida']
+
         widgets = {
-            'descripcion': forms.TextInput(attrs={
-                'class': 'w-full rounded border px-3 py-2 focus:ring-2 focus:ring-blue-500',
-                'placeholder': 'Ej: Jornada Normal - Lunes a Viernes'
+            'descripcion': forms.Select(attrs={
+                'class': 'w-full rounded border px-3 py-2 focus:ring-2 focus:ring-blue-500'
             }),
             'hora_entrada': forms.TimeInput(attrs={
                 'type': 'time',
@@ -52,42 +48,14 @@ class JornadaLaboralForm(forms.ModelForm):
                 'class': 'w-full rounded border px-3 py-2 focus:ring-2 focus:ring-blue-500'
             }),
         }
+
         labels = {
-            'descripcion': 'Descripción',
+            'descripcion': 'Tipo de Jornada',
             'hora_entrada': 'Hora de Entrada',
             'hora_salida': 'Hora de Salida',
         }
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        
-        # Si estamos editando, marcar los días actuales
-        if self.instance.pk:
-            dias_actuales = JornadaDias.objects.filter(
-                id_jornada=self.instance
-            ).values_list('numero_dia', flat=True)
-            self.fields['dias'].initial = [str(d) for d in dias_actuales]
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        hora_entrada = cleaned_data.get('hora_entrada')
-        hora_salida = cleaned_data.get('hora_salida')
-        dias = cleaned_data.get('dias')
-        
-        # Validar horarios
-        if hora_entrada and hora_salida:
-            if hora_salida <= hora_entrada:
-                raise forms.ValidationError(
-                    "La hora de salida debe ser posterior a la hora de entrada"
-                )
-        
-        # Validar que se haya seleccionado al menos un día
-        if not dias:
-            raise forms.ValidationError(
-                "Debe seleccionar al menos un día laboral"
-            )
-        
-        return cleaned_data
+
+
 
 
 # =========================================================
@@ -178,14 +146,24 @@ class AsignarJornadaForm(forms.ModelForm):
         }
     
     def __init__(self, *args, **kwargs):
+        request = kwargs.pop('request', None)
         super().__init__(*args, **kwargs)
+
         # Solo mostrar trabajadores activos
-        self.fields['id_trabajador'].queryset = Trabajador.objects.filter(activo=True)
-        # Fecha inicio por defecto es hoy
+        qs = Trabajador.objects.filter(activo=True)
+
+        # Si es jefe → limitar a su unidad
+        if request and hasattr(request.user, 'perfil') and request.user.perfil.es_jefe():
+            unidad = request.user.perfil.id_trabajador.id_unidad
+            qs = qs.filter(id_unidad=unidad)
+
+        self.fields['id_trabajador'].queryset = qs
+
         if not self.instance.pk:
             self.fields['fecha_inicio'].initial = date.today()
-        # Fecha fin es opcional
+
         self.fields['fecha_fin'].required = False
+
     
     def clean(self):
         cleaned_data = super().clean()

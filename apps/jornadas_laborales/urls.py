@@ -9,7 +9,7 @@ urlpatterns = [
     path('', views.JornadaListView.as_view(), name='list'),
     path('<int:pk>/', views.JornadaDetailView.as_view(), name='detail'),
     
-    # CRUD Jornadas (Solo Admin)
+    # CRUD Jornadas (Jefe + Admin)
     path('crear/', views.JornadaCreateView.as_view(), name='create'),
     path('<int:pk>/editar/', views.JornadaUpdateView.as_view(), name='update'),
     path('<int:pk>/eliminar/', views.JornadaDeleteView.as_view(), name='delete'),
@@ -21,7 +21,7 @@ urlpatterns = [
     # CRUD Calendario (Jefe + Admin)
     path('calendario/crear/', views.CalendarioCreateView.as_view(), name='calendario_crear'),
     path('calendario/<int:pk>/editar/', views.CalendarioUpdateView.as_view(), name='calendario_editar'),
-    path('calendario/<int:pk>/eliminar/', views.CalendarioDeleteView.as_view(), name='calendario_eliminar'),
+    path('calendario/<int:pk>/eliminar/', views.CalendarioDeleteView.as_view(), name='calendario_eliminaxr'),
     
     # ========== ASIGNACIONES DE JORNADAS ==========
     # Lista y CRUD (Jefe + Admin)

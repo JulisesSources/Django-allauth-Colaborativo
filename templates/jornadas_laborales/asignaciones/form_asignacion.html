@@ -3,34 +3,47 @@
 {% block page_title %}Asignar Jornada{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded shadow p-6 max-w-lg mx-auto">
+<div class="bg-gray-800 border border-gray-700 rounded-lg p-6 max-w-lg mx-auto shadow">
 
-    <form method="post">
+    <form method="post" class="space-y-4">
         {% csrf_token %}
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Trabajador</label>
+        <!-- Trabajador -->
+        <div>
+            <label class="block text-gray-300 mb-1">Trabajador</label>
             {{ form.id_trabajador }}
+            {% for error in form.id_trabajador.errors %}
+                <p class="text-red-400 text-sm mt-1">{{ error }}</p>
+            {% endfor %}
         </div>
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Jornada</label>
+        <!-- Jornada -->
+        <div>
+            <label class="block text-gray-300 mb-1">Jornada</label>
             {{ form.id_jornada }}
+            {% for error in form.id_jornada.errors %}
+                <p class="text-red-400 text-sm mt-1">{{ error }}</p>
+            {% endfor %}
         </div>
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Fecha de inicio</label>
+        <!-- Fecha inicio -->
+        <div>
+            <label class="block text-gray-300 mb-1">Fecha de inicio</label>
             {{ form.fecha_inicio }}
         </div>
 
-        <div class="mb-4">
-            <label class="block text-sm font-medium mb-1">Fecha de fin</label>
+        <!-- Fecha fin -->
+        <div>
+            <label class="block text-gray-300 mb-1">Fecha de fin</label>
             {{ form.fecha_fin }}
         </div>
 
-        <div class="mt-4 flex justify-between">
-            <a href="{% url 'jornadas:asignaciones' %}" class="text-gray-500">Cancelar</a>
-            <button class="bg-primary-600 text-white px-4 py-2 rounded">
+        <div class="flex justify-between pt-4">
+            <a href="{% url 'jornadas:asignaciones' %}" class="text-gray-400 hover:text-gray-200">
+                Cancelar
+            </a>
+
+            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
                 Guardar
             </button>
         </div>

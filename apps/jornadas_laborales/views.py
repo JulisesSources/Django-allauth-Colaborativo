@@ -17,56 +17,113 @@ from .models import (
     JornadaDias
 )
 
+from apps.trabajadores.models import Trabajador
+
 from .forms import (
     JornadaLaboralForm,
     CalendarioLaboralForm,
     AsignarJornadaForm
 )
 
-# Decoradores de roles
 from apps.accounts.decorators import (
     rol_requerido,
-    admin_requerido,
+    requiere_trabajador_y_unidad,
     jefe_o_admin_requerido
 )
+
 
 
 # =========================================================
 #   JORNADAS LABORALES - LIST & DETAIL
 # =========================================================
 
-@method_decorator(rol_requerido('admin', 'jefe'), name='dispatch')
+@method_decorator([rol_requerido('admin', 'jefe'), requiere_trabajador_y_unidad], name='dispatch')
 class JornadaListView(LoginRequiredMixin, ListView):
-    """
-    Lista de jornadas laborales
-    Acceso: Admin y Jefe
-    """
     model = JornadaLaboral
     template_name = 'jornadas_laborales/lista_jornadas.html'
     context_object_name = 'jornadas'
     paginate_by = 10
 
     def get_queryset(self):
-        return JornadaLaboral.objects.prefetch_related('dias').annotate(
+        qs = JornadaLaboral.objects.prefetch_related('dias').annotate(
             num_dias=Count('dias', distinct=True),
             num_trabajadores=Count('trabajadores_asignados', distinct=True)
         ).order_by('descripcion')
+
+        user = self.request.user
+
+        # 🔹 Si es jefe, filtrar por su unidad
+        if user.perfil.es_jefe():
+            unidad = user.perfil.id_trabajador.id_unidad
+            # Mostrar jornadas que:
+            # 1. Fueron creadas por el jefe, O
+            # 2. Tienen trabajadores de su unidad asignados
+            qs = qs.filter(
+                Q(created_by=user) |
+                Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
+            ).distinct()
+
+        return qs
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context['total_jornadas'] = JornadaLaboral.objects.count()
+
+        # Jornadas activas = las que tienen al menos un trabajador con fecha_fin NULL
+        context['jornadas_activas'] = JornadaLaboral.objects.filter(
+            trabajadores_asignados__fecha_fin__isnull=True
+        ).distinct().count()
+
+        # Jornadas en uso = similar a activas
+        context['jornadas_en_uso'] = context['jornadas_activas']
+
         return context
 
 
-@method_decorator(rol_requerido('admin', 'jefe'), name='dispatch')
+
+@method_decorator([rol_requerido('admin', 'jefe'), requiere_trabajador_y_unidad], name='dispatch')
 class JornadaDetailView(LoginRequiredMixin, DetailView):
-    """
-    Detalle de una jornada laboral
-    Acceso: Admin y Jefe
-    """
     model = JornadaLaboral
     template_name = 'jornadas_laborales/detalle_jornada.html'
     context_object_name = 'jornada'
+
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+
+        user = self.request.user
+        if user.perfil.es_jefe():
+            unidad = user.perfil.id_trabajador.id_unidad
+
+            pertenece = TrabajadorJornada.objects.filter(
+                id_jornada=obj,
+                id_trabajador__id_unidad=unidad
+            ).exists()
+
+            if not pertenece:
+                raise Http404("No tienes permiso para ver esta jornada.")
+
+        return obj
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+
+        # Si es jefe → validar que la jornada sea de su unidad
+        user = request.user
+        if user.perfil.es_jefe():
+            unidad_jefe = user.perfil.id_trabajador.id_unidad
+
+            # jornada pertenece a su unidad?
+            pertenece = TrabajadorJornada.objects.filter(
+                id_jornada=obj,
+                id_trabajador__id_unidad=unidad_jefe
+            ).exists()
+
+            if not pertenece:
+                raise Http404("No puedes acceder a esta jornada")
+
+        return super().dispatch(request, *args, **kwargs)
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -86,11 +143,12 @@ class JornadaDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
+
 # =========================================================
-#   JORNADAS LABORALES - CRUD (Solo Admin)
+#   JORNADAS LABORALES - CRUD 
 # =========================================================
 
-@method_decorator(admin_requerido, name='dispatch')
+@method_decorator([rol_requerido('admin', 'jefe'), requiere_trabajador_y_unidad], name='dispatch')
 class JornadaCreateView(LoginRequiredMixin, CreateView):
     """
     Crear nueva jornada laboral
@@ -118,9 +176,11 @@ class JornadaCreateView(LoginRequiredMixin, CreateView):
             f"Jornada '{jornada.descripcion}' creada exitosamente"
         )
         return redirect(self.success_url)
+    
+    
 
 
-@method_decorator(admin_requerido, name='dispatch')
+@method_decorator([rol_requerido('admin', 'jefe'), requiere_trabajador_y_unidad], name='dispatch')
 class JornadaUpdateView(LoginRequiredMixin, UpdateView):
     """
     Editar jornada laboral existente
@@ -149,9 +209,29 @@ class JornadaUpdateView(LoginRequiredMixin, UpdateView):
             f"Jornada '{jornada.descripcion}' actualizada exitosamente"
         )
         return redirect(self.success_url)
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+
+        # Si es jefe → validar que la jornada sea de su unidad
+        user = request.user
+        if user.perfil.es_jefe():
+            unidad_jefe = user.perfil.id_trabajador.id_unidad
+
+            # jornada pertenece a su unidad?
+            pertenece = TrabajadorJornada.objects.filter(
+                id_jornada=obj,
+                id_trabajador__id_unidad=unidad_jefe
+            ).exists()
+
+            if not pertenece:
+                raise Http404("No puedes acceder a esta jornada")
+
+        return super().dispatch(request, *args, **kwargs)
 
 
-@method_decorator(admin_requerido, name='dispatch')
+
+@method_decorator([rol_requerido('admin', 'jefe'), requiere_trabajador_y_unidad], name='dispatch')
 class JornadaDeleteView(LoginRequiredMixin, DeleteView):
     """
     Eliminar jornada laboral
@@ -177,6 +257,25 @@ class JornadaDeleteView(LoginRequiredMixin, DeleteView):
             f"Jornada '{jornada.descripcion}' eliminada exitosamente"
         )
         return super().delete(request, *args, **kwargs)
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+
+        # Si es jefe → validar que la jornada sea de su unidad
+        user = request.user
+        if user.perfil.es_jefe():
+            unidad_jefe = user.perfil.id_trabajador.id_unidad
+
+            # jornada pertenece a su unidad?
+            pertenece = TrabajadorJornada.objects.filter(
+                id_jornada=obj,
+                id_trabajador__id_unidad=unidad_jefe
+            ).exists()
+
+            if not pertenece:
+                raise Http404("No puedes acceder a esta jornada")
+
+        return super().dispatch(request, *args, **kwargs)
 
 
 # =========================================================
@@ -294,9 +393,18 @@ class AsignacionListView(LoginRequiredMixin, ListView):
     paginate_by = 20
 
     def get_queryset(self):
-        return TrabajadorJornada.objects.select_related(
-            'id_trabajador', 'id_jornada'
+        qs = TrabajadorJornada.objects.select_related(
+        'id_trabajador', 'id_jornada'
         ).order_by('-fecha_inicio')
+
+        user = self.request.user
+
+        # 🔹 Filtro por unidad del jefe
+        if user.perfil.es_jefe():
+            unidad = user.perfil.id_trabajador.id_unidad
+            qs = qs.filter(id_trabajador__id_unidad=unidad)
+
+        return qs
 
 
 @method_decorator(jefe_o_admin_requerido, name='dispatch')
@@ -311,14 +419,43 @@ class AsignacionCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('jornadas:asignaciones')
 
     def form_valid(self, form):
+        user = self.request.user
+
+        if user.perfil.es_jefe():
+            unidad = user.perfil.id_trabajador.id_unidad
+            trabajador = form.cleaned_data['id_trabajador']
+
+            if trabajador.id_unidad != unidad:
+                messages.error(self.request, "No puedes asignar jornadas a trabajadores de otra unidad.")
+                return redirect('jornadas:asignaciones')
+
         obj = form.save(commit=False)
         obj.created_by = self.request.user
         obj.save()
+
         messages.success(
             self.request,
             f"Jornada asignada a {obj.id_trabajador.nombre_completo} exitosamente"
         )
         return super().form_valid(form)
+    
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        user = self.request.user
+
+        if user.perfil.es_jefe():
+            unidad = user.perfil.id_trabajador.id_unidad
+            form.fields['id_trabajador'].queryset = Trabajador.objects.filter(
+                id_unidad=unidad,
+                activo=True
+            )
+        else:
+            # Admin → todos
+            form.fields['id_trabajador'].queryset = Trabajador.objects.filter(activo=True)
+
+        return form
+
+
 
 
 @method_decorator(jefe_o_admin_requerido, name='dispatch')
@@ -333,14 +470,54 @@ class AsignacionUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('jornadas:asignaciones')
 
     def form_valid(self, form):
+        user = self.request.user
+
+        if user.perfil.es_jefe():
+            unidad = user.perfil.id_trabajador.id_unidad
+            trabajador = form.cleaned_data['id_trabajador']
+
+            if trabajador.id_unidad != unidad:
+                messages.error(self.request, "No puedes editar asignaciones de un trabajador de otra unidad.")
+                return redirect('jornadas:asignaciones')
+
         obj = form.save(commit=False)
         obj.updated_by = self.request.user
         obj.save()
+
         messages.success(
             self.request,
             f"Asignación actualizada para {obj.id_trabajador.nombre_completo}"
         )
         return super().form_valid(form)
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+
+        if request.user.perfil.es_jefe():
+            unidad_jefe = request.user.perfil.id_trabajador.id_unidad
+            
+            if obj.id_trabajador.id_unidad != unidad_jefe:
+                raise Http404("No puedes modificar esta asignación")
+
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        user = self.request.user
+
+        if user.perfil.es_jefe():
+            unidad = user.perfil.id_trabajador.id_unidad
+            form.fields['id_trabajador'].queryset = Trabajador.objects.filter(
+                id_unidad=unidad,
+                activo=True
+            )
+        else:
+            form.fields['id_trabajador'].queryset = Trabajador.objects.filter(activo=True)
+
+        return form
+
+
+
 
 
 @method_decorator(jefe_o_admin_requerido, name='dispatch')
@@ -361,6 +538,18 @@ class AsignacionDeleteView(LoginRequiredMixin, DeleteView):
             f"Asignación eliminada para {trabajador_nombre}"
         )
         return super().delete(request, *args, **kwargs)
+    
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+
+        if request.user.perfil.es_jefe():
+            unidad_jefe = request.user.perfil.id_trabajador.id_unidad
+            
+            if obj.id_trabajador.id_unidad != unidad_jefe:
+                raise Http404("No puedes modificar esta asignación")
+
+        return super().dispatch(request, *args, **kwargs)
+
 
 
 # =========================================================

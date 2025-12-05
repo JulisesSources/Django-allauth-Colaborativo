@@ -1,16 +1,33 @@
 {% extends "base.html" %}
+
 {% block title %}Eliminar Jornada{% endblock %}
 {% block page_title %}Eliminar Jornada{% endblock %}
+{% block page_subtitle %}Esta acción no se puede deshacer{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded shadow p-6 max-w-2xl">
-    <h3 class="text-lg font-semibold">Confirmar eliminación</h3>
-    <p class="mt-2 text-gray-700">Vas a eliminar la jornada <strong>{{ object.get_descripcion_display }}</strong>. Esta acción es irreversible.</p>
+<div class="max-w-xl mx-auto bg-gray-800 border border-gray-700 shadow rounded-lg p-8">
 
-    <form method="post" class="mt-4">
+    <h3 class="text-lg font-semibold text-white">Confirmar eliminación</h3>
+
+    <p class="mt-3 text-gray-300">
+        Vas a eliminar la jornada:
+        <strong class="text-red-400">{{ object.get_descripcion_display }}</strong><br>
+        Esta acción es irreversible.
+    </p>
+
+    <form method="post" class="mt-6">
         {% csrf_token %}
-        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded">Eliminar definitivamente</button>
-        <a href="{% url 'jornadas:detail' object.pk %}" class="ml-4 text-gray-600">Cancelar</a>
+
+        <button type="submit"
+                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+            Eliminar definitivamente
+        </button>
+
+        <a href="{% url 'jornadas:detail' object.pk %}"
+           class="ml-4 text-gray-300 hover:text-gray-100">
+            Cancelar
+        </a>
     </form>
+
 </div>
 {% endblock %}

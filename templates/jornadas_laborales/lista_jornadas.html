@@ -1,119 +1,110 @@
 {% extends "base.html" %}
 
-{% block title %}Jornadas Laborales - SCA-B123{% endblock %}
-
+{% block title %}Jornadas Laborales{% endblock %}
 {% block page_title %}Jornadas Laborales{% endblock %}
 {% block page_subtitle %}Gestión de horarios y turnos de trabajo{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
-    
-    <!-- Estadísticas -->
+
+    <!-- Tarjetas de estadísticas -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Total Jornadas</p>
-                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ total_jornadas }}</p>
-                </div>
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <span class="text-2xl">⏰</span>
-                </div>
-            </div>
+
+        <!-- Total Jornadas -->
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow">
+            <p class="text-sm text-gray-300">Total Jornadas</p>
+            <p class="text-3xl font-bold text-white mt-2">{{ total_jornadas }}</p>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">Jornadas Activas</p>
-                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ jornadas|length }}</p>
-                </div>
-                <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <span class="text-2xl">✅</span>
-                </div>
-            </div>
+        <!-- Jornadas Activas -->
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow">
+            <p class="text-sm text-gray-300">Jornadas Activas</p>
+            <p class="text-3xl font-bold text-green-400 mt-2">{{ jornadas_activas }}</p>
         </div>
 
-        <div class="bg-white rounded-lg shadow-sm border p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <p class="text-sm font-medium text-gray-600">En Uso</p>
-                    <p class="text-3xl font-bold text-gray-800 mt-2">{{ jornadas|length }}</p>
-                </div>
-                <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <span class="text-2xl">📊</span>
-                </div>
-            </div>
+        <!-- En uso -->
+        <div class="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow">
+            <p class="text-sm text-gray-300">En uso</p>
+            <p class="text-3xl font-bold text-blue-400 mt-2">{{ jornadas_en_uso }}</p>
         </div>
     </div>
 
-    <!-- Lista de jornadas -->
-    <div class="bg-white rounded-lg shadow-sm border">
-        <div class="p-6 border-b">
-            <div class="flex items-center justify-between">
-                <h2 class="text-xl font-semibold text-gray-800">Lista de Jornadas</h2>
-                <a href="{% url 'admin:jornadas_laborales_jornadalaboral_add' %}" 
-                   class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                    + Nueva Jornada
-                </a>
-            </div>
+    <!-- ENCABEZADO LISTA -->
+    <div class="bg-gray-800 border border-gray-700 rounded-lg shadow">
+        <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-white">Lista de Jornadas</h2>
+
+            {% if user.perfil.es_admin or user.perfil.es_jefe %}
+            <a href="{% url 'jornadas:create' %}"
+               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition">
+                + Nueva Jornada
+            </a>
+            {% endif %}
         </div>
 
+        <!-- TABLA -->
         <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-gray-50 border-b">
+            <table class="w-full text-gray-300">
+                <thead class="bg-gray-700 text-gray-300">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Descripción
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Horario
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Días
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Trabajadores
-                        </th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Acciones
-                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase">Descripción</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase">Horario</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase">Días</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase">Trabajadores</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase">Acciones</th>
                     </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
+
+                <tbody>
                     {% for jornada in jornadas %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm font-medium text-gray-900">{{ jornada.descripcion }}</div>
+                    <tr class="border-b border-gray-700 hover:bg-gray-700">
+
+                        <!-- Descripción -->
+                        <td class="px-6 py-4 text-white font-semibold">
+                            {{ jornada.get_descripcion_display }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="text-sm text-gray-900">
-                                {{ jornada.hora_entrada|time:"H:i" }} - {{ jornada.hora_salida|time:"H:i" }}
-                            </div>
+
+                        <!-- Horario -->
+                        <td class="px-6 py-4">
+                            {{ jornada.hora_entrada|time:"H:i" }} - {{ jornada.hora_salida|time:"H:i" }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+
+                        <!-- Días -->
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 inline-block text-xs font-semibold rounded-full bg-blue-900 text-blue-200">
                                 {{ jornada.dias_cortos }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+
+                        <!-- Trabajadores -->
+                        <td class="px-6 py-4">
                             {{ jornada.num_trabajadores }} asignado{{ jornada.num_trabajadores|pluralize }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                            <a href="{% url 'jornadas_laborales:detalle' jornada.pk %}" 
-                               class="text-blue-600 hover:text-blue-900">
-                                Ver detalle
-                            </a>
-                            <a href="{% url 'admin:jornadas_laborales_jornadalaboral_change' jornada.pk %}" 
-                               class="text-green-600 hover:text-green-900">
-                                Editar
-                            </a>
+
+                        <!-- Acciones -->
+                        <td class="px-6 py-4 space-x-4">
+
+                            <!-- Ver detalle: todos pueden (admin + jefe) -->
+                            <a href="{% url 'jornadas:detail' jornada.pk %}"
+                               class="text-blue-400 hover:text-blue-300">Ver detalle</a>
+
+                            {% if user.perfil.es_admin or user.perfil.es_jefe %}
+                            <!-- Editar -->
+                            <a href="{% url 'jornadas:update' jornada.pk %}"
+                               class="text-green-400 hover:text-green-300">Editar</a>
+
+                            <!-- Eliminar -->
+                            <a href="{% url 'jornadas:delete' jornada.pk %}"
+                               class="text-red-400 hover:text-red-300">Eliminar</a>
+                            {% endif %}
+
                         </td>
                     </tr>
+
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">
-                            No hay jornadas laborales registradas.
+                        <td colspan="5" class="px-6 py-6 text-center text-gray-400">
+                            No hay jornadas registradas.
                         </td>
                     </tr>
                     {% endfor %}
@@ -121,45 +112,36 @@
             </table>
         </div>
 
-        <!-- Paginación -->
+        <!-- PAGINACIÓN -->
         {% if is_paginated %}
-        <div class="px-6 py-4 border-t flex items-center justify-between">
-            <div class="text-sm text-gray-700">
-                Mostrando página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-            </div>
-            <div class="flex space-x-2">
+        <div class="px-6 py-4 border-t border-gray-700 flex justify-between text-gray-400">
+            <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+
+            <div class="space-x-2">
                 {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}" 
-                   class="px-3 py-1 border rounded hover:bg-gray-100">
-                    Anterior
-                </a>
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded">Anterior</a>
                 {% endif %}
+
                 {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}" 
-                   class="px-3 py-1 border rounded hover:bg-gray-100">
-                    Siguiente
-                </a>
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded">Siguiente</a>
                 {% endif %}
             </div>
         </div>
         {% endif %}
     </div>
 
-    <!-- Link al calendario -->
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <span class="text-2xl">📆</span>
-                <div>
-                    <h3 class="font-semibold text-blue-900">Calendario Laboral</h3>
-                    <p class="text-sm text-blue-700">Gestiona días inhábiles y festivos</p>
-                </div>
-            </div>
-            <a href="{% url 'jornadas_laborales:calendario' %}" 
-               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                Ver Calendario
-            </a>
+    <!-- ENLACE CALENDARIO -->
+    <div class="bg-blue-900 border border-blue-700 rounded-lg p-4 flex justify-between items-center">
+        <div>
+            <h3 class="text-lg font-semibold text-white">Calendario Laboral</h3>
+            <p class="text-sm text-blue-200">Gestiona días inhábiles y festivos</p>
         </div>
+        <a href="{% url 'jornadas:calendario' %}"
+           class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">
+            Ver Calendario
+        </a>
     </div>
 
 </div>
