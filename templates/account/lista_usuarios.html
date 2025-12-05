@@ -69,10 +69,6 @@
         </form>
     </div>
 
-    <!-- TEST: mostrar rol y es_admin -->
-    <p>Tu rol: {{ request.user.perfil.rol }}</p>
-    <p>es_admin: {{ es_admin }}</p>
-
     <!-- Tabla de Usuarios -->
     <div class="bg-white shadow rounded-lg overflow-hidden">
         {% if usuarios %}
@@ -154,33 +150,33 @@
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                             <div class="flex items-center justify-center space-x-2">
                                 {% if es_admin %}
-                                <!-- Botón de editar rol visible -->
+                                <!-- Botón de editar rol -->
                                 <a href="{% url 'accounts:asignar_rol' usuario.id %}" 
-                                   style="color:white; font-weight:bold; background:blue; padding:2px 6px; border-radius:4px;"
+                                   class="px-2 py-1 text-white font-bold bg-blue-600 rounded hover:bg-blue-700"
                                    title="Editar rol">
                                     Editar Rol
                                 </a>
-                                {% endif %}
-                                
+                                <!-- Botón activar/desactivar -->
                                 {% if usuario.is_active %}
                                 <form method="post" action="{% url 'accounts:desactivar_usuario' usuario.id %}" class="inline">
                                     {% csrf_token %}
                                     <button type="submit" 
-                                            class="text-red-600 hover:text-red-900"
+                                            class="px-2 py-1 text-white bg-red-600 rounded hover:bg-red-700"
                                             title="Desactivar usuario"
                                             onclick="return confirm('¿Estás seguro de desactivar este usuario?')">
-                                        <i class="fas fa-user-slash"></i>
+                                        Desactivar
                                     </button>
                                 </form>
                                 {% else %}
                                 <form method="post" action="{% url 'accounts:activar_usuario' usuario.id %}" class="inline">
                                     {% csrf_token %}
                                     <button type="submit" 
-                                            class="text-green-600 hover:text-green-900"
+                                            class="px-2 py-1 text-white bg-green-600 rounded hover:bg-green-700"
                                             title="Activar usuario">
-                                        <i class="fas fa-user-check"></i>
+                                        Activar
                                     </button>
                                 </form>
+                                {% endif %}
                                 {% endif %}
                             </div>
                         </td>
@@ -202,4 +198,37 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Toast de mensajes -->
+<div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50"></div>
+
+<script>
+    const toastContainer = document.getElementById('toast-container');
+
+    {% if messages %}
+        {% for message in messages %}
+            const msgDiv = document.createElement('div');
+            msgDiv.className = "px-4 py-2 rounded shadow text-white font-medium text-sm transition-all duration-300";
+            
+            {% if message.tags == 'success' %}
+                msgDiv.classList.add('bg-green-500');
+            {% elif message.tags == 'error' %}
+                msgDiv.classList.add('bg-red-500');
+            {% else %}
+                msgDiv.classList.add('bg-gray-500');
+            {% endif %}
+            
+            msgDiv.textContent = "{{ message }}";
+            toastContainer.appendChild(msgDiv);
+
+            // Desaparecer después de 3s
+            setTimeout(() => {
+                msgDiv.classList.add('opacity-0');
+                setTimeout(() => msgDiv.remove(), 300);
+            }, 3000);
+        {% endfor %}
+    {% endif %}
+</script>
 {% endblock %}
