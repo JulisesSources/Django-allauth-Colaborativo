@@ -1,234 +1,151 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - SCA-B123{% endblock %}
+{% block title %}Inicio - SCA-B123{% endblock %}
 
 {% block content %}
 <div class="space-y-6">
 
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Total Trabajadores -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-                <div>
-                    <div
-                        class="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center text-blue-500 mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">0</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Total Trabajadores</p>
-                </div>
-                <span
-                    class="bg-blue-100 text-blue-600 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                    Activos
-                </span>
-            </div>
-        </div>
-
-        <!-- Asistencias Hoy -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-                <div>
-                    <div
-                        class="w-10 h-10 bg-green-50 dark:bg-green-900/20 rounded-lg flex items-center justify-center text-green-500 mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">0</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Asistencias Hoy</p>
-                </div>
-                <span
-                    class="bg-green-100 text-green-600 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                    {% now "d/m/Y" %}
-                </span>
-            </div>
-        </div>
-
-        <!-- Incidencias Activas -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-                <div>
-                    <div
-                        class="w-10 h-10 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg flex items-center justify-center text-yellow-500 mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">0</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Incidencias Activas</p>
-                </div>
-                <span
-                    class="bg-yellow-100 text-yellow-600 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                    Atención
-                </span>
-            </div>
-        </div>
-
-        <!-- Retardos/Faltas -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div class="flex justify-between items-start">
-                <div>
-                    <div
-                        class="w-10 h-10 bg-red-50 dark:bg-red-900/20 rounded-lg flex items-center justify-center text-red-500 mb-4">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                    </div>
-                    <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">0</h3>
-                    <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Retardos/Faltas</p>
-                </div>
-                <span class="bg-red-100 text-red-600 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
-                    Hoy
-                </span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Middle Section: Banner & Quick Actions -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Banner -->
-        <div
-            class="lg:col-span-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-8 text-white relative overflow-hidden">
-            <div class="relative z-10">
-                <h2 class="text-2xl font-bold mb-2">Bienvenido, {{ user.first_name|default:user.username }}!</h2>
-                <p class="text-blue-100 mb-6 max-w-md">Sistema de Control de Asistencia - Apartado B del Artículo 123
-                    Constitucional.</p>
-
-                <div class="space-y-2">
-                    <div class="flex items-center gap-2">
-                        <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 13l4 4L19 7"></path>
-                            </svg>
-                        </div>
-                        <span class="text-sm">Base de datos conectada</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <div class="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 13l4 4L19 7"></path>
-                            </svg>
-                        </div>
-                        <span class="text-sm">Sistema operativo</span>
-                    </div>
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg overflow-hidden relative">
+        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-10"></div>
+        <div class="relative z-10 px-8 py-12 text-white">
+            <div class="max-w-4xl">
+                <h1 class="text-4xl font-bold mb-3">Sistema de Control de Asistencia</h1>
+                <p class="text-blue-100 text-lg mb-6">
+                    Apartado B del Artículo 123 Constitucional
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="{% url 'account_login' %}" 
+                        class="px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-all duration-200 shadow-md hover:shadow-lg">
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Iniciar Sesión
+                    </a>
+                    <a href="{% url 'account_signup' %}" 
+                        class="px-6 py-3 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 transition-all duration-200 border-2 border-white/30">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Registrarse
+                    </a>
                 </div>
             </div>
-            <!-- Illustration placeholder -->
-            <div class="absolute right-0 bottom-0 w-64 h-64 opacity-20 transform translate-x-10 translate-y-10">
+            
+            <!-- Decorative circles -->
+            <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+            <div class="absolute bottom-0 right-0 w-64 h-64 opacity-20 transform translate-x-10 translate-y-10">
                 <svg class="w-full h-full" fill="currentColor" viewBox="0 0 24 24">
-                    <path
-                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
                 </svg>
-            </div>
-        </div>
-
-        <!-- Quick Actions / Status -->
-        <div class="space-y-6">
-            <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-                <h3 class="font-bold text-gray-800 dark:text-gray-100 mb-4">Accesos Rápidos</h3>
-                <div class="space-y-3">
-                    <a href="{% url 'asistencias:index' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center group-hover:bg-blue-200 dark:group-hover:bg-blue-800/50">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4"></path>
-                                </svg>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Registrar
-                                Asistencia</span>
-                        </div>
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </a>
-
-                    <a href="{% url 'incidencias:index' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-400 rounded-lg flex items-center justify-center group-hover:bg-yellow-200 dark:group-hover:bg-yellow-800/50">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Nueva Incidencia</span>
-                        </div>
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </a>
-
-                    <a href="{% url 'reportes:index' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                                    </path>
-                                </svg>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Generar Reporte</span>
-                        </div>
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </a>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- Recent Activity / Placeholder for Charts -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100">Resumen de Actividad</h3>
-            <div class="flex gap-2">
-                <button class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z">
-                        </path>
-                    </svg>
-                </button>
+    <!-- Features Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Feature 1 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
             </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Control de Asistencias</h3>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">
+                Registra y monitorea las asistencias de todo el personal de manera eficiente y precisa.
+            </p>
         </div>
 
-        <!-- Placeholder for future charts/tables -->
-        <div
-            class="h-64 flex items-center justify-center bg-gray-50 dark:bg-gray-700/30 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-600">
-            <div class="text-center text-gray-400">
-                <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                    </path>
+        <!-- Feature 2 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center text-yellow-600 dark:text-yellow-400 mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                 </svg>
-                <p>Gráficos de asistencia e incidencias se mostrarán aquí</p>
-                <p class="text-xs mt-1">Requiere integración con modelos de datos</p>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Gestión de Incidencias</h3>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">
+                Administra permisos, faltas y retardos con un sistema completo de seguimiento y autorización.
+            </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center text-purple-600 dark:text-purple-400 mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Reportes Detallados</h3>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">
+                Genera reportes completos de asistencias e incidencias para análisis y toma de decisiones.
+            </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center text-green-600 dark:text-green-400 mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Gestión de Personal</h3>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">
+                Administra trabajadores, unidades y jornadas laborales desde un único sistema centralizado.
+            </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center text-red-600 dark:text-red-400 mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Seguridad y Roles</h3>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">
+                Sistema de roles (Admin, Jefe, Trabajador) con permisos diferenciados y autenticación segura.
+            </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Interfaz Moderna</h3>
+            <p class="text-gray-600 dark:text-gray-400 text-sm">
+                Diseño intuitivo y responsivo con soporte para modo oscuro y optimizado para todos los dispositivos.
+            </p>
+        </div>
+    </div>
+
+    <!-- Info Card -->
+    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-6">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center text-blue-600 dark:text-blue-400 flex-shrink-0">
+                <i class="fas fa-info-circle text-xl"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-blue-900 dark:text-blue-100 mb-2 text-lg">Información del Sistema</h3>
+                <p class="text-blue-800 dark:text-blue-200 text-sm mb-3">
+                    SCA-B123 es un sistema completo de control de asistencia diseñado específicamente para instituciones 
+                    que operan bajo el Apartado B del Artículo 123 Constitucional. Proporciona herramientas robustas 
+                    para la gestión eficiente del personal y el seguimiento de asistencias.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">
+                        Django
+                    </span>
+                    <span class="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">
+                        Allauth
+                    </span>
+                    <span class="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">
+                        TailwindCSS
+                    </span>
+                    <span class="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full font-medium">
+                        PostgreSQL
+                    </span>
+                </div>
             </div>
         </div>
     </div>
@@ -237,5 +154,5 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<!-- Scripts para gráficos futuros -->
+<!-- Scripts adicionales si se necesitan -->
 {% endblock %}
