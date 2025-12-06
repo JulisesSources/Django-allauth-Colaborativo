@@ -1,13 +1,16 @@
+# apps/asistencias/forms.py
+
 from django import forms
 from .models import RegistroAsistencia
 from apps.trabajadores.models import Trabajador
 from datetime import date, datetime
 
 
+# =========================================================
+#   FORMULARIO: REGISTRO DE ASISTENCIA (Completo)
+# =========================================================
+
 class RegistroAsistenciaForm(forms.ModelForm):
-    """
-    Formulario para registrar asistencia de trabajadores
-    """
     class Meta:
         model = RegistroAsistencia
         fields = ['id_trabajador', 'fecha', 'hora_entrada', 'hora_salida', 'estatus']
@@ -59,10 +62,11 @@ class RegistroAsistenciaForm(forms.ModelForm):
         return cleaned_data
 
 
+# =========================================================
+#   FORMULARIO: REGISTRO RÁPIDO (Checador)
+# =========================================================
+
 class RegistroRapidoForm(forms.Form):
-    """
-    Formulario simplificado para registro rápido (solo entrada)
-    """
     numero_empleado = forms.ModelChoiceField(
         queryset=Trabajador.objects.filter(activo=True),
         widget=forms.Select(attrs={
@@ -79,10 +83,11 @@ class RegistroRapidoForm(forms.Form):
         self.fields['numero_empleado'].label_from_instance = lambda obj: f"{obj.numero_empleado} - {obj.nombre} {obj.apellido_paterno} {obj.apellido_materno}"
 
 
+# =========================================================
+#   FORMULARIO: FILTROS DE ASISTENCIA
+# =========================================================
+
 class FiltroAsistenciaForm(forms.Form):
-    """
-    Formulario para filtrar registros de asistencia
-    """
     fecha_inicio = forms.DateField(
         required=False,
         widget=forms.DateInput(attrs={

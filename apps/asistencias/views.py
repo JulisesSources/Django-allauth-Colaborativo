@@ -1,6 +1,4 @@
-# =========================================================
-#   IMPORTS
-# =========================================================
+# apps/asistencias/views.py
 
 from datetime import date, datetime, timedelta
 
@@ -120,20 +118,36 @@ class RegistroRapidoView(FormView):
         form = super().get_form(form_class)
         
         user = self.request.user
+        hoy = date.today()
         
         # 🔹 Si es jefe, filtrar trabajadores solo de su unidad
         if user.perfil.es_jefe():
             trabajador_jefe = user.perfil.id_trabajador
             if trabajador_jefe and trabajador_jefe.id_unidad:
-                form.fields['numero_empleado'].queryset = Trabajador.objects.filter(
+                trabajadores_base = Trabajador.objects.filter(
                     id_unidad=trabajador_jefe.id_unidad,
                     activo=True
-                ).order_by('apellido_paterno', 'apellido_materno', 'nombre')
+                )
         else:
             # Admin ve todos los trabajadores activos
-            form.fields['numero_empleado'].queryset = Trabajador.objects.filter(
-                activo=True
-            ).order_by('apellido_paterno', 'apellido_materno', 'nombre')
+            trabajadores_base = Trabajador.objects.filter(activo=True)
+        
+        # Obtener trabajadores que ya completaron su asistencia hoy
+        trabajadores_completos_hoy = RegistroAsistencia.objects.filter(
+            fecha=hoy,
+            hora_entrada__isnull=False,
+            hora_salida__isnull=False
+        ).values_list('id_trabajador', flat=True)
+        
+        # Excluir trabajadores que ya completaron su asistencia
+        trabajadores_disponibles = trabajadores_base.exclude(
+            id_trabajador__in=trabajadores_completos_hoy
+        ).order_by('apellido_paterno', 'apellido_materno', 'nombre')
+        
+        form.fields['numero_empleado'].queryset = trabajadores_disponibles
+        
+        # Guardar flag si todos asistieron
+        self.todos_asistieron = not trabajadores_disponibles.exists() and trabajadores_base.exists()
         
         return form
 
@@ -143,6 +157,12 @@ class RegistroRapidoView(FormView):
         hora_actual = datetime.now().time()
 
         user = self.request.user
+        
+        # 🔹 Validar si es día inhábil
+        from .utils import es_dia_inhabil
+        if es_dia_inhabil(hoy):
+            messages.error(self.request, "Hoy es día festivo/inhábil. No se puede registrar asistencia.")
+            return redirect(self.success_url)
 
         # 🔹 Jefe no puede registrar asistencia de trabajador de otra unidad
         if user.perfil.es_jefe():
@@ -183,12 +203,20 @@ class RegistroRapidoView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['fecha_actual'] = date.today()
+        hoy = date.today()
+        context['fecha_actual'] = hoy
         context['hora_actual'] = datetime.now().strftime('%H:%M:%S')
+        
+        # Verificar si es día festivo/inhábil
+        from .utils import es_dia_inhabil
+        context['es_dia_inhabil'] = es_dia_inhabil(hoy)
+        
+        # Flag de todos asistieron
+        context['todos_asistieron'] = getattr(self, 'todos_asistieron', False)
 
         # 🔹 Filtrar últimos registros según rol
         user = self.request.user
-        ultimos_registros = RegistroAsistencia.objects.filter(fecha=date.today())
+        ultimos_registros = RegistroAsistencia.objects.filter(fecha=hoy)
         
         if user.perfil.es_jefe():
             trabajador_jefe = user.perfil.id_trabajador
@@ -218,23 +246,120 @@ class RegistroAsistenciaCreateView(CreateView):
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-
         user = self.request.user
+        hoy = date.today()
 
-        # 🔹 Filtrar trabajadores por unidad si es jefe
+        # Base queryset de trabajadores activos
         if user.perfil.es_jefe():
             unidad = user.perfil.id_trabajador.id_unidad
-            form.fields['id_trabajador'].queryset = Trabajador.objects.filter(id_unidad=unidad)
+            trabajadores_base = Trabajador.objects.filter(id_unidad=unidad, activo=True)
+        else:
+            trabajadores_base = Trabajador.objects.filter(activo=True)
+
+        # Obtener trabajadores que ya completaron su asistencia hoy
+        # (tienen entrada Y salida registradas)
+        trabajadores_completos_hoy = RegistroAsistencia.objects.filter(
+            fecha=hoy,
+            hora_entrada__isnull=False,
+            hora_salida__isnull=False
+        ).values_list('id_trabajador', flat=True)
+
+        # Excluir trabajadores que ya completaron su asistencia
+        trabajadores_disponibles = trabajadores_base.exclude(
+            id_trabajador__in=trabajadores_completos_hoy
+        )
+
+        form.fields['id_trabajador'].queryset = trabajadores_disponibles
+
+        # Verificar si hay trabajadores disponibles
+        if not trabajadores_disponibles.exists():
+            self.todos_asistieron = True
+        else:
+            self.todos_asistieron = False
+
+        # Si estamos editando un trabajador que ya tiene entrada, deshabilitar hora_entrada
+        trabajador_id = self.request.POST.get('id_trabajador') or self.request.GET.get('trabajador')
+        if trabajador_id:
+            registro_existente = RegistroAsistencia.objects.filter(
+                id_trabajador_id=trabajador_id,
+                fecha=hoy,
+                hora_entrada__isnull=False
+            ).first()
+            if registro_existente:
+                form.fields['hora_entrada'].widget.attrs['readonly'] = True
+                form.fields['hora_entrada'].initial = registro_existente.hora_entrada
 
         return form
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['todos_asistieron'] = getattr(self, 'todos_asistieron', False)
+        
+        # Verificar si es día festivo/inhábil
+        from .utils import es_dia_inhabil
+        hoy = date.today()
+        context['es_dia_inhabil'] = es_dia_inhabil(hoy)
+        
+        # Obtener trabajadores con registro parcial (solo entrada)
+        user = self.request.user
+        
+        if user.perfil.es_jefe():
+            unidad = user.perfil.id_trabajador.id_unidad
+            registros_parciales = RegistroAsistencia.objects.filter(
+                fecha=hoy,
+                hora_entrada__isnull=False,
+                hora_salida__isnull=True,
+                id_trabajador__id_unidad=unidad
+            ).select_related('id_trabajador')
+        else:
+            registros_parciales = RegistroAsistencia.objects.filter(
+                fecha=hoy,
+                hora_entrada__isnull=False,
+                hora_salida__isnull=True
+            ).select_related('id_trabajador')
+        
+        context['registros_parciales'] = registros_parciales
+        context['fecha_actual'] = hoy
+        
+        return context
+
     def form_valid(self, form):
         registro = form.save(commit=False)
+        hoy = date.today()
+        
+        # Verificar si es día inhábil
+        from .utils import es_dia_inhabil
+        if es_dia_inhabil(registro.fecha):
+            messages.error(self.request, "No se puede registrar asistencia en días festivos/inhábiles.")
+            return redirect(self.success_url)
+        
+        # Verificar si ya existe un registro para este trabajador hoy
+        registro_existente = RegistroAsistencia.objects.filter(
+            id_trabajador=registro.id_trabajador,
+            fecha=registro.fecha
+        ).first()
+        
+        if registro_existente:
+            # Si ya tiene entrada pero no salida, solo actualizar la salida
+            if registro_existente.hora_entrada and not registro_existente.hora_salida:
+                if registro.hora_salida:
+                    registro_existente.hora_salida = registro.hora_salida
+                    registro_existente.save()
+                    messages.success(self.request, "Salida registrada correctamente")
+                    return redirect(self.success_url)
+                else:
+                    messages.warning(self.request, "El trabajador ya tiene entrada. Solo falta registrar la salida.")
+                    return redirect(self.success_url)
+            elif registro_existente.hora_entrada and registro_existente.hora_salida:
+                messages.warning(self.request, "El trabajador ya completó su asistencia hoy.")
+                return redirect(self.success_url)
+        
         registro.calcular_estatus_automatico()
+        registro.created_by = self.request.user
         registro.save()
 
         messages.success(self.request, "Registro creado correctamente")
-        return super().form_valid(form)
+        return redirect(self.success_url)
 
 
 
@@ -312,8 +437,9 @@ class ResumenTrabajadorView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         trabajador = self.get_object()
+        hoy = date.today()
 
-        fecha_fin = date.today()
+        fecha_fin = hoy
         fecha_inicio = fecha_fin - timedelta(days=30)
 
         if self.request.GET.get('fecha_inicio'):
@@ -322,10 +448,29 @@ class ResumenTrabajadorView(DetailView):
         if self.request.GET.get('fecha_fin'):
             fecha_fin = datetime.strptime(self.request.GET['fecha_fin'], '%Y-%m-%d').date()
 
-        context['resumen'] = obtener_resumen_asistencia_trabajador(trabajador, fecha_inicio, fecha_fin)
+        # Obtener resumen estadístico
+        resumen = obtener_resumen_asistencia_trabajador(trabajador, fecha_inicio, fecha_fin)
+        context['resumen'] = resumen
         context['fecha_inicio'] = fecha_inicio
         context['fecha_fin'] = fecha_fin
 
+        # Estadísticas para las tarjetas
+        context['asistencias'] = resumen.get('asistencias', 0)
+        context['retardos'] = resumen.get('retardos', 0)
+        context['faltas'] = resumen.get('faltas', 0)
+        context['porcentaje_asistencia'] = resumen.get('porcentaje_asistencia', 0)
+        context['porcentaje_retardos'] = resumen.get('porcentaje_retardos', 0)
+        context['porcentaje_faltas'] = resumen.get('porcentaje_faltas', 0)
+
+        # Resumen de la semana (últimos 7 días)
+        inicio_semana = hoy - timedelta(days=7)
+        context['resumen_semana'] = RegistroAsistencia.objects.filter(
+            id_trabajador=trabajador,
+            fecha__gte=inicio_semana,
+            fecha__lte=hoy
+        ).order_by('-fecha')
+
+        # Historial de registros en el rango de fechas
         context['registros'] = RegistroAsistencia.objects.filter(
             id_trabajador=trabajador,
             fecha__range=[fecha_inicio, fecha_fin]
@@ -333,15 +478,16 @@ class ResumenTrabajadorView(DetailView):
 
         context['registro_hoy'] = RegistroAsistencia.objects.filter(
             id_trabajador=trabajador,
-            fecha=date.today()
+            fecha=hoy
         ).first()
 
         return context
     
-@method_decorator(rol_requerido('trabajador'), name='dispatch')
+@method_decorator(rol_requerido('admin', 'jefe', 'trabajador'), name='dispatch')
 class RegistrarMiAsistenciaView(View):
     """
-    Vista que permite al trabajador registrar su propia entrada y salida.
+    Vista que permite al trabajador (o jefe/admin) registrar su propia entrada y salida.
+    - Valida que tenga jornada vigente asignada
     - Entrada si no tiene entrada registrada
     - Salida si ya tiene entrada pero no salida
     """
@@ -350,6 +496,12 @@ class RegistrarMiAsistenciaView(View):
         """Mostrar la página de registro de asistencia"""
         trabajador = request.user.perfil.id_trabajador
         hoy = date.today()
+        
+        # Verificar si tiene jornada vigente y día inhábil
+        from .utils import obtener_jornada_vigente, trabajador_debe_asistir, es_dia_inhabil, obtener_resumen_asistencia_trabajador
+        jornada_vigente = obtener_jornada_vigente(trabajador, hoy)
+        debe_asistir, razon = trabajador_debe_asistir(trabajador, hoy)
+        dia_inhabil = es_dia_inhabil(hoy)
         
         # Obtener registro de hoy si existe
         registro_hoy = RegistroAsistencia.objects.filter(
@@ -362,11 +514,25 @@ class RegistrarMiAsistenciaView(View):
             id_trabajador=trabajador
         ).order_by('-fecha')[:10]
         
+        # Obtener resumen de asistencias (últimos 30 días)
+        fecha_fin = hoy
+        fecha_inicio = hoy - timedelta(days=30)
+        resumen = obtener_resumen_asistencia_trabajador(trabajador, fecha_inicio, fecha_fin)
+        
         context = {
             'trabajador': trabajador,
             'registro_hoy': registro_hoy,
             'ultimos_registros': ultimos_registros,
             'fecha_actual': hoy,
+            'jornada_vigente': jornada_vigente,
+            'debe_asistir': debe_asistir,
+            'razon_no_asistir': razon if not debe_asistir else None,
+            'es_dia_inhabil': dia_inhabil,
+            # Resumen estadístico
+            'asistencias': resumen.get('asistencias', 0),
+            'retardos': resumen.get('retardos', 0),
+            'faltas': resumen.get('faltas', 0),
+            'porcentaje_asistencia': resumen.get('porcentaje_asistencia', 0),
         }
         
         return render(request, 'asistencias/mi_registro.html', context)
@@ -375,6 +541,40 @@ class RegistrarMiAsistenciaView(View):
         trabajador = request.user.perfil.id_trabajador
         hoy = date.today()
         hora_actual = datetime.now().time()
+        
+        # Verificar si es día inhábil
+        from .utils import obtener_jornada_vigente, trabajador_debe_asistir, calcular_estatus_asistencia, es_dia_inhabil
+        
+        if es_dia_inhabil(hoy):
+            messages.error(request, "Hoy es día festivo/inhábil. No se puede registrar asistencia.")
+            return redirect('asistencias:mi_registro')
+        
+        jornada_vigente = obtener_jornada_vigente(trabajador, hoy)
+        
+        # Si no tiene jornada vigente, avisar pero permitir registrar lo que alcanzó
+        if not jornada_vigente:
+            # Verificar si ya tiene registro de hoy (pudo haber tenido jornada al inicio del día)
+            registro_existente = RegistroAsistencia.objects.filter(
+                id_trabajador=trabajador,
+                fecha=hoy
+            ).first()
+            
+            if registro_existente:
+                if not registro_existente.hora_salida:
+                    registro_existente.hora_salida = hora_actual
+                    registro_existente.save()
+                    messages.warning(
+                        request, 
+                        "Ya no tienes jornada asignada para hoy, pero se registró tu salida con lo que alcanzaste."
+                    )
+                else:
+                    messages.warning(request, "Tu registro de hoy ya está completo.")
+            else:
+                messages.error(
+                    request, 
+                    "No tienes una jornada asignada vigente. Contacta a tu supervisor."
+                )
+            return redirect('asistencias:mi_registro')
 
         registro, creado = RegistroAsistencia.objects.get_or_create(
             id_trabajador=trabajador,

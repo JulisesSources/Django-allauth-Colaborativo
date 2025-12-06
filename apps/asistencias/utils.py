@@ -1,3 +1,4 @@
+# apps/asistencias/utils.py
 
 from datetime import datetime, date, timedelta
 from django.db.models import Q
@@ -235,25 +236,34 @@ def obtener_resumen_asistencia_trabajador(trabajador, fecha_inicio, fecha_fin):
         fecha__range=[fecha_inicio, fecha_fin]
     )
 
+    asistencias = registros.filter(estatus='ASI').count()
+    retardos = registros.filter(estatus='RET').count()
+    faltas = registros.filter(estatus='FAL').count()
+    justificadas = registros.filter(estatus='JUS').count()
+
+    total_registros = asistencias + retardos + faltas + justificadas
+
     resumen = {
         'total_dias': (fecha_fin - fecha_inicio).days + 1,
-        'asistencias': registros.filter(estatus='ASI').count(),
-        'retardos': registros.filter(estatus='RET').count(),
-        'faltas': registros.filter(estatus='FAL').count(),
-        'faltas_justificadas': registros.filter(estatus='JUS').count(),
-        'porcentaje_asistencia': 0
+        'asistencias': asistencias,
+        'retardos': retardos,
+        'faltas': faltas,
+        'faltas_justificadas': justificadas,
+        'total_registros': total_registros,
+        'porcentaje_asistencia': 0,
+        'porcentaje_retardos': 0,
+        'porcentaje_faltas': 0,
     }
 
-    dias_laborales_reales = (
-        resumen['asistencias'] +
-        resumen['retardos'] +
-        resumen['faltas']
-    )
-
-    if dias_laborales_reales > 0:
+    if total_registros > 0:
         resumen['porcentaje_asistencia'] = round(
-            (resumen['asistencias'] + resumen['retardos']) / dias_laborales_reales * 100,
-            2
+            asistencias / total_registros * 100, 1
+        )
+        resumen['porcentaje_retardos'] = round(
+            retardos / total_registros * 100, 1
+        )
+        resumen['porcentaje_faltas'] = round(
+            (faltas + justificadas) / total_registros * 100, 1
         )
 
     return resumen
