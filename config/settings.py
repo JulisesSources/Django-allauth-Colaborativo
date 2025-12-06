@@ -122,6 +122,7 @@ ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT = config('ACCOUNT_LOGIN_ATTEMPTS_TIMEOUT', defaul
 
 LOGIN_REDIRECT_URL = 'accounts:dashboard'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGOUT_ON_GET = True  # Permite cerrar sesión con enlaces GET
 # Para usuarios que no están logueados
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/accounts/login/'
 
