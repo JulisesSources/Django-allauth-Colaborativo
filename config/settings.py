@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'apps.jornadas_laborales',
     'apps.asistencias',
     'apps.reportes',
+
+    # Required for django-browser-reload
+    'django_browser_reload',
 ]
 
 MIDDLEWARE = [
@@ -55,6 +58,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',  # Requerido por allauth
+    'django_browser_reload.middleware.BrowserReloadMiddleware',  # Required for django-browser-reload
 ]
 
 ROOT_URLCONF = 'config.urls'
