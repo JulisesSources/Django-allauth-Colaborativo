@@ -1,81 +1,148 @@
 {% extends 'base.html' %}
 
 {% block title %}{% if object %}Editar Jornada{% else %}Nueva Jornada{% endif %}{% endblock %}
-{% block page_title %}{% if object %}Editar Jornada{% else %}Registrar Jornada{% endif %}{% endblock %}
-{% block page_subtitle %}Gestión de horarios laborales{% endblock %}
+{% block page_title %}{% if object %}Editar Jornada{% else %}Nueva Jornada{% endif %}{% endblock %}
+{% block page_subtitle %}{% if object %}Modifica los datos de la jornada laboral{% else %}Configura un nuevo horario de trabajo{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto bg-gray-800 border border-gray-700 shadow rounded-lg p-8">
+<div class="max-w-2xl mx-auto">
+    
+    <!-- Botón volver -->
+    <div class="mb-6">
+        <a href="{% url 'jornadas:list' %}" 
+           class="inline-flex items-center text-gray-400 hover:text-white transition">
+            <i class="fas fa-arrow-left mr-2"></i>Volver a jornadas
+        </a>
+    </div>
 
-    <h2 class="text-2xl font-bold text-white mb-6">
-        {% if object %}
-            Editar Jornada Laboral
-        {% else %}
-            Registrar Nueva Jornada
-        {% endif %}
-    </h2>
-
-    <form method="post" class="space-y-6">
-        {% csrf_token %}
-
-        <!-- Campo: Tipo de Jornada -->
-        <div>
-            <label class="block text-gray-300 font-semibold mb-2">Tipo de Jornada</label>
-            {{ form.descripcion }}
-            {% if form.descripcion.errors %}
-                <p class="text-red-400 text-sm mt-1">{{ form.descripcion.errors.0 }}</p>
-            {% endif %}
+    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
+        
+        <!-- Header del formulario -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-clock text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">
+                        {% if object %}Editar Jornada{% else %}Nueva Jornada Laboral{% endif %}
+                    </h2>
+                    <p class="text-blue-100 text-sm">
+                        {% if object %}ID: {{ object.pk }}{% else %}Complete los datos del horario{% endif %}
+                    </p>
+                </div>
+            </div>
         </div>
 
-        <!-- Campo: Hora de Entrada -->
-        <div>
-            <label class="block text-gray-300 font-semibold mb-2">Hora de Entrada</label>
-            {{ form.hora_entrada }}
-            {% if form.hora_entrada.errors %}
-                <p class="text-red-400 text-sm mt-1">{{ form.hora_entrada.errors.0 }}</p>
-            {% endif %}
-        </div>
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
 
-        <!-- Campo: Hora de Salida -->
-        <div>
-            <label class="block text-gray-300 font-semibold mb-2">Hora de Salida</label>
-            {{ form.hora_salida }}
-            {% if form.hora_salida.errors %}
-                <p class="text-red-400 text-sm mt-1">{{ form.hora_salida.errors.0 }}</p>
-            {% endif %}
-        </div>
-
-        <!-- Campo: Días Laborables -->
-        <div>
-            <label class="block text-gray-300 font-semibold mb-2">Días Laborales</label>
-
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-3 text-white">
-                {% for checkbox in form.dias %}
-                    <label class="flex items-center space-x-2 bg-gray-700 p-2 rounded border border-gray-600">
-                        {{ checkbox.tag }}
-                        <span class="text-gray-200">{{ checkbox.choice_label }}</span>
-                    </label>
-                {% endfor %}
+            <!-- Campo: Tipo de Jornada -->
+            <div class="space-y-2">
+                <label class="flex items-center text-sm font-medium text-gray-300">
+                    <i class="fas fa-tag text-blue-400 mr-2"></i>Tipo de Jornada
+                </label>
+                <div class="relative">
+                    {{ form.descripcion }}
+                </div>
+                {% if form.descripcion.errors %}
+                    <p class="text-red-400 text-sm flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ form.descripcion.errors.0 }}
+                    </p>
+                {% endif %}
             </div>
 
-            {% if form.dias.errors %}
-                <p class="text-red-400 text-sm mt-1">{{ form.dias.errors.0 }}</p>
-            {% endif %}
-        </div>
+            <!-- Horarios en grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Campo: Hora de Entrada -->
+                <div class="space-y-2">
+                    <label class="flex items-center text-sm font-medium text-gray-300">
+                        <i class="fas fa-sign-in-alt text-green-400 mr-2"></i>Hora de Entrada
+                    </label>
+                    <div class="relative">
+                        {{ form.hora_entrada }}
+                    </div>
+                    {% if form.hora_entrada.errors %}
+                        <p class="text-red-400 text-sm flex items-center">
+                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.hora_entrada.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
 
-        <!-- Botones -->
-        <div class="flex justify-between mt-8">
-            <a href="{% url 'jornadas:list' %}"
-               class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded">
-                Cancelar
-            </a>
+                <!-- Campo: Hora de Salida -->
+                <div class="space-y-2">
+                    <label class="flex items-center text-sm font-medium text-gray-300">
+                        <i class="fas fa-sign-out-alt text-red-400 mr-2"></i>Hora de Salida
+                    </label>
+                    <div class="relative">
+                        {{ form.hora_salida }}
+                    </div>
+                    {% if form.hora_salida.errors %}
+                        <p class="text-red-400 text-sm flex items-center">
+                            <i class="fas fa-exclamation-circle mr-1"></i>{{ form.hora_salida.errors.0 }}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
 
-            <button type="submit"
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
-                Guardar
-            </button>
-        </div>
+            <!-- Campo: Días Laborables -->
+            <div class="space-y-3">
+                <label class="flex items-center text-sm font-medium text-gray-300">
+                    <i class="fas fa-calendar-week text-purple-400 mr-2"></i>Días Laborales
+                </label>
+                <p class="text-xs text-gray-500">Selecciona los días en que aplica esta jornada</p>
 
-    </form>
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                    {% for checkbox in form.dias %}
+                        <label class="relative cursor-pointer">
+                            <input type="checkbox" name="dias" value="{{ checkbox.data.value }}"
+                                   {% if checkbox.data.selected %}checked{% endif %}
+                                   class="peer sr-only">
+                            <div class="flex flex-col items-center justify-center p-3 rounded-xl border-2 border-gray-600 bg-gray-700/50 
+                                        peer-checked:border-blue-500 peer-checked:bg-blue-900/30 
+                                        hover:border-gray-500 transition-all">
+                                <span class="text-2xl mb-1">
+                                    {% if checkbox.data.label == 'Lunes' %}📅{% endif %}
+                                    {% if checkbox.data.label == 'Martes' %}📅{% endif %}
+                                    {% if checkbox.data.label == 'Miércoles' %}📅{% endif %}
+                                    {% if checkbox.data.label == 'Jueves' %}📅{% endif %}
+                                    {% if checkbox.data.label == 'Viernes' %}📅{% endif %}
+                                    {% if checkbox.data.label == 'Sábado' %}🌤️{% endif %}
+                                    {% if checkbox.data.label == 'Domingo' %}☀️{% endif %}
+                                </span>
+                                <span class="text-xs font-medium text-gray-300 peer-checked:text-blue-300">
+                                    {{ checkbox.data.label|slice:":3" }}
+                                </span>
+                            </div>
+                            <div class="absolute top-1 right-1 w-4 h-4 bg-blue-500 rounded-full hidden peer-checked:flex items-center justify-center">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                        </label>
+                    {% endfor %}
+                </div>
+
+                {% if form.dias.errors %}
+                    <p class="text-red-400 text-sm flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ form.dias.errors.0 }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- Botones -->
+            <div class="flex items-center justify-between pt-6 border-t border-gray-700">
+                <a href="{% url 'jornadas:list' %}"
+                   class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg font-medium transition flex items-center">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </a>
+
+                <button type="submit"
+                        class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition flex items-center shadow-lg shadow-blue-600/20">
+                    <i class="fas fa-save mr-2"></i>
+                    {% if object %}Actualizar{% else %}Crear Jornada{% endif %}
+                </button>
+            </div>
+
+        </form>
+    </div>
 </div>
 {% endblock %}

@@ -5,29 +5,69 @@
 {% block page_subtitle %}Esta acción no se puede deshacer{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto bg-gray-800 border border-gray-700 shadow rounded-lg p-8">
-
-    <h3 class="text-lg font-semibold text-white">Confirmar eliminación</h3>
-
-    <p class="mt-3 text-gray-300">
-        Vas a eliminar la jornada:
-        <strong class="text-red-400">{{ object.get_descripcion_display }}</strong><br>
-        Esta acción es irreversible.
-    </p>
-
-    <form method="post" class="mt-6">
-        {% csrf_token %}
-
-        <button type="submit"
-                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
-            Eliminar definitivamente
-        </button>
-
-        <a href="{% url 'jornadas:detail' object.pk %}"
-           class="ml-4 text-gray-300 hover:text-gray-100">
-            Cancelar
+<div class="max-w-lg mx-auto">
+    
+    <!-- Botón volver -->
+    <div class="mb-6">
+        <a href="{% url 'jornadas:list' %}" 
+           class="inline-flex items-center text-gray-400 hover:text-white transition">
+            <i class="fas fa-arrow-left mr-2"></i>Volver a jornadas
         </a>
-    </form>
+    </div>
 
+    <div class="bg-gray-800 border border-red-700/50 rounded-xl shadow-lg overflow-hidden">
+        
+        <!-- Header de advertencia -->
+        <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-5">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Confirmar Eliminación</h2>
+                    <p class="text-red-100">Esta acción es permanente e irreversible</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-6">
+            <!-- Info de la jornada a eliminar -->
+            <div class="bg-red-900/20 border border-red-700/50 rounded-xl p-4 mb-6">
+                <p class="text-gray-300 mb-2">Vas a eliminar la jornada:</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-red-900/50 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-clock text-red-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-white">{{ object.get_descripcion_display }}</p>
+                        <p class="text-sm text-gray-400">
+                            {{ object.hora_entrada|time:"H:i" }} - {{ object.hora_salida|time:"H:i" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-gray-400 text-sm mb-6">
+                <i class="fas fa-info-circle text-yellow-500 mr-2"></i>
+                Si la jornada tiene trabajadores asignados, no podrá ser eliminada.
+            </p>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="flex items-center justify-between">
+                    <a href="{% url 'jornadas:list' %}"
+                       class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg font-medium transition flex items-center">
+                        <i class="fas fa-times mr-2"></i>Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition flex items-center shadow-lg shadow-red-600/20">
+                        <i class="fas fa-trash-alt mr-2"></i>Eliminar Definitivamente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
