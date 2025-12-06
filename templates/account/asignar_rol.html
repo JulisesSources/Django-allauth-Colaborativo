@@ -3,186 +3,278 @@
 {% block title %}Asignar Rol - SCA-B123{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto space-y-6">
+<div class="space-y-6">
 
-    <!-- Header Banner -->
-    <div class="bg-gradient-to-r from-purple-600 to-purple-800 rounded-xl shadow-lg overflow-hidden relative">
-        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-10"></div>
-        <div class="relative z-10 px-8 py-6 flex items-center gap-4">
-            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <i class="fas fa-user-tag text-2xl text-white"></i>
+    <!-- Header con Breadcrumb -->
+    <div class="space-y-4">
+        <!-- Breadcrumb
+        <nav class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <a href="{% url 'home' %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <i class="fas fa-home"></i>
+            </a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <a href="{% url 'accounts:lista_usuarios' %}" class="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                Gestión de Usuarios
+            </a>
+            <i class="fas fa-chevron-right text-xs"></i>
+            <span class="text-gray-700 dark:text-gray-300 font-medium">Asignar Rol</span>
+        </nav>
+ -->
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-700 dark:to-purple-900 rounded-xl shadow-xl overflow-hidden relative">
+            <div class="absolute inset-0 bg-white/5 backdrop-blur-sm"></div>
+            <div class="relative z-10 px-6 md:px-8 py-6 flex flex-col md:flex-row items-center gap-4">
+                <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm shadow-lg">
+                    <i class="fas fa-user-shield text-3xl text-white"></i>
+                </div>
+                <div class="text-white text-center md:text-left flex-1">
+                    <h1 class="text-2xl md:text-3xl font-bold">Asignar Rol a Usuario</h1>
+                    <p class="text-purple-100 text-sm mt-1">Gestión de permisos y accesos del sistema</p>
+                </div>
             </div>
-            <div class="text-white">
-                <h1 class="text-2xl font-bold">Asignar Rol a Usuario</h1>
-                <p class="text-purple-100 text-sm">Gestión de permisos y accesos del sistema</p>
-            </div>
+            
+            <!-- Decorative circles -->
+            <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
         </div>
-        
-        <!-- Decorative circles -->
-        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-        <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
     </div>
 
     <!-- User Information Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-        <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-700 px-6 py-5 border-b border-gray-200 dark:border-gray-600">
-            <div class="flex items-center gap-4">
-                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg ring-4 ring-white dark:ring-gray-800">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden transition-colors duration-300">
+        <!-- User Header -->
+        <div class="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-750 px-6 py-5 border-b border-gray-200 dark:border-gray-600">
+            <div class="flex flex-col md:flex-row items-center md:items-start gap-4">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-3xl shadow-lg ring-4 ring-white dark:ring-gray-800">
                     {{ usuario.username|first|upper|default:"?" }}
                 </div>
-                <div class="flex-1">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                <div class="flex-1 text-center md:text-left">
+                    <h3 class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                         {{ usuario.username }}
                     </h3>
-                    <p class="text-gray-600 dark:text-gray-400 flex items-center gap-2 mt-1">
+                    <p class="text-gray-600 dark:text-gray-400 flex items-center justify-center md:justify-start gap-2 mt-1">
                         <i class="fas fa-envelope text-sm"></i>
                         {{ usuario.email }}
                     </p>
+                    <div class="mt-3 flex items-center justify-center md:justify-start gap-2">
+                        <span class="text-xs text-gray-500 dark:text-gray-400">Miembro desde:</span>
+                        <span class="text-xs font-medium text-gray-700 dark:text-gray-300">
+                            <i class="fas fa-calendar-alt mr-1"></i>
+                            {{ usuario.date_joined|date:"d/m/Y" }}
+                        </span>
+                    </div>
                 </div>
-                <div class="text-right">
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">Rol Actual</p>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold
-                        {% if perfil.rol == 'administrador' %}bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300
-                        {% elif perfil.rol == 'jefe_area' %}bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300
-                        {% else %}bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300{% endif %}">
-                        <i class="fas fa-shield-alt mr-1.5"></i>
+                <div class="text-center md:text-right">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mb-2 font-medium uppercase tracking-wider">Rol Actual</p>
+                    <span class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold shadow-sm
+                        {% if perfil.rol == 'administrador' %}bg-gradient-to-r from-purple-100 to-purple-200 text-purple-800 dark:from-purple-900/40 dark:to-purple-800/40 dark:text-purple-300
+                        {% elif perfil.rol == 'jefe_area' %}bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 dark:from-blue-900/40 dark:to-blue-800/40 dark:text-blue-300
+                        {% else %}bg-gradient-to-r from-green-100 to-green-200 text-green-800 dark:from-green-900/40 dark:to-green-800/40 dark:text-green-300{% endif %}">
+                        <i class="fas fa-shield-alt mr-2"></i>
                         {{ perfil.get_rol_display }}
                     </span>
+                </div>
+            </div>
+            
+            <!-- Security Warning -->
+            <div class="mt-4 bg-gradient-to-r from-yellow-50 to-amber-50 dark:from-yellow-900/20 dark:to-amber-900/20 border-l-4 border-yellow-500 dark:border-yellow-400 rounded-r-lg p-4 flex items-start gap-3">
+                <div class="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-yellow-900 dark:text-yellow-100 text-xs mb-1 flex items-center gap-2">
+                        <i class="fas fa-shield-alt"></i>
+                        Advertencia de Seguridad
+                    </h4>
+                    <p class="text-xs text-yellow-800 dark:text-yellow-200 leading-relaxed">
+                        Al cambiar el rol de un usuario, sus permisos se actualizarán inmediatamente. Asegúrate de asignar el rol correcto según las responsabilidades del usuario en el sistema.
+                    </p>
                 </div>
             </div>
         </div>
 
         <!-- Form -->
-        <div class="p-8">
+        <div class="px-6 pt-2 pb-6 md:px-8 md:pt-2 md:pb-8">
             <form method="post" class="space-y-6">
                 {% csrf_token %}
 
                 {% if form.non_field_errors %}
                 <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-800 dark:text-red-200 px-4 py-3 rounded-lg flex items-start gap-3">
-                    <i class="fas fa-exclamation-circle mt-0.5"></i>
-                    <div>{{ form.non_field_errors }}</div>
+                    <i class="fas fa-exclamation-circle mt-0.5 text-lg"></i>
+                    <div class="flex-1">{{ form.non_field_errors }}</div>
                 </div>
                 {% endif %}
 
                 <!-- Rol Selection -->
-                <div>
-                    <label for="{{ form.rol.id_for_label }}" class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                        <i class="fas fa-user-shield text-purple-500 mr-2"></i>
+                <div class="space-y-4">
+                    <label for="{{ form.rol.id_for_label }}" class="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3">
+                        <i class="fas fa-user-shield text-purple-600 dark:text-purple-400 mr-2"></i>
                         Seleccionar Nuevo Rol
                     </label>
                     
                     <div class="relative">
-                        {{ form.rol }}
+                        <select name="{{ form.rol.name }}" id="{{ form.rol.id_for_label }}" 
+                                class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200 appearance-none cursor-pointer">
+                            {% for value, label in form.rol.field.choices %}
+                            <option value="{{ value }}" {% if form.rol.value == value %}selected{% endif %}>{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                     </div>
 
                     {% if form.rol.errors %}
-                    <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
                         <i class="fas fa-exclamation-circle"></i>
                         {{ form.rol.errors.0 }}
                     </p>
                     {% endif %}
 
-                    <!-- Role Descriptions -->
-                    <div class="mt-4 space-y-3">
-                        <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                            Descripción de Roles
-                        </p>
-                        
-                        <div class="bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500 dark:border-purple-400 p-4 rounded-r-lg">
-                            <div class="flex items-start gap-3">
-                                <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-crown text-purple-600 dark:text-purple-400"></i>
+                    <!-- Role Descriptions (Expandable) -->
+                    <div class="mt-6">
+                        <details class="group bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden transition-all duration-300">
+                            <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+                                <div class="flex items-center gap-2">
+                                    <i class="fas fa-info-circle text-blue-500 dark:text-blue-400"></i>
+                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                                        Ver Descripción de Roles
+                                    </span>
                                 </div>
-                                <div>
-                                    <p class="font-semibold text-purple-900 dark:text-purple-200 text-sm mb-1">
-                                        Administrador
-                                    </p>
-                                    <p class="text-sm text-purple-800 dark:text-purple-300">
-                                        Acceso completo al sistema, gestión de usuarios, configuraciones y reportes globales.
-                                    </p>
+                                <span class="group-open:rotate-180 transition-transform duration-200">
+                                    <i class="fas fa-chevron-down text-gray-500 dark:text-gray-400"></i>
+                                </span>
+                            </summary>
+                            
+                            <div class="p-4 space-y-3 border-t border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800">
+                                
+                                <!-- Admin -->
+                                <div class="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 border-l-4 border-purple-600 dark:border-purple-400 p-4 rounded-r-lg hover:shadow-md transition-shadow duration-200">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-crown text-purple-600 dark:text-purple-400 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-purple-900 dark:text-purple-200 text-sm mb-1 flex items-center gap-2">
+                                                Administrador
+                                                <span class="text-xs bg-purple-200 dark:bg-purple-800/40 px-2 py-0.5 rounded">Acceso Total</span>
+                                            </p>
+                                            <p class="text-sm text-purple-800 dark:text-purple-300 leading-relaxed">
+                                                Acceso completo al sistema, gestión de usuarios, configuraciones y reportes globales.
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
+                                
+                                <!-- Jefe -->
+                                <div class="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 border-l-4 border-blue-600 dark:border-blue-400 p-4 rounded-r-lg hover:shadow-md transition-shadow duration-200">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-user-tie text-blue-600 dark:text-blue-400 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-blue-900 dark:text-blue-200 text-sm mb-1 flex items-center gap-2">
+                                                Jefe de Área
+                                                <span class="text-xs bg-blue-200 dark:bg-blue-800/40 px-2 py-0.5 rounded">Supervisión</span>
+                                            </p>
+                                            <p class="text-sm text-blue-800 dark:text-blue-300 leading-relaxed">
+                                                Gestión de incidencias, supervisión de trabajadores y acceso a reportes de su área.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Trabajador -->
+                                <div class="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 border-l-4 border-green-600 dark:border-green-400 p-4 rounded-r-lg hover:shadow-md transition-shadow duration-200">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-10 h-10 bg-green-100 dark:bg-green-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-user text-green-600 dark:text-green-400 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-green-900 dark:text-green-200 text-sm mb-1 flex items-center gap-2">
+                                                Trabajador
+                                                <span class="text-xs bg-green-200 dark:bg-green-800/40 px-2 py-0.5 rounded">Básico</span>
+                                            </p>
+                                            <p class="text-sm text-green-800 dark:text-green-300 leading-relaxed">
+                                                Visualización de información personal, registro de asistencias e incidencias propias.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- En Espera -->
+                                <div class="bg-gradient-to-r from-yellow-50 to-amber-100 dark:from-yellow-900/20 dark:to-amber-800/20 border-l-4 border-yellow-500 dark:border-yellow-400 p-4 rounded-r-lg hover:shadow-md transition-shadow duration-200">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-10 h-10 bg-yellow-100 dark:bg-yellow-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
+                                            <i class="fas fa-clock text-yellow-600 dark:text-yellow-400 text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-yellow-900 dark:text-yellow-200 text-sm mb-1 flex items-center gap-2">
+                                                En Espera
+                                                <span class="text-xs bg-yellow-200 dark:bg-yellow-800/40 px-2 py-0.5 rounded">Sin Acceso</span>
+                                            </p>
+                                            <p class="text-sm text-yellow-800 dark:text-yellow-300 leading-relaxed">
+                                                Usuario registrado sin permisos específicos o validación pendiente. Acceso limitado.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
-                        </div>
-                        
-                        <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-4 rounded-r-lg">
-                            <div class="flex items-start gap-3">
-                                <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-user-tie text-blue-600 dark:text-blue-400"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-blue-900 dark:text-blue-200 text-sm mb-1">
-                                        Jefe de Área
-                                    </p>
-                                    <p class="text-sm text-blue-800 dark:text-blue-300">
-                                        Gestión de incidencias, supervisión de trabajadores y acceso a reportes de su área.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 dark:border-green-400 p-4 rounded-r-lg">
-                            <div class="flex items-start gap-3">
-                                <div class="w-8 h-8 bg-green-100 dark:bg-green-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
-                                    <i class="fas fa-user text-green-600 dark:text-green-400"></i>
-                                </div>
-                                <div>
-                                    <p class="font-semibold text-green-900 dark:text-green-200 text-sm mb-1">
-                                        Trabajador
-                                    </p>
-                                    <p class="text-sm text-green-800 dark:text-green-300">
-                                        Visualización de información personal, registro de asistencias e incidencias propias.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        </details>
                     </div>
                 </div>
 
-                <div>
+                <!-- Trabajador Selection -->
+                <div class="space-y-3">
                     <label for="{{ form.id_trabajador.id_for_label }}"
-                        class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-id-card mr-1"></i> {{ form.id_trabajador.label }}
+                        class="block text-sm font-bold text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-id-card text-blue-600 dark:text-blue-400 mr-2"></i> 
+                        {{ form.id_trabajador.label }}
                     </label>
 
-                    {{ form.id_trabajador }}
+                    <select name="{{ form.id_trabajador.name }}" id="{{ form.id_trabajador.id_for_label }}"
+                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 appearance-none cursor-pointer">
+                        {% for value, label in form.id_trabajador.field.choices %}
+                        <option value="{{ value }}" {% if form.id_trabajador.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
 
                     {% if form.id_trabajador.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.id_trabajador.errors.0 }}</p>
+                    <p class="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ form.id_trabajador.errors.0 }}
+                    </p>
                     {% endif %}
 
                     {% if form.id_trabajador.help_text %}
-                    <p class="mt-1 text-sm text-gray-500">
-                        <i class="fas fa-info-circle"></i> {{ form.id_trabajador.help_text }}
+                    <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 flex items-start gap-2">
+                        <i class="fas fa-info-circle mt-0.5"></i>
+                        <span>{{ form.id_trabajador.help_text }}</span>
                     </p>
                     {% endif %}
                 </div>
 
-                <div class="flex space-x-4 pt-4">
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                     <button type="submit"
-                        class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2">
+                        class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 transform hover:scale-105">
                         <i class="fas fa-save"></i>
                         Guardar Cambios
                     </button>
                     <a href="{% url 'accounts:lista_usuarios' %}"
-                        class="flex-1 px-6 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 flex items-center justify-center gap-2">
-                        <i class="fas fa-times"></i>
-                        Cancelar
+                        class="flex-1 px-6 py-3 bg-white dark:bg-gray-700 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver
                     </a>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Security Warning -->
-    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4 flex items-start gap-3">
-        <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 mt-1"></i>
-        <div>
-            <h4 class="font-semibold text-yellow-900 dark:text-yellow-100 text-sm">Advertencia de Seguridad</h4>
-            <p class="text-sm text-yellow-800 dark:text-yellow-200 mt-1">
-                Al cambiar el rol de un usuario, sus permisos se actualizarán inmediatamente. Asegúrate de asignar el rol correcto según las responsabilidades del usuario.
-            </p>
-        </div>
-    </div>
-
 </div>
+
+<style>
+    /* Custom select styling */
+    select {
+        background-image: none;
+    }
+</style>
 {% endblock %}
