@@ -1,7 +1,13 @@
+# apps/jornadas_laborales/models.py
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
+
+# =========================================================
+#   JORNADA LABORAL (Horarios de trabajo)
+# =========================================================
 
 class JornadaLaboral(models.Model):
     """
@@ -100,6 +106,11 @@ class JornadaLaboral(models.Model):
                 'hora_salida': 'La hora de salida debe ser mayor a la hora de entrada'
             })
 
+
+# =========================================================
+#   DÍAS DE LA JORNADA (L, M, Mi, J, V, S, D)
+# =========================================================
+
 class JornadaDias(models.Model):
     """
     Modelo para asignar días de la semana a una jornada laboral
@@ -136,6 +147,10 @@ class JornadaDias(models.Model):
     def __str__(self):
         return f"{self.id_jornada.descripcion} - {self.get_numero_dia_display()}"
 
+
+# =========================================================
+#   CALENDARIO LABORAL (Días festivos/inhábiles)
+# =========================================================
 
 class CalendarioLaboral(models.Model):
     """
@@ -178,11 +193,11 @@ class CalendarioLaboral(models.Model):
         return f"{self.fecha.strftime('%d/%m/%Y')} - {estado}"
 
 
+# =========================================================
+#   ASIGNACIÓN TRABAJADOR-JORNADA (Quién trabaja en qué horario)
+# =========================================================
+
 class TrabajadorJornada(models.Model):
-    """
-    Modelo para asignar jornadas laborales a trabajadores
-    (relación N:M entre Trabajador y JornadaLaboral con fechas)
-    """
     id_trabajador_jornada = models.AutoField(primary_key=True)
     
     # Foreign Keys

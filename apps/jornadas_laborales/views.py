@@ -1,11 +1,14 @@
-from datetime import date
+# apps/jornadas_laborales/views.py
+
+from datetime import date, timedelta
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.http import Http404
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Exists, OuterRef
+from django.db.models.deletion import ProtectedError
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 )
@@ -45,9 +48,16 @@ class JornadaListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
+        hoy = date.today()
+        # Anotamos con trabajadores activos (fecha_fin NULL o futura)
         qs = JornadaLaboral.objects.prefetch_related('dias').annotate(
             num_dias=Count('dias', distinct=True),
-            num_trabajadores=Count('trabajadores_asignados', distinct=True)
+            num_trabajadores=Count('trabajadores_asignados', distinct=True),
+            num_trabajadores_activos=Count(
+                'trabajadores_asignados',
+                filter=Q(trabajadores_asignados__fecha_fin__isnull=True) | Q(trabajadores_asignados__fecha_fin__gte=hoy),
+                distinct=True
+            )
         ).order_by('descripcion')
 
         user = self.request.user
@@ -67,16 +77,70 @@ class JornadaListView(LoginRequiredMixin, ListView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+        hoy = date.today()
 
-        context['total_jornadas'] = JornadaLaboral.objects.count()
+        # Base queryset según rol
+        if user.perfil.es_jefe():
+            unidad = user.perfil.id_trabajador.id_unidad
+            jornadas_qs = JornadaLaboral.objects.filter(
+                Q(created_by=user) |
+                Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
+            ).distinct()
+            trabajadores_qs = Trabajador.objects.filter(id_unidad=unidad)
+        else:
+            # Admin ve todo
+            jornadas_qs = JornadaLaboral.objects.all()
+            trabajadores_qs = Trabajador.objects.all()
 
-        # Jornadas activas = las que tienen al menos un trabajador con fecha_fin NULL
-        context['jornadas_activas'] = JornadaLaboral.objects.filter(
-            trabajadores_asignados__fecha_fin__isnull=True
-        ).distinct().count()
+        # 1. Total de jornadas
+        context['total_jornadas'] = jornadas_qs.count()
 
-        # Jornadas en uso = similar a activas
-        context['jornadas_en_uso'] = context['jornadas_activas']
+        # 2. Jornadas en uso (tienen al menos un trabajador con asignación vigente)
+        jornadas_en_uso = jornadas_qs.filter(
+            Exists(
+                TrabajadorJornada.objects.filter(
+                    id_jornada=OuterRef('pk')
+                ).filter(
+                    Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
+                )
+            )
+        ).count()
+        context['jornadas_en_uso'] = jornadas_en_uso
+
+        # 3. Jornadas sin uso (no tienen trabajadores vigentes)
+        context['jornadas_sin_uso'] = context['total_jornadas'] - jornadas_en_uso
+
+        # 4. Trabajadores sin jornada vigente
+        trabajadores_con_jornada = TrabajadorJornada.objects.filter(
+            Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
+        ).values_list('id_trabajador', flat=True)
+        context['trabajadores_sin_jornada'] = trabajadores_qs.exclude(
+            id_trabajador__in=trabajadores_con_jornada
+        ).count()
+
+        # 5. Días inhábiles próximos (próximos 30 días)
+        fecha_limite = hoy + timedelta(days=30)
+        context['dias_inhabiles_proximos'] = CalendarioLaboral.objects.filter(
+            fecha__gte=hoy,
+            fecha__lte=fecha_limite,
+            es_inhabil=True
+        ).count()
+
+        # 6. Asignaciones para el tab de asignaciones
+        if user.perfil.es_jefe():
+            context['asignaciones'] = TrabajadorJornada.objects.filter(
+                id_trabajador__id_unidad=unidad
+            ).select_related('id_trabajador', 'id_jornada').order_by('-fecha_inicio')[:20]
+        else:
+            context['asignaciones'] = TrabajadorJornada.objects.all().select_related(
+                'id_trabajador', 'id_jornada'
+            ).order_by('-fecha_inicio')[:20]
+
+        # 7. Calendario laboral para el tab de calendario
+        context['dias_calendario'] = CalendarioLaboral.objects.filter(
+            fecha__gte=hoy - timedelta(days=30)
+        ).order_by('fecha')[:30]
 
         return context
 
@@ -128,16 +192,22 @@ class JornadaDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         jornada = self.get_object()
+        hoy = date.today()
 
         context['dias_asignados'] = jornada.dias.all().order_by('numero_dia')
+        context['hoy'] = hoy
+        
+        # Trabajadores vigentes = fecha_fin NULL o >= hoy
         context['trabajadores_vigentes'] = TrabajadorJornada.objects.filter(
-            id_jornada=jornada,
-            fecha_fin__isnull=True
+            id_jornada=jornada
+        ).filter(
+            Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
         ).select_related('id_trabajador')
 
         context['trabajadores_historicos'] = TrabajadorJornada.objects.filter(
             id_jornada=jornada,
-            fecha_fin__isnull=False
+            fecha_fin__isnull=False,
+            fecha_fin__lt=hoy
         ).select_related('id_trabajador').order_by('-fecha_fin')[:5]
 
         return context
@@ -190,6 +260,14 @@ class JornadaUpdateView(LoginRequiredMixin, UpdateView):
     form_class = JornadaLaboralForm
     template_name = 'jornadas_laborales/form_jornada.html'
     success_url = reverse_lazy('jornadas:list')
+
+    def get_initial(self):
+        initial = super().get_initial()
+        # Cargar los días existentes de la jornada
+        jornada = self.get_object()
+        dias_existentes = list(jornada.dias.values_list('numero_dia', flat=True))
+        initial['dias'] = [str(d) for d in dias_existentes]
+        return initial
 
     def form_valid(self, form):
         jornada = form.save(commit=False)
@@ -252,11 +330,22 @@ class JornadaDeleteView(LoginRequiredMixin, DeleteView):
             )
             return redirect(self.success_url)
         
-        messages.success(
-            request,
-            f"Jornada '{jornada.descripcion}' eliminada exitosamente"
-        )
-        return super().delete(request, *args, **kwargs)
+        try:
+            messages.success(
+                request,
+                f"Jornada '{jornada.descripcion}' eliminada exitosamente"
+            )
+            return super().delete(request, *args, **kwargs)
+        except ProtectedError:
+            messages.error(
+                request,
+                f"No se puede eliminar '{jornada.descripcion}' porque tiene registros relacionados protegidos"
+            )
+            return redirect(self.success_url)
+    
+    def post(self, request, *args, **kwargs):
+        """Manejo alternativo para formularios POST"""
+        return self.delete(request, *args, **kwargs)
     
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -449,9 +538,15 @@ class AsignacionCreateView(LoginRequiredMixin, CreateView):
                 id_unidad=unidad,
                 activo=True
             )
+            # Filtrar jornadas: las creadas por el jefe o que tengan trabajadores de su unidad
+            form.fields['id_jornada'].queryset = JornadaLaboral.objects.filter(
+                Q(created_by=user) |
+                Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
+            ).distinct()
         else:
             # Admin → todos
             form.fields['id_trabajador'].queryset = Trabajador.objects.filter(activo=True)
+            form.fields['id_jornada'].queryset = JornadaLaboral.objects.all()
 
         return form
 
@@ -511,8 +606,14 @@ class AsignacionUpdateView(LoginRequiredMixin, UpdateView):
                 id_unidad=unidad,
                 activo=True
             )
+            # Filtrar jornadas: las creadas por el jefe o que tengan trabajadores de su unidad
+            form.fields['id_jornada'].queryset = JornadaLaboral.objects.filter(
+                Q(created_by=user) |
+                Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
+            ).distinct()
         else:
             form.fields['id_trabajador'].queryset = Trabajador.objects.filter(activo=True)
+            form.fields['id_jornada'].queryset = JornadaLaboral.objects.all()
 
         return form
 
@@ -566,6 +667,8 @@ class MiJornadaView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        hoy = date.today()
+        context['hoy'] = hoy
 
         # Verificar si el usuario tiene un trabajador asociado
         if not hasattr(self.request.user.perfil, 'id_trabajador') or not self.request.user.perfil.id_trabajador:
@@ -579,12 +682,13 @@ class MiJornadaView(LoginRequiredMixin, TemplateView):
 
         trabajador = self.request.user.perfil.id_trabajador
 
-        # Buscar jornada activa
+        # Buscar jornada vigente (fecha_fin NULL o >= hoy)
         jornada_asignada = TrabajadorJornada.objects.select_related(
             'id_jornada'
         ).filter(
-            id_trabajador=trabajador,
-            fecha_fin__isnull=True
+            id_trabajador=trabajador
+        ).filter(
+            Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
         ).first()
 
         context['trabajador'] = trabajador
@@ -592,5 +696,14 @@ class MiJornadaView(LoginRequiredMixin, TemplateView):
         
         if jornada_asignada:
             context['dias_laborales'] = jornada_asignada.id_jornada.dias.all().order_by('numero_dia')
+        
+        # Todas las jornadas vigentes del trabajador
+        context['jornadas_vigentes'] = TrabajadorJornada.objects.select_related(
+            'id_jornada'
+        ).filter(
+            id_trabajador=trabajador
+        ).filter(
+            Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
+        ).order_by('-fecha_inicio')
         
         return context

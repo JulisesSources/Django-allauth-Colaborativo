@@ -1,3 +1,5 @@
+# apps/jornadas_laborales/forms.py
+
 from django import forms
 from django.db.models import Q
 from datetime import date
@@ -37,15 +39,15 @@ class JornadaLaboralForm(forms.ModelForm):
 
         widgets = {
             'descripcion': forms.Select(attrs={
-                'class': 'w-full rounded border px-3 py-2 focus:ring-2 focus:ring-blue-500'
+                'class': 'w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition'
             }),
             'hora_entrada': forms.TimeInput(attrs={
                 'type': 'time',
-                'class': 'w-full rounded border px-3 py-2 focus:ring-2 focus:ring-blue-500'
+                'class': 'w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition'
             }),
             'hora_salida': forms.TimeInput(attrs={
                 'type': 'time',
-                'class': 'w-full rounded border px-3 py-2 focus:ring-2 focus:ring-blue-500'
+                'class': 'w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition'
             }),
         }
 
@@ -72,13 +74,13 @@ class CalendarioLaboralForm(forms.ModelForm):
         widgets = {
             'fecha': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500'
+                'class': 'w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition'
             }),
             'es_inhabil': forms.CheckboxInput(attrs={
-                'class': 'h-4 w-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500'
+                'class': 'w-6 h-6 bg-gray-900 border-gray-600 rounded text-red-500 focus:ring-red-500 focus:ring-2 cursor-pointer'
             }),
             'descripcion': forms.TextInput(attrs={
-                'class': 'w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500',
+                'class': 'w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition placeholder-gray-500',
                 'placeholder': 'Ej: Día de la Independencia'
             }),
         }
@@ -124,18 +126,18 @@ class AsignarJornadaForm(forms.ModelForm):
         fields = ['id_trabajador', 'id_jornada', 'fecha_inicio', 'fecha_fin']
         widgets = {
             'id_trabajador': forms.Select(attrs={
-                'class': 'w-full rounded border px-3 py-2 focus:ring-2 focus:ring-blue-500'
+                'class': 'w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition'
             }),
             'id_jornada': forms.Select(attrs={
-                'class': 'w-full rounded border px-3 py-2 focus:ring-2 focus:ring-blue-500'
+                'class': 'w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition'
             }),
             'fecha_inicio': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'w-full rounded border px-3 py-2 focus:ring-2 focus:ring-blue-500'
+                'class': 'w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition'
             }),
             'fecha_fin': forms.DateInput(attrs={
                 'type': 'date',
-                'class': 'w-full rounded border px-3 py-2 focus:ring-2 focus:ring-blue-500'
+                'class': 'w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-green-500 focus:border-green-500 transition'
             }),
         }
         labels = {
