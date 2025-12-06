@@ -1,40 +1,111 @@
 {% extends "base.html" %}
 
-{% block title %}{{ form.instance.pk|yesno:"Editar Día,Nuevo Día" }}{% endblock %}
-{% block page_title %}{{ form.instance.pk|yesno:"Editar Día del Calendario,Nuevo Día del Calendario" }}{% endblock %}
+{% block title %}{{ form.instance.pk|yesno:"Editar Día,Nuevo Día" }} - Calendario{% endblock %}
+{% block page_title %}{{ form.instance.pk|yesno:"Editar Día,Nuevo Día" }}{% endblock %}
+{% block page_subtitle %}{{ form.instance.pk|yesno:"Modifica el día del calendario,Agrega un día al calendario laboral" }}{% endblock %}
 
 {% block content %}
-<div class="bg-white p-6 rounded shadow max-w-xl mx-auto">
+<div class="max-w-xl mx-auto">
+    
+    <!-- Botón volver -->
+    <div class="mb-6">
+        <a href="{% url 'jornadas:list' %}" 
+           class="inline-flex items-center text-gray-400 hover:text-white transition">
+            <i class="fas fa-arrow-left mr-2"></i>Volver a jornadas
+        </a>
+    </div>
 
-    <form method="POST">
-        {% csrf_token %}
-
-        <div class="mb-4">
-            <label class="block font-medium mb-1">Fecha:</label>
-            {{ form.fecha }}
+    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
+        
+        <!-- Header del formulario -->
+        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-5">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-calendar-alt text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">
+                        {{ form.instance.pk|yesno:"Editar Día del Calendario,Nuevo Día del Calendario" }}
+                    </h2>
+                    <p class="text-purple-100 text-sm">
+                        {{ form.instance.pk|yesno:"Modifica la configuración del día,Registra días inhábiles o festivos" }}
+                    </p>
+                </div>
+            </div>
         </div>
 
-        <div class="mb-4">
-            <label class="block font-medium mb-1">¿Es inhábil?</label>
-            {{ form.es_inhabil }}
-        </div>
+        <form method="POST" class="p-6 space-y-5">
+            {% csrf_token %}
 
-        <div class="mb-4">
-            <label class="block font-medium mb-1">Descripción:</label>
-            {{ form.descripcion }}
-        </div>
+            <!-- Fecha -->
+            <div class="space-y-2">
+                <label class="flex items-center text-sm font-medium text-gray-300">
+                    <i class="fas fa-calendar-day text-blue-400 mr-2"></i>Fecha
+                </label>
+                <div class="relative">
+                    {{ form.fecha }}
+                </div>
+                {% for error in form.fecha.errors %}
+                    <p class="text-red-400 text-sm flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ error }}
+                    </p>
+                {% endfor %}
+            </div>
 
-        <div class="flex justify-between mt-6">
-            <a href="{% url 'jornadas:calendario' %}" class="text-gray-600 hover:underline">
-                ← Cancelar
-            </a>
+            <!-- Es inhábil - Switch estilizado -->
+            <div class="space-y-2">
+                <label class="flex items-center text-sm font-medium text-gray-300 mb-3">
+                    <i class="fas fa-toggle-on text-yellow-400 mr-2"></i>Tipo de día
+                </label>
+                
+                <div class="bg-gray-900/50 border border-gray-700 rounded-xl p-4">
+                    <label class="flex items-center justify-between cursor-pointer">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-red-900/50 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-times-circle text-red-400"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-medium">Marcar como día inhábil</p>
+                                <p class="text-xs text-gray-500">El sistema no contará este día como laborable</p>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            {{ form.es_inhabil }}
+                        </div>
+                    </label>
+                </div>
+            </div>
 
-            <button type="submit" 
-                    class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded">
-                Guardar
-            </button>
-        </div>
-    </form>
+            <!-- Descripción -->
+            <div class="space-y-2">
+                <label class="flex items-center text-sm font-medium text-gray-300">
+                    <i class="fas fa-comment-alt text-green-400 mr-2"></i>Descripción
+                </label>
+                <div class="relative">
+                    {{ form.descripcion }}
+                </div>
+                <p class="text-xs text-gray-500">Ej: Día de la Independencia, Navidad, etc.</p>
+                {% for error in form.descripcion.errors %}
+                    <p class="text-red-400 text-sm flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ error }}
+                    </p>
+                {% endfor %}
+            </div>
 
+            <!-- Botones -->
+            <div class="flex items-center justify-between pt-6 border-t border-gray-700">
+                <a href="{% url 'jornadas:list' %}"
+                   class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg font-medium transition flex items-center">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </a>
+
+                <button type="submit"
+                        class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition flex items-center shadow-lg shadow-purple-600/20">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+            </div>
+
+        </form>
+    </div>
 </div>
 {% endblock %}

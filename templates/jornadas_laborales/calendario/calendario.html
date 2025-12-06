@@ -1,64 +1,99 @@
 {% extends "base.html" %}
 {% block title %}Calendario Laboral{% endblock %}
 {% block page_title %}Calendario Laboral{% endblock %}
+{% block page_subtitle %}Días inhábiles y festivos del sistema{% endblock %}
 
 {% block content %}
-<div class="flex items-center justify-between mb-4">
-    <h2 class="text-lg font-semibold">Calendario Laboral</h2>
+<div class="space-y-6">
 
-   {% if user.perfil.es_admin or user.perfil.es_jefe %}
-    <a href="{% url 'jornadas:calendario_crear' %}" 
-       class="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg text-sm">
-        ➕ Nuevo día
-    </a>
-    {% endif %}
-</div>
+    <!-- Botón volver -->
+    <div>
+        <a href="{% url 'jornadas:list' %}" 
+           class="inline-flex items-center text-gray-400 hover:text-white transition">
+            <i class="fas fa-arrow-left mr-2"></i>Volver a jornadas
+        </a>
+    </div>
 
-<div class="bg-white rounded shadow p-4">
-    <table class="w-full table-auto">
-        <thead>
-            <tr class="text-left text-sm text-gray-600 border-b">
-                <th class="p-2">Fecha</th>
-                <th class="p-2">Tipo</th>
-                <th class="p-2">Descripción</th>
-                {% if user.perfil.es_admin or user.perfil.es_jefe %}
-                <th class="p-2 text-center">Acciones</th>
-                {% endif %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for dia in dias_calendario %}
-            <tr class="border-b hover:bg-gray-50">
-                <td class="p-2">{{ dia.fecha|date:"d/m/Y" }}</td>
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h2 class="text-xl font-semibold text-white flex items-center">
+                <i class="fas fa-calendar-alt text-purple-400 mr-3"></i>Calendario Laboral
+            </h2>
+            <p class="text-sm text-gray-400 mt-1">Gestiona los días inhábiles, festivos y excepciones</p>
+        </div>
 
-                <td class="p-2">
-                    {% if dia.es_inhabil %}
-                        <span class="px-2 py-1 bg-red-100 text-red-700 rounded">Inhábil</span>
-                    {% else %}
-                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded">Hábil</span>
-                    {% endif %}
-                </td>
+        {% if user.perfil.es_admin or user.perfil.es_jefe %}
+        <a href="{% url 'jornadas:calendario_crear' %}"
+           class="inline-flex items-center px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition shadow-lg shadow-purple-600/20">
+            <i class="fas fa-plus mr-2"></i>Nuevo Día
+        </a>
+        {% endif %}
+    </div>
 
-                <td class="p-2">{{ dia.descripcion|default:"—" }}</td>
+    <!-- Lista de días -->
+    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
+        <div class="p-6">
+            <div class="grid gap-3">
+                {% for dia in dias_calendario %}
+                <div class="bg-gray-900/50 border border-gray-700 rounded-xl p-4 hover:border-gray-600 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    
+                    <!-- Fecha con icono -->
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 {% if dia.es_inhabil %}bg-gradient-to-br from-red-600 to-red-700{% else %}bg-gradient-to-br from-green-600 to-green-700{% endif %} rounded-xl flex flex-col items-center justify-center shadow">
+                            <span class="text-white text-xs uppercase">{{ dia.fecha|date:"M" }}</span>
+                            <span class="text-white font-bold text-xl leading-none">{{ dia.fecha|date:"d" }}</span>
+                        </div>
+                        <div>
+                            <p class="text-white font-semibold">{{ dia.fecha|date:"l, d F Y" }}</p>
+                            {% if dia.descripcion %}
+                            <p class="text-sm text-gray-400">{{ dia.descripcion }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
 
-                {% if user.perfil.es_admin or user.perfil.es_jefe %}
-                <td class="p-2 text-center">
-                    <a href="{% url 'jornadas:calendario_editar' dia.pk %}" 
-                       class="text-yellow-600 hover:underline text-sm mr-4">Editar</a>
+                    <div class="flex items-center gap-4">
+                        <!-- Tipo -->
+                        <div>
+                            {% if dia.es_inhabil %}
+                                <span class="inline-flex items-center px-3 py-1.5 bg-red-900/50 text-red-400 rounded-lg text-sm">
+                                    <i class="fas fa-ban mr-2"></i>Inhábil
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-3 py-1.5 bg-green-900/50 text-green-400 rounded-lg text-sm">
+                                    <i class="fas fa-check mr-2"></i>Hábil
+                                </span>
+                            {% endif %}
+                        </div>
 
-                    <a href="{% url 'jornadas:calendario_eliminar' dia.pk %}" 
-                       class="text-red-600 hover:underline text-sm">Eliminar</a>
-                </td>
-                {% endif %}
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="p-4 text-center text-gray-500">
-                    No hay eventos en el calendario.
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                        <!-- Acciones -->
+                        {% if user.perfil.es_admin or user.perfil.es_jefe %}
+                        <div class="flex items-center gap-2">
+                            <a href="{% url 'jornadas:calendario_editar' dia.pk %}"
+                               class="p-2 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-900/30 rounded-lg transition"
+                               title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'jornadas:calendario_eliminar' dia.pk %}"
+                               class="p-2 text-red-400 hover:text-red-300 hover:bg-red-900/30 rounded-lg transition"
+                               title="Eliminar">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-calendar-times text-gray-500 text-2xl"></i>
+                    </div>
+                    <p class="text-gray-400 font-medium">No hay días especiales registrados</p>
+                    <p class="text-gray-500 text-sm mt-1">Agrega días inhábiles o festivos al calendario</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

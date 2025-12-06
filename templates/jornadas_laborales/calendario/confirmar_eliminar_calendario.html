@@ -1,33 +1,79 @@
 {% extends "base.html" %}
 {% block title %}Eliminar Día{% endblock %}
 {% block page_title %}Eliminar Día del Calendario{% endblock %}
+{% block page_subtitle %}Esta acción no se puede deshacer{% endblock %}
 
 {% block content %}
-<div class="bg-white rounded shadow p-6 max-w-xl mx-auto text-center">
+<div class="max-w-lg mx-auto">
+    
+    <!-- Botón volver -->
+    <div class="mb-6">
+        <a href="{% url 'jornadas:list' %}" 
+           class="inline-flex items-center text-gray-400 hover:text-white transition">
+            <i class="fas fa-arrow-left mr-2"></i>Volver a jornadas
+        </a>
+    </div>
 
-    <p class="text-lg">¿Seguro que deseas eliminar este día?</p>
-
-    <p class="mt-3 text-gray-700">
-        <strong>{{ object.fecha|date:"d/m/Y" }}</strong> — 
-        {% if object.es_inhabil %}Inhábil{% else %}Hábil{% endif %}
-    </p>
-
-    <p class="text-gray-600 mt-2">{{ object.descripcion|default:"(sin descripción)" }}</p>
-
-    <form method="post" class="mt-6">
-        {% csrf_token %}
+    <div class="bg-gray-800 border border-red-700/50 rounded-xl shadow-lg overflow-hidden">
         
-        <div class="flex justify-center gap-4">
-            <a href="{% url 'jornadas:calendario' %}"
-               class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300">
-                Cancelar
-            </a>
-
-            <button type="submit"
-                    class="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700">
-                Eliminar
-            </button>
+        <!-- Header de advertencia -->
+        <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-5">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-calendar-times text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Eliminar Día del Calendario</h2>
+                    <p class="text-red-100">¿Seguro que deseas eliminar este día?</p>
+                </div>
+            </div>
         </div>
-    </form>
+
+        <div class="p-6">
+            <!-- Info del día a eliminar -->
+            <div class="bg-red-900/20 border border-red-700/50 rounded-xl p-4 mb-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-xl flex flex-col items-center justify-center
+                        {% if object.es_inhabil %}bg-red-900/50{% else %}bg-green-900/50{% endif %}">
+                        <span class="text-xs uppercase {% if object.es_inhabil %}text-red-400{% else %}text-green-400{% endif %}">
+                            {{ object.fecha|date:"M" }}
+                        </span>
+                        <span class="text-xl font-bold {% if object.es_inhabil %}text-red-300{% else %}text-green-300{% endif %}">
+                            {{ object.fecha|date:"d" }}
+                        </span>
+                    </div>
+                    <div>
+                        <p class="text-lg font-semibold text-white">{{ object.fecha|date:"l, d F Y" }}</p>
+                        <p class="text-sm text-gray-400">{{ object.descripcion|default:"Sin descripción" }}</p>
+                        {% if object.es_inhabil %}
+                            <span class="mt-2 inline-flex items-center px-2 py-0.5 bg-red-900/50 text-red-300 text-xs rounded-full">
+                                <i class="fas fa-times-circle mr-1"></i>Inhábil
+                            </span>
+                        {% else %}
+                            <span class="mt-2 inline-flex items-center px-2 py-0.5 bg-green-900/50 text-green-300 text-xs rounded-full">
+                                <i class="fas fa-check-circle mr-1"></i>Hábil
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="flex items-center justify-between">
+                    <a href="{% url 'jornadas:list' %}"
+                       class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg font-medium transition flex items-center">
+                        <i class="fas fa-times mr-2"></i>Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition flex items-center shadow-lg shadow-red-600/20">
+                        <i class="fas fa-trash-alt mr-2"></i>Eliminar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
