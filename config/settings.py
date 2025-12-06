@@ -127,7 +127,7 @@ ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/accounts/login/'
 
 # Para usuarios que ya están logueados
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/accounts/dashboard/'
-
+ACCOUNT_UNIQUE_EMAIL = True
 
 # ==================================
 # EMAIL CONFIGURATION (MailHog)

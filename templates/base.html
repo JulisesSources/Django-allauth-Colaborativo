@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}SCA-B123 - Sistema de Control de Asistencia{% endblock %}</title>
-    
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Configuración básica de Tailwind -->
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -25,187 +30,293 @@
             }
         }
     </script>
-    
-    <!-- Estilos básicos para evitar FOUC -->
-    <style>
-        /* Ocultar contenido hasta que Tailwind cargue */
-        .tailwind-loading {
-            display: none;
-        }
-    </style>
-    
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
-    
+
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
+
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-50">
-    <!-- Contenido principal -->
-    <div class="flex min-h-screen">
+
+<body class="bg-slate-100 dark:bg-gray-900 font-sans text-gray-600 dark:text-gray-300 transition-colors duration-300">
+    <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <aside class="bg-primary-700 text-white w-64 fixed inset-y-0 left-0 z-50">
-            <div class="p-4 border-b border-primary-600">
-                <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                        <span class="text-primary-700 text-lg">⏰</span>
-                    </div>
-                    <div>
-                        <h1 class="text-lg font-bold">SCA-B123</h1>
-                        <p class="text-primary-200 text-xs">Control de Asistencia</p>
-                    </div>
+        <aside id="sidebar"
+            class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:flex flex-col z-10 transition-colors duration-300">
+            <!-- Logo -->
+            <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-700">
+                <div class="flex items-center gap-2 font-bold text-xl text-gray-800 dark:text-white">
+                    <span class="text-2xl">🕒</span>
+                    <span>SCA-B123</span>
                 </div>
             </div>
-            
-            <nav class="p-4">
-                <ul class="space-y-2">
-                    <li>
-                        <a href="{% url 'accounts:dashboard' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
-                            <span>📊</span>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'trabajadores:index' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
-                            <span>👥</span>
-                            <span>Trabajadores</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'unidades:lista' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
-                            <span>🏢</span>
-                            <span>Unidades</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'asistencias:index' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
-                            <span>✅</span>
-                            <span>Asistencias</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'incidencias:index' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
-                            <span>📝</span>
-                            <span>Incidencias</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'reportes:index' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
-                            <span>📈</span>
-                            <span>Reportes</span>
-                        </a>
-                    </li>
-                    {% if user.perfil.rol == "trabajador" %}
-                    <li><a href="{% url 'jornadas:mi_jornada' %}">Mi Jornada</a></li>
-                    {% endif %}
+
+            <!-- Navigation -->
+            <div class="flex-1 overflow-y-auto py-4">
+                <nav class="px-4 space-y-8">
+                    <!-- Principal -->
+                    <div>
+                        <h3
+                            class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-2">
+                            Principal
+                        </h3>
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="{% url 'home' %}"
+                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
+                                    <i class="fas fa-th-large w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    <span class="font-medium">Dashboard</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Gestión -->
+                    <div>
+                        <h3
+                            class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-2">
+                            Gestión</h3>
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="{% url 'trabajadores:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
+                                    <i class="fas fa-users w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    <span class="font-medium">Trabajadores</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'unidades:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
+                                    <i class="fas fa-building w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    <span class="font-medium">Unidades Admin.</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'jornadas_laborales:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
+                                    <i class="fas fa-clock w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    <span class="font-medium">Jornadas y Horarios</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Control -->
+                    <div>
+                        <h3
+                            class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-2">
+                            Control</h3>
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="{% url 'asistencias:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
+                                    <i class="fas fa-clipboard-check w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    <span class="font-medium">Asistencias</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'incidencias:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
+                                    <i
+                                        class="fas fa-exclamation-triangle w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    <span class="font-medium">Incidencias</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'reportes:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
+                                    <i class="fas fa-chart-bar w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    <span class="font-medium">Reportes</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                     {% if user.is_staff %}
-                    <li class="pt-4 border-t border-primary-600">
-                        <a href="{% url 'admin:index' %}" class="flex items-center space-x-3 p-2 rounded-lg hover:bg-primary-600 transition-colors">
-                            <span>⚙️</span>
-                            <span>Administración</span>
-                        </a>
-                    </li>
+                    <!-- Administración -->
+                    <div>
+                        <h3
+                            class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-2">
+                            Sistema</h3>
+                        <ul class="space-y-1">
+                            <li>
+                                <a href="{% url 'admin:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
+                                    <i class="fas fa-cog w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    <span class="font-medium">Administración</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                     {% endif %}
-                </ul>
-            </nav>
+                </nav>
+            </div>
         </aside>
 
-        <!-- Contenido principal -->
-        <main class="flex-1 ml-64">
-            <!-- Header -->
-            <header class="bg-white shadow-sm border-b">
-                <div class="flex items-center justify-between p-4">
-                    <div>
-                        <h1 class="text-2xl font-bold text-gray-800">
-                            {% block page_title %}Sistema de Control de Asistencia{% endblock %}
-                        </h1>
-                        <p class="text-gray-600 text-sm">
-                            {% block page_subtitle %}Apartado B del Artículo 123 Constitucional{% endblock %}
-                        </p>
-                    </div>
-                    
-                    <div class="flex items-center space-x-4">
-                        {% if user.is_authenticated %}
-                            <div class="text-right">
-                                <p class="text-sm font-medium text-gray-800">
-                                    {{ user.get_full_name|default:user.username }}
-                                </p>
-                                <p class="text-xs text-gray-600">
-                                    {% if user.perfil %}
-                                        <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                                            {{ user.perfil.get_rol_display }}
-                                        </span>
-                                    {% else %}
-                                        <span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">
-                                            Sin rol asignado
-                                        </span>
-                                    {% endif %}
-                                </p>
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navbar -->
+            <header
+                class="h-16 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between px-6 z-10 transition-colors duration-300">
+                <!-- Left: Mobile Menu -->
+                <div class="flex items-center gap-4">
+                    <button id="mobileMenuToggle"
+                        class="md:hidden text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Center: Live Clock -->
+                <div id="liveClock"
+                    class="hidden md:block font-mono text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wide">
+                </div>
+
+                <!-- Right: Icons & Profile -->
+                <div class="flex items-center gap-6">
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle"
+                        class="text-gray-400 hover:text-blue-600 dark:hover:text-yellow-400 transition-colors">
+                        <i id="sunIcon" class="fas fa-sun text-lg hidden"></i>
+                        <i id="moonIcon" class="fas fa-moon text-lg"></i>
+                    </button>
+
+                    <div class="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
+
+                    <!-- User Profile Dropdown -->
+                    <div class="relative">
+                        <button id="userMenuButton" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                            <div class="text-right hidden sm:block">
+                                <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+                                    {{ user.get_full_name|default:user.username|default:"Usuario" }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    {% if user.is_staff %}Admin{% else%}Personal{% endif %}</p>
                             </div>
-                            <div class="w-10 h-10 bg-primary-500 rounded-full flex items-center justify-center text-white font-bold">
-                                {{ user.first_name|first|default:user.username|first|upper }}
+                            <div
+                                class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 overflow-hidden border-2 border-white dark:border-gray-600 shadow-sm flex items-center justify-center text-white font-semibold">
+                                {{ user.username|default:'U'|slice:":1"|upper }}
                             </div>
-                            <a href="{% url 'account_logout' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-sm transition-colors">
-                                Cerrar Sesión
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div id="userMenu"
+                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-2 hidden z-20">
+                            <a href="{% url 'accounts:mi_perfil' %}"
+                                class="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <i class="fas fa-user-circle mr-2"></i> Perfil
                             </a>
-                        {% else %}
-                            <a href="{% url 'account_login' %}" class="bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-lg text-sm transition-colors">
-                                Iniciar Sesión
+                            <a href="{% url 'account_logout' %}"
+                                class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+                                <i class="fas fa-sign-out-alt w-4"></i>
+                                <span>Cerrar Sesión</span>
                             </a>
-                        {% endif %}
+                        </div>
                     </div>
                 </div>
             </header>
 
-            <!-- Contenido de la página -->
-            <div class="p-6">
-                <!-- Mensajes de Django -->
+            <!-- Page Content -->
+            <main
+                class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-100 dark:bg-gray-900 p-6 transition-colors duration-300">
                 {% if messages %}
-                    <div class="mb-6 space-y-2">
-                        {% for message in messages %}
-                            <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-200
-                                {% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200
-                                {% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-200
-                                {% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %}">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
+                <div class="mb-6 space-y-2">
+                    {% for message in messages %}
+                    <div
+                        class="p-4 rounded-lg flex items-start gap-3 {% if message.tags == 'success' %}bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800{% elif message.tags == 'error' %}bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800{% elif message.tags == 'warning' %}bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800{% else %}bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800{% endif %}">
+                        <i
+                            class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mt-0.5"></i>
+                        <span>{{ message }}</span>
                     </div>
+                    {% endfor %}
+                </div>
                 {% endif %}
 
                 {% block content %}
                 {% endblock %}
-            </div>
-
-            <!-- Footer -->
-            <footer class="bg-white border-t mt-auto py-4">
-                <div class="px-6">
-                    <div class="flex items-center justify-between">
-                        <div class="text-sm text-gray-600">
-                            <strong>SCA-B123</strong> - Sistema de Control de Asistencia 
-                            &copy; {% now "Y" %} - Instituto Tecnológico de Ciudad Guzmán
-                        </div>
-                        <div class="text-sm text-gray-500">
-                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                                v0.1-dev
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-        </main>
+            </main>
+        </div>
     </div>
 
-    <!-- Script para manejar la carga de Tailwind -->
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Una vez que la página cargue, ocultamos el loader si existe
-        document.addEventListener('DOMContentLoaded', function() {
-            // Si hay un elemento de loading, lo ocultamos
-            const loadingElement = document.getElementById('tailwind-loading');
-            if (loadingElement) {
-                loadingElement.style.display = 'none';
+        // Dark Mode Logic
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        const html = document.documentElement;
+
+        // Check local storage or system preference
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            html.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            if (html.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
             }
         });
-    </script>
 
+        // User Menu Dropdown
+        const userMenuButton = document.getElementById('userMenuButton');
+        const userMenu = document.getElementById('userMenu');
+
+        userMenuButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenu.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userMenuButton.contains(e.target) && !userMenu.contains(e.target)) {
+                userMenu.classList.add('hidden');
+            }
+        });
+
+        // Live Clock Logic
+        function updateClock() {
+            const now = new Date();
+            const options = {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            const timeString = now.toLocaleString('es-ES', options).replace(',', ' -');
+
+            const clockElement = document.getElementById('liveClock');
+            if (clockElement) {
+                clockElement.textContent = timeString;
+            }
+        }
+
+        // Update immediately and then every second
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Mobile Menu Toggle (basic implementation)
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+
+        mobileMenuToggle?.addEventListener('click', () => {
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('flex');
+        });
+    </script>
     {% block extra_scripts %}{% endblock %}
 </body>
+
 </html>
