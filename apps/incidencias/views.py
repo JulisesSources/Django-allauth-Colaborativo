@@ -399,3 +399,36 @@ def crear_tipo_incidencia(request):
         'titulo': 'Registrar Tipo de Incidencia',
         'boton': 'Guardar',
     })
+    
+@admin_requerido
+def lista_tipos_incidencia(request):
+    """Lista de tipos de incidencia (solo admin)."""
+    tipos = TipoIncidencia.objects.all().order_by('descripcion')
+
+    return render(request, 'incidencias/tipos_listado.html', {
+        'tipos': tipos,
+        'titulo': 'Tipos de Incidencia',
+    })
+    
+@admin_requerido
+def editar_tipo_incidencia(request, pk):
+    """Editar un tipo de incidencia existente."""
+    tipo = get_object_or_404(TipoIncidencia, pk=pk)
+
+    if request.method == 'POST':
+        form = TipoIncidenciaForm(request.POST, instance=tipo)
+        if form.is_valid():
+            tipo = form.save(commit=False)
+            tipo.updated_by = request.user
+            tipo.save()
+
+            messages.success(request, "Tipo de incidencia actualizado correctamente.")
+            return redirect('incidencias:lista_tipos_incidencia')
+    else:
+        form = TipoIncidenciaForm(instance=tipo)
+
+    return render(request, 'incidencias/tipo_incidencia_form.html', {
+        'form': form,
+        'titulo': 'Editar Tipo de Incidencia',
+        'boton': 'Actualizar',
+    })
