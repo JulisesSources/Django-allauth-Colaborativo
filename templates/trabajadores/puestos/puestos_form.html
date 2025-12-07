@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if form.instance.pk %}Editar Puesto{% else %}Nuevo Puesto{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+    {% if form.instance.pk %}Editar Puesto{% else %}Nuevo Puesto{% endif %}
+</h1>
+
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 border border-gray-200 dark:border-gray-700">
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Nombre -->
+            <div>
+                <label class="block text-sm font-medium mb-1">Nombre del Puesto</label>
+                {{ form.nombre_puesto }}
+            </div>
+
+            <!-- Nivel -->
+            <div>
+                <label class="block text-sm font-medium mb-1">Nivel</label>
+                {{ form.nivel }}
+            </div>
+
+        </div>
+
+        <div class="flex gap-4">
+            <button type="submit"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow">
+                Guardar
+            </button>
+
+            <a href="{% url 'trabajadores:puestos-lista' %}"
+               class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ form.instance.pk|yesno:"Editar Unidad,Crear Unidad" }}
+{% endblock %}
+
+{% block content %}
+
+<h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+    {{ form.instance.pk|yesno:"Editar Unidad,Crear Unidad" }}
+</h1>
+
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 border border-gray-200 dark:border-gray-700">
+
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+
+        <div class="space-y-4">
+            {{ form.as_p }}
+        </div>
+
+        <div class="flex gap-4 mt-6">
+            <button type="submit"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow">
+                Guardar
+            </button>
+
+            <a href="{% url 'unidades:lista' %}"
+               class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow">
+                Cancelar
+            </a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

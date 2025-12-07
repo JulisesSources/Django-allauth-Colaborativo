@@ -2,6 +2,7 @@
 
 from django import forms
 from django.core.exceptions import ValidationError
+from apps.trabajadores.models import Trabajador
 from .models import Incidencia, TipoIncidencia
 # from apps.workers.models import Trabajador   # ← Aún no existe, lo comentamos
 
@@ -62,30 +63,28 @@ class IncidenciaForm(forms.ModelForm):
         # ===========================================================
         #  SECCIÓN DE TRABAJADORES — DESACTIVADA TEMPORALMENTE
         # ===========================================================
-        #
-        # queryset_trab = Trabajador.objects.filter(activo=True)
-        #
-        # if perfil:
-        #
-        #     if perfil.es_admin():
-        #         self.fields['id_trabajador'].queryset = queryset_trab
-        #
-        #     elif perfil.es_jefe():
-        #         if perfil.id_trabajador and perfil.id_trabajador.id_unidad:
-        #             unidad = perfil.id_trabajador.id_unidad
-        #             self.fields['id_trabajador'].queryset = queryset_trab.filter(id_unidad=unidad)
-        #         else:
-        #             self.fields['id_trabajador'].queryset = queryset_trab.none()
-        #
-        #     elif perfil.es_trabajador():
-        #         if perfil.id_trabajador:
-        #             self.fields['id_trabajador'].queryset = queryset_trab.filter(id=perfil.id_trabajador.id)
-        #             self.fields['id_trabajador'].initial = perfil.id_trabajador
-        #             self.fields['id_trabajador'].widget = forms.HiddenInput()
-        #         else:
-        #             self.fields['id_trabajador'].queryset = queryset_trab.none()
-        #
-        # ===========================================================
+        
+        queryset_trab = Trabajador.objects.filter(activo=True)
+        
+        if perfil:
+            if perfil.es_admin():
+                 self.fields['id_trabajador'].queryset = queryset_trab
+        
+            elif perfil.es_jefe():
+                    if perfil.id_trabajador and perfil.id_trabajador.id_unidad:
+                        unidad = perfil.id_trabajador.id_unidad
+                        self.fields['id_trabajador'].queryset = queryset_trab.filter(id_unidad=unidad)
+                    else:
+                        self.fields['id_trabajador'].queryset = queryset_trab.none()
+        
+            elif perfil.es_trabajador():
+                if perfil.id_trabajador:
+                    self.fields['id_trabajador'].queryset = queryset_trab.filter(id=perfil.id_trabajador.id)
+                    self.fields['id_trabajador'].initial = perfil.id_trabajador
+                    self.fields['id_trabajador'].widget = forms.HiddenInput()
+                else:
+                    self.fields['id_trabajador'].queryset = queryset_trab.none()
+
 
         # Validación dinámica de fechas
         self.fields['fecha_inicio'].required = True
