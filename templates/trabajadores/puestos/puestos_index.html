@@ -1,47 +1,67 @@
 {% extends 'base.html' %}
 
+{% block title %}Listado de Puestos{% endblock %}
+
 {% block content %}
 
 <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">Listado de Puestos</h1>
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">
+        Listado de Puestos
+    </h1>
 
     <a href="{% url 'trabajadores:puestos-crear' %}"
-       class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
+       class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow">
         + Agregar Puesto
     </a>
 </div>
 
-<div class="overflow-x-auto">
-    <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg">
-        <thead class="bg-gray-100">
-            <tr>
-                <th class="py-2 px-3 text-left text-sm font-semibold">Nombre del Puesto</th>
-                <th class="py-2 px-3 text-left text-sm font-semibold">Nivel</th>
-                <th class="py-2 px-3 text-center text-sm font-semibold">Acciones</th>
-            </tr>
-        </thead>
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow p-6 border border-gray-200 dark:border-gray-700">
 
-        <tbody class="divide-y divide-gray-200">
-            {% for p in puestos %}
-            <tr>
-                <td class="py-2 px-3">{{ p.nombre_puesto }}</td>
-                <td class="py-2 px-3">{{ p.nivel }}</td>
+    <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+        <table class="min-w-full text-sm">
 
-                <td class="py-2 px-3 text-center space-x-2">
-                    <a href="{% url 'trabajadores:puestos-editar' p.id_puesto %}"
-                       class="text-blue-600 hover:underline">Editar</a>
+            <thead class="bg-gray-100 dark:bg-gray-700/40 text-gray-700 dark:text-gray-300">
+                <tr>
+                    <th class="py-3 px-4 text-left font-semibold">Nombre del Puesto</th>
+                    <th class="py-3 px-4 text-left font-semibold">Nivel</th>
+                    <th class="py-3 px-4 text-center font-semibold">Acciones</th>
+                </tr>
+            </thead>
 
-                    <a href="{% url 'trabajadores:puestos-eliminar' p.id_puesto %}"
-                       class="text-red-600 hover:underline">Eliminar</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3" class="py-4 text-center text-gray-500">No hay puestos registrados.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+
+                {% for p in puestos %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition">
+
+                    <td class="py-3 px-4">{{ p.nombre_puesto }}</td>
+                    <td class="py-3 px-4">{{ p.nivel }}</td>
+
+                    <td class="py-3 px-4 text-center space-x-4">
+                        <a href="{% url 'trabajadores:puestos-editar' p.id_puesto %}"
+                           class="text-blue-600 hover:text-blue-700">
+                            Editar
+                        </a>
+
+                        <a href="{% url 'trabajadores:puestos-eliminar' p.id_puesto %}"
+                           class="text-red-600 hover:text-red-700">
+                            Eliminar
+                        </a>
+                    </td>
+
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="py-6 text-center text-gray-500 dark:text-gray-400">
+                        No hay puestos registrados.
+                    </td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+
 </div>
 
 {% endblock %}

@@ -1,139 +1,151 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}Listado de Trabajadores{% endblock %}
+
 {% block content %}
 
-<div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">Listado de Trabajadores</h1>
+<h1 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+    Listado de Trabajadores
+</h1>
 
-    <div class="flex space-x-3">
+<!-- ------------------------ -->
+<!-- ACCIONES PRINCIPALES -->
+<!-- ------------------------ -->
+<div class="flex justify-end mb-6 gap-3">
 
-        <!-- Tipos de Nombramiento -->
-        <a href="{% url 'trabajadores:nombramientos-lista' %}"
-           class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg">
-            + Nombramientos
-        </a>
+    <a href="{% url 'trabajadores:nombramientos-lista' %}"
+       class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg shadow">
+        + Nombramientos
+    </a>
 
-        <!-- Puestos -->
-        <a href="{% url 'trabajadores:puestos-lista' %}"
-           class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
-            + Puestos
-        </a>
+    <a href="{% url 'trabajadores:puestos-lista' %}"
+       class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow">
+        + Puestos
+    </a>
 
-        <!-- Trabajadores -->
-        <a href="{% url 'trabajadores:crear' %}"
-           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-            + Agregar Trabajador
-        </a>
-    </div>
+    <a href="{% url 'trabajadores:crear' %}"
+       class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow">
+        + Agregar Trabajador
+    </a>
+
 </div>
 
-
-<!-- ============================= -->
+<!-- ------------------------ -->
 <!-- FILTROS -->
-<!-- ============================= -->
-<form method="get" class="mb-6 bg-white p-4 rounded-lg shadow flex space-x-4 items-end">
+<!-- ------------------------ -->
+<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow mb-6">
 
-    <!-- Buscar nombre -->
-    <div>
-        <label class="block text-sm font-medium mb-1">Buscar por nombre:</label>
-        <input type="text" name="nombre"
-               value="{{ values.nombre }}"
-               placeholder="Escribe un nombre..."
-               class="border rounded px-3 py-1 w-64">
-    </div>
+    <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-6">
 
-    <!-- Unidad -->
-    <div>
-        <label class="block text-sm font-medium mb-1">Unidad:</label>
-        <select name="unidad" class="border rounded px-3 py-1">
-            <option value="">Todas</option>
-            {% for u in unidades %}
-                <option value="{{ u.id_unidad }}"
-                    {% if values.unidad == u.id_unidad|stringformat:"s" %}selected{% endif %}>
-                    {{ u.nombre }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
+        <!-- Nombre -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Buscar por nombre</label>
+            <input type="text" name="nombre" value="{{ values.nombre }}"
+                class="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
+                placeholder="Escribe un nombre...">
+        </div>
 
-    <!-- Puesto -->
-    <div>
-        <label class="block text-sm font-medium mb-1">Puesto:</label>
-        <select name="puesto" class="border rounded px-3 py-1">
-            <option value="">Todos</option>
-            {% for p in puestos %}
-                <option value="{{ p.id_puesto }}"
-                    {% if values.puesto == p.id_puesto|stringformat:"s" %}selected{% endif %}>
-                    {{ p.nombre_puesto }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
+        <!-- Unidad -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Unidad</label>
+            <select name="unidad"
+                class="w-full px-3 py-2 rounded-lg border dark:bg-gray-900 border-gray-300 dark:border-gray-700">
+                <option value="">Todas</option>
+                {% for u in unidades %}
+                    <option value="{{ u.id_unidad }}"
+                        {% if values.unidad == u.id_unidad|stringformat:"s" %}selected{% endif %}>
+                        {{ u.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <!-- Nombramiento -->
-    <div>
-        <label class="block text-sm font-medium mb-1">Nombramiento:</label>
-        <select name="nombramiento" class="border rounded px-3 py-1">
-            <option value="">Todos</option>
-            {% for n in nombramientos %}
-                <option value="{{ n.id_tipo_nombramiento }}"
-                    {% if values.nombramiento == n.id_tipo_nombramiento|stringformat:"s" %}selected{% endif %}>
-                    {{ n.descripcion }}
-                </option>
-            {% endfor %}
-        </select>
-    </div>
+        <!-- Puesto -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Puesto</label>
+            <select name="puesto"
+                class="w-full px-3 py-2 rounded-lg border dark:bg-gray-900 border-gray-300 dark:border-gray-700">
+                <option value="">Todos</option>
+                {% for p in puestos %}
+                    <option value="{{ p.id_puesto }}"
+                        {% if values.puesto == p.id_puesto|stringformat:"s" %}selected{% endif %}>
+                        {{ p.nombre_puesto }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <!-- Botón filtrar -->
-    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-        Filtrar
-    </button>
+        <!-- Nombramiento -->
+        <div>
+            <label class="block text-sm font-medium mb-1">Nombramiento</label>
+            <select name="nombramiento"
+                class="w-full px-3 py-2 rounded-lg border dark:bg-gray-900 border-gray-300 dark:border-gray-700">
+                <option value="">Todos</option>
+                {% for n in nombramientos %}
+                    <option value="{{ n.id_tipo_nombramiento }}"
+                        {% if values.nombramiento == n.id_tipo_nombramiento|stringformat:"s" %}selected{% endif %}>
+                        {{ n.descripcion }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
 
-    <!-- Botón limpiar -->
-    <a href="{% url 'trabajadores:index' %}"
-       class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded-lg">
-        Limpiar
-    </a>
-</form>
+        <!-- Botones -->
+        <div class="flex items-end gap-3 col-span-full">
+            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow">
+                Filtrar
+            </button>
 
-<!-- Tabla -->
-<div class="overflow-x-auto">
-    <table class="min-w-full divide-y divide-gray-300 bg-white shadow-md rounded-lg">
-        <thead class="bg-gray-100">
+            <a href="{% url 'trabajadores:index' %}"
+               class="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg shadow">
+                Limpiar
+            </a>
+        </div>
+
+    </form>
+</div>
+
+<!-- ------------------------ -->
+<!-- TABLA -->
+<!-- ------------------------ -->
+<div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow overflow-hidden">
+
+    <table class="min-w-full text-sm">
+        <thead class="bg-gray-100 dark:bg-gray-700/40 text-gray-700 dark:text-gray-300">
             <tr>
-                <th class="py-2 px-3 text-left text-sm font-semibold">No. Empleado</th>
-                <th class="py-2 px-3 text-left text-sm font-semibold">Nombre</th>
-                <th class="py-2 px-3 text-left text-sm font-semibold">Unidad Administrativa</th>
-                <th class="py-2 px-3 text-left text-sm font-semibold">Puesto</th>
-                <th class="py-2 px-3 text-left text-sm font-semibold">Nombramiento</th>
-                <th class="py-2 px-3 text-left text-sm font-semibold">RFC</th>
-                <th class="py-2 px-3 text-left text-sm font-semibold">CURP</th>
-                <th class="py-2 px-3 text-center text-sm font-semibold">Activo</th>
-                <th class="py-2 px-3 text-center text-sm font-semibold">Acciones</th>
+                <th class="px-4 py-3 text-left font-semibold">No. Empleado</th>
+                <th class="px-4 py-3 text-left font-semibold">Nombre</th>
+                <th class="px-4 py-3 text-left font-semibold">Unidad Administrativa</th>
+                <th class="px-4 py-3 text-left font-semibold">Puesto</th>
+                <th class="px-4 py-3 text-left font-semibold">Nombramiento</th>
+                <th class="px-4 py-3 text-left font-semibold">RFC</th>
+                <th class="px-4 py-3 text-left font-semibold">CURP</th>
+                <th class="px-4 py-3 text-center font-semibold">Activo</th>
+                <th class="px-4 py-3 text-center font-semibold">Acciones</th>
             </tr>
         </thead>
 
-        <tbody class="divide-y divide-gray-200">
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
             {% for trabajador in trabajadores %}
-            <tr>
-                <td class="py-2 px-3">{{ trabajador.numero_empleado }}</td>
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/40 transition">
+                <td class="px-4 py-3">{{ trabajador.numero_empleado }}</td>
 
-                <td class="py-2 px-3">
+                <td class="px-4 py-3">
                     {{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}
                 </td>
 
-                <td class="py-2 px-3">{{ trabajador.id_unidad.nombre }}</td>
+                <td class="px-4 py-3">{{ trabajador.id_unidad.nombre }}</td>
 
-                <td class="py-2 px-3">{{ trabajador.id_puesto.nombre_puesto }}</td>
+                <td class="px-4 py-3">{{ trabajador.id_puesto.nombre_puesto }}</td>
 
-                <td class="py-2 px-3">{{ trabajador.id_tipo_nombramiento.descripcion }}</td>
+                <td class="px-4 py-3">{{ trabajador.id_tipo_nombramiento.descripcion }}</td>
 
-                <td class="py-2 px-3">{{ trabajador.rfc }}</td>
+                <td class="px-4 py-3">{{ trabajador.rfc }}</td>
 
-                <td class="py-2 px-3">{{ trabajador.curp }}</td>
+                <td class="px-4 py-3">{{ trabajador.curp }}</td>
 
-                <td class="py-2 px-3 text-center">
+                <td class="px-4 py-3 text-center">
                     {% if trabajador.activo %}
                         <span class="text-green-600 font-semibold">Activo</span>
                     {% else %}
@@ -141,22 +153,21 @@
                     {% endif %}
                 </td>
 
-                <td class="py-2 px-3 text-center space-x-2">
+                <td class="px-4 py-3 text-center space-x-3">
                     <a href="{% url 'trabajadores:editar' trabajador.id_trabajador %}"
-                       class="text-blue-600 hover:underline">
+                       class="text-blue-600 hover:text-blue-700">
                         Editar
                     </a>
 
                     <a href="{% url 'trabajadores:eliminar' trabajador.id_trabajador %}"
-                       class="text-red-600 hover:underline">
+                       class="text-red-600 hover:text-red-700">
                         Eliminar
                     </a>
                 </td>
             </tr>
-
             {% empty %}
             <tr>
-                <td colspan="9" class="py-4 px-3 text-center text-gray-500">
+                <td colspan="9" class="py-6 text-center text-gray-500 dark:text-gray-400">
                     No hay trabajadores registrados.
                 </td>
             </tr>
