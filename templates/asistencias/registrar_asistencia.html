@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Asistencia - SCA-B123{% endblock %}
+
+{% block page_title %}Registrar Asistencia{% endblock %}
+{% block page_subtitle %}Formulario completo de registro{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto space-y-6">
+    
+    <!-- Botón volver -->
+    <div>
+        <a href="{% url 'asistencias:lista' %}" 
+           class="inline-flex items-center text-gray-400 hover:text-white transition">
+            <i class="fas fa-arrow-left mr-2"></i>Volver a lista de asistencias
+        </a>
+    </div>
+
+    {% if es_dia_inhabil %}
+    <!-- Mensaje: Día festivo/inhábil -->
+    <div class="bg-amber-900/30 border-2 border-amber-600 rounded-xl p-6 text-center">
+        <div class="w-16 h-16 bg-amber-600/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-calendar-times text-amber-400 text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-bold text-amber-300 mb-2">Día Festivo / Inhábil</h2>
+        <p class="text-amber-400">Hoy es un día festivo según el calendario laboral. No se puede registrar asistencia.</p>
+        <a href="{% url 'asistencias:lista' %}" 
+           class="inline-flex items-center mt-4 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium transition">
+            <i class="fas fa-list mr-2"></i>Ver lista de asistencias
+        </a>
+    </div>
+    
+    {% elif todos_asistieron %}
+    <!-- Mensaje: Todos asistieron -->
+    <div class="bg-green-900/30 border border-green-700 rounded-xl p-6 text-center">
+        <div class="w-16 h-16 bg-green-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-check-double text-green-400 text-2xl"></i>
+        </div>
+        <h2 class="text-xl font-bold text-green-400 mb-2">¡Todos han asistido hoy!</h2>
+        <p class="text-green-300">Todos los trabajadores ya completaron su registro de asistencia (entrada y salida).</p>
+        <a href="{% url 'asistencias:lista' %}" 
+           class="inline-flex items-center mt-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition">
+            <i class="fas fa-list mr-2"></i>Ver lista de asistencias
+        </a>
+    </div>
+    {% else %}
+
+    <!-- Trabajadores con registro parcial (solo entrada) -->
+    {% if registros_parciales %}
+    <div class="bg-yellow-900/30 border border-yellow-700 rounded-xl p-5">
+        <h3 class="text-lg font-semibold text-yellow-400 mb-3 flex items-center">
+            <i class="fas fa-clock text-yellow-500 mr-2"></i>Pendientes de salida
+        </h3>
+        <p class="text-yellow-300 text-sm mb-3">Estos trabajadores ya registraron entrada pero falta su salida:</p>
+        <div class="flex flex-wrap gap-2">
+            {% for reg in registros_parciales %}
+            <span class="px-3 py-1.5 bg-yellow-900/50 text-yellow-300 rounded-lg text-sm">
+                {{ reg.id_trabajador.nombre_completo }} ({{ reg.hora_entrada|time:"H:i" }})
+            </span>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Formulario -->
+    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-user-clock text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white">Datos del Registro</h2>
+                    <p class="text-blue-100 text-sm">Fecha: {{ fecha_actual|date:"d/m/Y" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            <!-- Trabajador -->
+            <div class="space-y-2">
+                <label class="flex items-center text-sm font-medium text-gray-300">
+                    <i class="fas fa-user text-blue-400 mr-2"></i>Trabajador *
+                </label>
+                <select name="id_trabajador" 
+                        class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    <option value="">-- Selecciona un trabajador --</option>
+                    {% for trabajador in form.id_trabajador.field.queryset %}
+                    <option value="{{ trabajador.pk }}" {% if form.id_trabajador.value == trabajador.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ trabajador.numero_empleado }} - {{ trabajador.nombre_completo }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if form.id_trabajador.errors %}
+                <p class="text-red-400 text-sm flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.id_trabajador.errors.0 }}
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- Fecha -->
+            <div class="space-y-2">
+                <label class="flex items-center text-sm font-medium text-gray-300">
+                    <i class="fas fa-calendar text-purple-400 mr-2"></i>Fecha *
+                </label>
+                <input type="date" name="fecha" value="{{ form.fecha.value|date:'Y-m-d'|default:fecha_actual|date:'Y-m-d' }}"
+                       class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                {% if form.fecha.errors %}
+                <p class="text-red-400 text-sm flex items-center">
+                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.fecha.errors.0 }}
+                </p>
+                {% endif %}
+            </div>
+
+            <!-- Horas -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="flex items-center text-sm font-medium text-gray-300">
+                        <i class="fas fa-sign-in-alt text-green-400 mr-2"></i>Hora de Entrada
+                    </label>
+                    <input type="time" name="hora_entrada" value="{{ form.hora_entrada.value|time:'H:i' }}"
+                           class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    {% if form.hora_entrada.errors %}
+                    <p class="text-red-400 text-sm flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ form.hora_entrada.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="space-y-2">
+                    <label class="flex items-center text-sm font-medium text-gray-300">
+                        <i class="fas fa-sign-out-alt text-red-400 mr-2"></i>Hora de Salida
+                    </label>
+                    <input type="time" name="hora_salida" value="{{ form.hora_salida.value|time:'H:i' }}"
+                           class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    {% if form.hora_salida.errors %}
+                    <p class="text-red-400 text-sm flex items-center">
+                        <i class="fas fa-exclamation-circle mr-1"></i>{{ form.hora_salida.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Estatus -->
+            <div class="space-y-2">
+                <label class="flex items-center text-sm font-medium text-gray-300">
+                    <i class="fas fa-tag text-yellow-400 mr-2"></i>Estatus (opcional)
+                </label>
+                <select name="estatus"
+                        class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                    {% for value, label in form.estatus.field.choices %}
+                    <option value="{{ value }}" {% if form.estatus.value == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+                <p class="text-xs text-gray-500">
+                    Si no se especifica, el sistema calculará el estatus automáticamente.
+                </p>
+            </div>
+
+            <!-- Errores generales -->
+            {% if form.non_field_errors %}
+            <div class="bg-red-900/30 border border-red-700 text-red-400 px-4 py-3 rounded-lg">
+                {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <!-- Botones -->
+            <div class="flex items-center justify-between pt-6 border-t border-gray-700">
+                <a href="{% url 'asistencias:lista' %}"
+                   class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg font-medium transition flex items-center">
+                    <i class="fas fa-times mr-2"></i>Cancelar
+                </a>
+
+                <button type="submit"
+                        class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition flex items-center shadow-lg shadow-blue-600/20">
+                    <i class="fas fa-save mr-2"></i>Guardar Registro
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Ayuda -->
+    <div class="bg-blue-900/30 border border-blue-700 rounded-xl p-5">
+        <h3 class="font-semibold text-blue-400 mb-2 flex items-center">
+            <i class="fas fa-lightbulb text-yellow-400 mr-2"></i>Ayuda
+        </h3>
+        <ul class="text-sm text-blue-300 space-y-1">
+            <li>• El estatus se calcula automáticamente según la hora de entrada y la jornada del trabajador</li>
+            <li>• Se considera retardo si llega más de 10 minutos después de la hora de entrada</li>
+            <li>• Si no hay hora de entrada, se marca como falta</li>
+        </ul>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
