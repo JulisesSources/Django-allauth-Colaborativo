@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+
+{% block title %}Registros de Asistencia - SCA-B123{% endblock %}
+
+{% block page_title %}Registros de Asistencia{% endblock %}
+{% block page_subtitle %}Control y seguimiento de asistencias diarias{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    
+    <!-- Estadísticas del día -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gradient-to-br from-green-900/40 to-gray-900 border border-green-700/50 rounded-xl p-5 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-green-400 uppercase tracking-wider">Asistencias Hoy</p>
+                    <p class="text-3xl font-bold text-green-400 mt-1">{{ asistencias_hoy }}</p>
+                </div>
+                <div class="w-12 h-12 bg-green-900/50 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-yellow-900/40 to-gray-900 border border-yellow-700/50 rounded-xl p-5 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-yellow-400 uppercase tracking-wider">Retardos Hoy</p>
+                    <p class="text-3xl font-bold text-yellow-400 mt-1">{{ retardos_hoy }}</p>
+                </div>
+                <div class="w-12 h-12 bg-yellow-900/50 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clock text-yellow-500 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-red-900/40 to-gray-900 border border-red-700/50 rounded-xl p-5 shadow-lg">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-red-400 uppercase tracking-wider">Faltas Hoy</p>
+                    <p class="text-3xl font-bold text-red-400 mt-1">{{ faltas_hoy }}</p>
+                </div>
+                <div class="w-12 h-12 bg-red-900/50 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-times-circle text-red-500 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <a href="{% url 'asistencias:registro_rapido' %}" 
+           class="group bg-gradient-to-br from-blue-900/30 to-gray-800 border border-blue-700/50 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-blue-600 transition-all">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-blue-900/50 rounded-xl flex items-center justify-center group-hover:bg-blue-800/50 transition">
+                        <i class="fas fa-bolt text-blue-400 text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white group-hover:text-blue-300 transition">Registro Rápido</h3>
+                        <p class="text-sm text-gray-400">Checador rápido de entrada/salida</p>
+                    </div>
+                </div>
+                <div class="text-blue-500 group-hover:translate-x-1 transition-transform">
+                    <i class="fas fa-chevron-right text-xl"></i>
+                </div>
+            </div>
+        </a>
+
+        <a href="{% url 'asistencias:registrar' %}" 
+           class="group bg-gradient-to-br from-green-900/30 to-gray-800 border border-green-700/50 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-green-600 transition-all">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-green-900/50 rounded-xl flex items-center justify-center group-hover:bg-green-800/50 transition">
+                        <i class="fas fa-user-clock text-green-400 text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-white group-hover:text-green-300 transition">Registro Completo</h3>
+                        <p class="text-sm text-gray-400">Formulario detallado de asistencia</p>
+                    </div>
+                </div>
+                <div class="text-green-500 group-hover:translate-x-1 transition-transform">
+                    <i class="fas fa-chevron-right text-xl"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg p-5">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+            <i class="fas fa-filter text-blue-400 mr-3"></i>Filtrar Registros
+        </h3>
+        <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+            <div class="space-y-1">
+                <label class="text-xs text-gray-400">Fecha Inicio</label>
+                <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}"
+                       class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="space-y-1">
+                <label class="text-xs text-gray-400">Fecha Fin</label>
+                <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin }}"
+                       class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="space-y-1">
+                <label class="text-xs text-gray-400">Estatus</label>
+                <select name="estatus"
+                        class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                    <option value="">Todos</option>
+                    <option value="ASI" {% if request.GET.estatus == 'ASI' %}selected{% endif %}>Asistencia</option>
+                    <option value="RET" {% if request.GET.estatus == 'RET' %}selected{% endif %}>Retardo</option>
+                    <option value="FAL" {% if request.GET.estatus == 'FAL' %}selected{% endif %}>Falta</option>
+                    <option value="JUS" {% if request.GET.estatus == 'JUS' %}selected{% endif %}>Justificada</option>
+                </select>
+            </div>
+            <div class="space-y-1">
+                <label class="text-xs text-gray-400">Trabajador</label>
+                <select name="trabajador"
+                        class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+                    <option value="">Todos</option>
+                    {% for t in filtro_form.trabajador.field.queryset %}
+                    <option value="{{ t.pk }}" {% if request.GET.trabajador == t.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ t.nombre_completo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" 
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition flex items-center justify-center">
+                <i class="fas fa-search mr-2"></i>Filtrar
+            </button>
+        </form>
+    </div>
+
+    <!-- Lista de registros -->
+    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
+        <div class="p-5 border-b border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h2 class="text-lg font-semibold text-white flex items-center">
+                    <i class="fas fa-clipboard-list text-blue-400 mr-3"></i>Lista de Registros
+                </h2>
+                <p class="text-sm text-gray-400">Mostrando registros de los últimos 7 días</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-900/50">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Trabajador</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Fecha</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Entrada</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Salida</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Estatus</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    {% for registro in registros %}
+                    <tr class="hover:bg-gray-700/30 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center shadow">
+                                    <span class="text-white font-bold">{{ registro.id_trabajador.nombre|slice:":1"|upper }}</span>
+                                </div>
+                                <div>
+                                    <p class="text-white font-medium">{{ registro.id_trabajador.nombre_completo }}</p>
+                                    <p class="text-xs text-gray-500">{{ registro.id_trabajador.numero_empleado }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-300">
+                            {{ registro.fecha|date:"d/m/Y" }}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if registro.hora_entrada %}
+                            <span class="font-mono text-green-400">{{ registro.hora_entrada|time:"H:i" }}</span>
+                            {% else %}
+                            <span class="text-gray-500">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if registro.hora_salida %}
+                            <span class="font-mono text-red-400">{{ registro.hora_salida|time:"H:i" }}</span>
+                            {% else %}
+                            <span class="text-gray-500">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if registro.estatus == 'ASI' %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-900/50 text-green-400">
+                                <i class="fas fa-check mr-1"></i>{{ registro.get_estatus_display }}
+                            </span>
+                            {% elif registro.estatus == 'RET' %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-400">
+                                <i class="fas fa-clock mr-1"></i>{{ registro.get_estatus_display }}
+                            </span>
+                            {% elif registro.estatus == 'FAL' %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-900/50 text-red-400">
+                                <i class="fas fa-times mr-1"></i>{{ registro.get_estatus_display }}
+                            </span>
+                            {% else %}
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-900/50 text-blue-400">
+                                <i class="fas fa-info mr-1"></i>{{ registro.get_estatus_display }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{% url 'asistencias:detalle' registro.pk %}" 
+                                   class="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/30 rounded-lg transition"
+                                   title="Ver detalle">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'asistencias:resumen' registro.id_trabajador.numero_empleado %}" 
+                                   class="p-2 text-purple-400 hover:text-purple-300 hover:bg-purple-900/30 rounded-lg transition"
+                                   title="Ver resumen">
+                                    <i class="fas fa-chart-bar"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                                    <i class="fas fa-clipboard text-gray-500 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-400 font-medium">No hay registros para mostrar</p>
+                                <p class="text-gray-500 text-sm mt-1">Ajusta los filtros o registra nuevas asistencias</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        {% if is_paginated %}
+        <div class="px-6 py-4 border-t border-gray-700 flex justify-between items-center">
+            <span class="text-sm text-gray-400">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+            <div class="flex gap-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm transition">
+                    <i class="fas fa-chevron-left mr-1"></i>Anterior
+                </a>
+                {% endif %}
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm transition">
+                    Siguiente<i class="fas fa-chevron-right ml-1"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

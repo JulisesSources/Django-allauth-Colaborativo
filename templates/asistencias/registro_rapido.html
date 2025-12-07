@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Registro Rápido - SCA-B123{% endblock %}
+
+{% block page_title %}Registro Rápido de Asistencia{% endblock %}
+{% block page_subtitle %}Checador de entrada y salida{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+    
+    <!-- Botón volver -->
+    <div>
+        <a href="{% url 'asistencias:lista' %}" 
+           class="inline-flex items-center text-gray-400 hover:text-white transition">
+            <i class="fas fa-arrow-left mr-2"></i>Volver a lista
+        </a>
+    </div>
+
+    <!-- Alerta día inhábil/festivo -->
+    {% if es_dia_inhabil %}
+    <div class="bg-amber-900/30 border-2 border-amber-600 rounded-xl p-6 text-center">
+        <div class="w-16 h-16 bg-amber-600/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-calendar-times text-amber-400 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-amber-300 mb-2">Día Festivo / Inhábil</h3>
+        <p class="text-amber-400">Hoy es un día festivo según el calendario laboral. No se puede registrar asistencia.</p>
+        <a href="{% url 'asistencias:lista' %}" 
+           class="inline-flex items-center mt-4 px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium transition">
+            <i class="fas fa-list mr-2"></i>Ver lista de asistencias
+        </a>
+    </div>
+    
+    {% elif todos_asistieron %}
+    <!-- Todos han asistido -->
+    <div class="bg-gradient-to-br from-green-900/40 to-green-900/20 border-2 border-green-600 rounded-xl p-8 text-center">
+        <div class="w-16 h-16 bg-green-600/30 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-check-double text-green-400 text-3xl"></i>
+        </div>
+        <h3 class="text-xl font-bold text-green-300 mb-2">¡Todos han asistido hoy!</h3>
+        <p class="text-green-400">Todos los trabajadores ya completaron su registro de asistencia (entrada y salida).</p>
+        <a href="{% url 'asistencias:lista' %}" 
+           class="inline-flex items-center mt-4 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition">
+            <i class="fas fa-list mr-2"></i>Ver lista de asistencias
+        </a>
+    </div>
+    
+    {% else %}
+    <!-- Reloj en tiempo real -->
+    <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl shadow-lg p-8 text-center">
+        <div class="text-6xl font-bold mb-2 font-mono" id="reloj">{{ hora_actual }}</div>
+        <div class="text-xl text-blue-200">{{ fecha_actual|date:"l, d \d\e F \d\e Y" }}</div>
+    </div>
+
+    <!-- Formulario de registro -->
+    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+            <h2 class="text-lg font-bold text-white flex items-center">
+                <i class="fas fa-bolt text-yellow-300 mr-3"></i>Registro Rápido
+            </h2>
+        </div>
+        
+        <form method="post" class="p-6 space-y-6">
+            {% csrf_token %}
+            
+            <div class="space-y-2">
+                <label class="block text-gray-300 text-lg font-medium text-center mb-4">
+                    Selecciona el trabajador
+                </label>
+                <select name="numero_empleado" 
+                        class="w-full bg-gray-900 border-2 border-blue-500 text-white text-lg rounded-xl px-4 py-4 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition">
+                    <option value="">-- Selecciona un trabajador --</option>
+                    {% for trabajador in form.numero_empleado.field.queryset %}
+                    <option value="{{ trabajador.pk }}">
+                        {{ trabajador.numero_empleado }} - {{ trabajador.nombre_completo }}
+                    </option>
+                    {% endfor %}
+                </select>
+                {% if form.numero_empleado.errors %}
+                <p class="text-red-400 text-sm text-center flex items-center justify-center">
+                    <i class="fas fa-exclamation-circle mr-1"></i>{{ form.numero_empleado.errors.0 }}
+                </p>
+                {% endif %}
+            </div>
+
+            <button type="submit" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white text-xl font-bold py-5 rounded-xl transition-colors shadow-lg shadow-green-600/20 flex items-center justify-center gap-3">
+                <i class="fas fa-check-circle"></i>Registrar Entrada/Salida
+            </button>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Últimos registros -->
+    {% if ultimos_registros and not es_dia_inhabil %}
+    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg p-6">
+        <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
+            <i class="fas fa-history text-purple-400 mr-3"></i>Últimos Registros de Hoy
+        </h3>
+        <div class="space-y-3">
+            {% for registro in ultimos_registros %}
+            <div class="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl border border-gray-700">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center shadow">
+                        <span class="text-white font-bold">{{ registro.id_trabajador.nombre|slice:":1"|upper }}</span>
+                    </div>
+                    <div>
+                        <p class="font-medium text-white">{{ registro.id_trabajador.nombre_completo }}</p>
+                        <p class="text-sm text-gray-400">
+                            <i class="fas fa-sign-in-alt text-green-500 mr-1"></i>{{ registro.hora_entrada|time:"H:i"|default:"—" }}
+                            <span class="mx-2 text-gray-600">|</span>
+                            <i class="fas fa-sign-out-alt text-red-500 mr-1"></i>{{ registro.hora_salida|time:"H:i"|default:"—" }}
+                        </p>
+                    </div>
+                </div>
+                <span class="px-3 py-1.5 text-xs font-semibold rounded-full
+                    {% if registro.estatus == 'ASI' %}bg-green-900/50 text-green-400
+                    {% elif registro.estatus == 'RET' %}bg-yellow-900/50 text-yellow-400
+                    {% else %}bg-red-900/50 text-red-400{% endif %}">
+                    {{ registro.get_estatus_display }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% if not es_dia_inhabil and not todos_asistieron %}
+<script>
+// Actualizar reloj cada segundo
+function actualizarReloj() {
+    const ahora = new Date();
+    const horas = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+    const segundos = String(ahora.getSeconds()).padStart(2, '0');
+    document.getElementById('reloj').textContent = `${horas}:${minutos}:${segundos}`;
+}
+setInterval(actualizarReloj, 1000);
+actualizarReloj();
+</script>
+{% endif %}
+{% endblock %}
