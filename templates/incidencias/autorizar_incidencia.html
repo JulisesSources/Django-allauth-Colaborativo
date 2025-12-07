@@ -4,162 +4,181 @@
 {% block title %}Autorizar Incidencia - SCA-B123{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto">
-    <!-- Botón Volver -->
-    <div class="mb-6">
-        <a href="{% url 'incidencias:detalle_incidencia' incidencia.pk %}" 
-           class="inline-flex items-center text-blue-600 hover:text-blue-800">
-            <i class="fas fa-arrow-left mr-2"></i>
-            Volver al detalle
-        </a>
+<div class="space-y-6">
+    
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-900 dark:to-purple-950 shadow-xl rounded-xl p-6 text-white transition-all duration-300">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-3xl md:text-4xl font-bold flex items-center">
+                    <i class="fas fa-user-check mr-3"></i>
+                    Autorizar o Rechazar Incidencia
+                </h1>
+                <p class="text-purple-100 mt-2">Revisa la información y toma una decisión sobre la incidencia</p>
+            </div>
+        </div>
     </div>
     
-    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
-        <!-- Header -->
-        <div class="bg-purple-600 px-6 py-4">
-            <h2 class="text-2xl font-bold text-white">
-                <i class="fas fa-user-check mr-2"></i>
-                Autorizar o Rechazar Incidencia
+    <!-- Resumen de la Incidencia -->
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden transition-colors duration-300">
+        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="fas fa-info-circle text-purple-500"></i>
+                Resumen de la Incidencia
             </h2>
         </div>
-        
-        <!-- Resumen de la Incidencia -->
-        <div class="p-6 border-b bg-gray-50">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Resumen de la Incidencia</h3>
-            
+        <div class="p-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white p-4 rounded-lg border">
-                    <p class="text-sm text-gray-500 mb-1">Trabajador</p>
-                    <p class="font-semibold text-gray-900">{{ incidencia.id_trabajador.nombre_completo }}</p>
-                    <p class="text-sm text-gray-600">{{ incidencia.id_trabajador.numero_empleado }}</p>
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Trabajador</p>
+                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.id_trabajador.nombre_completo }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ incidencia.id_trabajador.numero_empleado }}</p>
                 </div>
                 
-                <div class="bg-white p-4 rounded-lg border">
-                    <p class="text-sm text-gray-500 mb-1">Tipo de Incidencia</p>
-                    <p class="font-semibold text-gray-900">{{ incidencia.id_tipo_incidencia.descripcion }}</p>
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Tipo de Incidencia</p>
+                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.id_tipo_incidencia.descripcion }}</p>
                 </div>
                 
-                <div class="bg-white p-4 rounded-lg border">
-                    <p class="text-sm text-gray-500 mb-1">Periodo</p>
-                    <p class="font-semibold text-gray-900">
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Periodo</p>
+                    <p class="font-semibold text-gray-900 dark:text-white">
                         {{ incidencia.fecha_inicio|date:"d/m/Y" }} - {{ incidencia.fecha_fin|date:"d/m/Y" }}
                     </p>
-                    <p class="text-sm text-gray-600">{{ incidencia.duracion_dias }} día(s)</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ incidencia.duracion_dias }} día(s)</p>
                 </div>
                 
-                <div class="bg-white p-4 rounded-lg border">
-                    <p class="text-sm text-gray-500 mb-1">Solicitado por</p>
-                    <p class="font-semibold text-gray-900">
+                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Solicitado por</p>
+                    <p class="font-semibold text-gray-900 dark:text-white">
                         {{ incidencia.created_by.get_full_name|default:incidencia.created_by.email }}
                     </p>
-                    <p class="text-sm text-gray-600">{{ incidencia.created_at|date:"d/m/Y H:i" }}</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ incidencia.created_at|date:"d/m/Y H:i" }}</p>
                 </div>
             </div>
             
             {% if incidencia.observaciones %}
-            <div class="mt-4 bg-white p-4 rounded-lg border">
-                <p class="text-sm text-gray-500 mb-1">Observaciones</p>
-                <p class="text-gray-900">{{ incidencia.observaciones }}</p>
+            <div class="mt-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Observaciones</p>
+                <p class="text-gray-900 dark:text-white">{{ incidencia.observaciones }}</p>
             </div>
             {% endif %}
         </div>
-        
-        <!-- Formulario de Autorización -->
-        <div class="p-6">
-            <form method="post" class="space-y-6">
-                {% csrf_token %}
-                
-                {% if form.non_field_errors %}
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                    {{ form.non_field_errors }}
+    </div>
+    
+    <!-- Formulario de Autorización -->
+    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 transition-colors duration-300">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+            <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-r-lg">
+                <div class="flex items-start">
+                    <i class="fas fa-exclamation-circle text-red-500 dark:text-red-400 text-xl mr-3 mt-0.5"></i>
+                    <div class="flex-1">
+                        <p class="text-sm text-red-800 dark:text-red-200">{{ form.non_field_errors }}</p>
+                    </div>
                 </div>
+            </div>
+            {% endif %}
+            
+            <!-- Acción -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                    <i class="fas fa-check-double mr-2 text-purple-600 dark:text-purple-400"></i> {{ form.accion.label }}
+                </label>
+                
+                <div class="space-y-3">
+                    {% for radio in form.accion %}
+                    <div class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200
+                                {% if radio.data.value == 'autorizar' %}
+                                    border-green-200 dark:border-green-800 hover:border-green-400 dark:hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20
+                                {% else %}
+                                    border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20
+                                {% endif %}">
+                        {{ radio.tag }}
+                        <label for="{{ radio.id_for_label }}" class="ml-3 cursor-pointer flex-1">
+                            <span class="block text-sm font-medium 
+                                  {% if radio.data.value == 'autorizar' %}
+                                      text-green-700 dark:text-green-400
+                                  {% else %}
+                                      text-red-700 dark:text-red-400
+                                  {% endif %}">
+                                {% if radio.data.value == 'autorizar' %}
+                                    <i class="fas fa-check-circle mr-1"></i> Autorizar Incidencia
+                                {% else %}
+                                    <i class="fas fa-times-circle mr-1"></i> Rechazar Incidencia
+                                {% endif %}
+                            </span>
+                            <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {% if radio.data.value == 'autorizar' %}
+                                    La incidencia será aprobada y se registrará en el sistema
+                                {% else %}
+                                    La incidencia será rechazada y no tendrá efecto
+                                {% endif %}
+                            </span>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                {% if form.accion.errors %}
+                <p class="mt-2 flex items-center text-sm text-red-600 dark:text-red-400">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>{{ form.accion.errors.0 }}
+                </p>
                 {% endif %}
-                
-                <!-- Acción -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">
-                        <i class="fas fa-check-double mr-1"></i> {{ form.accion.label }}
-                    </label>
-                    
-                    <div class="space-y-3">
-                        {% for radio in form.accion %}
-                        <div class="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 
-                                    {% if radio.data.value == 'autorizar' %}border-green-200 hover:border-green-400
-                                    {% else %}border-red-200 hover:border-red-400{% endif %}">
-                            {{ radio.tag }}
-                            <label for="{{ radio.id_for_label }}" class="ml-3 cursor-pointer flex-1">
-                                <span class="block text-sm font-medium 
-                                      {% if radio.data.value == 'autorizar' %}text-green-700
-                                      {% else %}text-red-700{% endif %}">
-                                    {% if radio.data.value == 'autorizar' %}
-                                        <i class="fas fa-check-circle mr-1"></i> Autorizar Incidencia
-                                    {% else %}
-                                        <i class="fas fa-times-circle mr-1"></i> Rechazar Incidencia
-                                    {% endif %}
-                                </span>
-                                <span class="block text-xs text-gray-500 mt-1">
-                                    {% if radio.data.value == 'autorizar' %}
-                                        La incidencia será aprobada y se registrará en el sistema
-                                    {% else %}
-                                        La incidencia será rechazada y no tendrá efecto
-                                    {% endif %}
-                                </span>
-                            </label>
-                        </div>
-                        {% endfor %}
+            </div>
+            
+            <!-- Comentario -->
+            <div class="space-y-2">
+                <label for="{{ form.comentario.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <i class="fas fa-comment-alt mr-2 text-purple-600 dark:text-purple-400"></i> {{ form.comentario.label }}
+                </label>
+                <textarea name="{{ form.comentario.name }}" id="{{ form.comentario.id_for_label }}" 
+                          rows="4"
+                          placeholder="Agrega un comentario explicando tu decisión (opcional)"
+                          class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200 hover:border-purple-400 dark:hover:border-purple-500 resize-none">{{ form.comentario.value|default:'' }}</textarea>
+                {% if form.comentario.errors %}
+                <p class="flex items-center mt-2 text-sm text-red-600 dark:text-red-400">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>{{ form.comentario.errors.0 }}
+                </p>
+                {% endif %}
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                    Puedes agregar un comentario explicando tu decisión (opcional)
+                </p>
+            </div>
+            
+            <!-- Advertencia -->
+            <div class="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-l-4 border-yellow-500 dark:border-yellow-400 p-5 rounded-r-lg">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 text-2xl"></i>
                     </div>
-                    
-                    {% if form.accion.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.accion.errors.0 }}</p>
-                    {% endif %}
-                </div>
-                
-                <!-- Comentario -->
-                <div>
-                    <label for="{{ form.comentario.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-comment mr-1"></i> {{ form.comentario.label }}
-                    </label>
-                    {{ form.comentario }}
-                    {% if form.comentario.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.comentario.errors.0 }}</p>
-                    {% endif %}
-                    <p class="mt-1 text-xs text-gray-500">
-                        Puedes agregar un comentario explicando tu decisión (opcional)
-                    </p>
-                </div>
-                
-                <!-- Advertencia -->
-                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-yellow-800">
-                                Importante
-                            </h3>
-                            <div class="mt-2 text-sm text-yellow-700">
-                                <p>Esta acción no se puede deshacer. Asegúrate de revisar toda la información antes de continuar.</p>
-                            </div>
-                        </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-bold text-yellow-900 dark:text-yellow-200 mb-2">
+                            Importante
+                        </h3>
+                        <p class="text-sm text-yellow-800 dark:text-yellow-300">
+                            Esta acción no se puede deshacer. Asegúrate de revisar toda la información antes de continuar.
+                        </p>
                     </div>
                 </div>
-                
-                <!-- Botones -->
-                <div class="flex space-x-4 pt-4">
-                    <button type="submit" 
-                            class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                        <i class="fas fa-check mr-2"></i>
-                        Confirmar Decisión
-                    </button>
-                    <a href="{% url 'incidencias:detalle_incidencia' incidencia.pk %}" 
-                       class="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 text-center">
-                        <i class="fas fa-times mr-2"></i>
-                        Cancelar
-                    </a>
-                </div>
-            </form>
-        </div>
+            </div>
+            
+            <!-- Botones -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                <button type="submit" 
+                        class="flex-1 inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-md text-base font-semibold text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 dark:from-purple-600 dark:to-purple-800 dark:hover:from-purple-700 dark:hover:to-purple-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 transform hover:scale-105">
+                    <i class="fas fa-check mr-2"></i>
+                    Confirmar Decisión
+                </button>
+                <a href="{% url 'incidencias:detalle_incidencia' incidencia.pk %}" 
+                   class="flex-1 inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-base font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200">
+                    <i class="fas fa-times mr-2"></i>
+                    Cancelar
+                </a>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}

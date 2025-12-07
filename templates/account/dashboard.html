@@ -26,7 +26,7 @@
     </div>
 
     <!-- Stats Cards (Admin only) -->
-    {% if es_admin %}
+    {% if es_admin or user.perfil.rol == 'admin' or user.is_staff %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <!-- Total Usuarios -->
         <div
@@ -137,39 +137,6 @@
             </div>
             {% endif %}
 
-            <!-- Actividad Reciente -->
-            <div
-                class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="p-6 border-b border-gray-100 dark:border-gray-700">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <i class="fas fa-history text-blue-500"></i>
-                        Actividad Reciente
-                    </h2>
-                </div>
-                <div class="p-6">
-                    <div class="space-y-4">
-                        <div class="flex items-start gap-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                            <div
-                                class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-sign-in-alt text-blue-600 dark:text-blue-400"></i>
-                            </div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-gray-900 dark:text-white">Inicio de sesión</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    {{ user.last_login|date:"d/m/Y H:i" }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="text-center py-8 text-gray-500 dark:text-gray-400">
-                            <i class="fas fa-inbox text-4xl mb-2 opacity-50"></i>
-                            <p class="text-sm">No hay más actividad reciente</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Right Column: Quick Actions & Info -->
         <div class="space-y-6">
 
@@ -183,7 +150,7 @@
                     </h3>
                 </div>
                 <div class="p-4 space-y-2">
-                    {% if es_admin %}
+                    {% if user.perfil.rol == 'admin' or user.is_staff %}
                     <!-- Gestionar Usuarios (Admin) -->
                     <a href="{% url 'accounts:lista_usuarios' %}"
                         class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors group">
@@ -196,9 +163,8 @@
                         </div>
                         <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
                     </a>
-                    {% endif %}
-
-                    <!-- Ver Trabajadores -->
+                    
+                    <!-- Ver Trabajadores (Admin) -->
                     <a href="{% url 'trabajadores:index' %}"
                         class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors group">
                         <div class="flex items-center gap-3">
@@ -210,8 +176,8 @@
                         </div>
                         <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
                     </a>
-
-                    <!-- Ver Asistencias -->
+                    
+                    <!-- Ver Asistencias (Admin/Jefe) -->
                     <a href="{% url 'asistencias:index' %}"
                         class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors group">
                         <div class="flex items-center gap-3">
@@ -223,8 +189,8 @@
                         </div>
                         <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
                     </a>
-
-                    <!-- Ver Reportes -->
+                    
+                    <!-- Ver Reportes (Admin/Jefe) -->
                     <a href="{% url 'reportes:index' %}"
                         class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors group">
                         <div class="flex items-center gap-3">
@@ -236,6 +202,72 @@
                         </div>
                         <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
                     </a>
+                    {% elif user.perfil.rol == 'jefe' %}
+                    <!-- Ver Asistencias (Jefe) -->
+                    <a href="{% url 'asistencias:index' %}"
+                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clipboard-check text-sm"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ver Asistencias</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    </a>
+                    
+                    <!-- Mis Incidencias (Jefe) -->
+                    <a href="{% url 'incidencias:index' %}"
+                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle text-sm"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Gestionar Incidencias</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    </a>
+                    
+                    <!-- Ver Reportes (Jefe) -->
+                    <a href="{% url 'reportes:index' %}"
+                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-chart-bar text-sm"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ver Reportes</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    </a>
+                    {% else %}
+                    <!-- Mis Incidencias (Trabajador) -->
+                    <a href="{% url 'incidencias:index' %}"
+                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-exclamation-triangle text-sm"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Mis Incidencias</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    </a>
+                    
+                    <!-- Mi Perfil (Trabajador) -->
+                    <a href="{% url 'accounts:mi_perfil' %}"
+                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-user-circle text-sm"></i>
+                            </div>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Mi Perfil</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    </a>
+                    {% endif %}
                 </div>
             </div>
 
@@ -254,7 +286,7 @@
                             </div>
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-tag w-4"></i>
-                                <span>Rol: <strong>{{ user.groups.first.name|default:"Usuario" }}</strong></span>
+                                <span>Rol: <strong>{{ user.perfil.rol|default:"Sin rol" }}</strong></span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <i class="fas fa-clock w-4"></i>
@@ -265,20 +297,6 @@
                 </div>
             </div>
 
-            <!-- Security Tip -->
-            <div
-                class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-100 dark:border-yellow-800 rounded-xl p-4">
-                <div class="flex items-start gap-3">
-                    <i class="fas fa-shield-alt text-yellow-600 dark:text-yellow-400 mt-1"></i>
-                    <div>
-                        <h4 class="font-semibold text-yellow-900 dark:text-yellow-100 text-sm">Consejo de Seguridad</h4>
-                        <p class="text-xs text-yellow-800 dark:text-yellow-200 mt-1">
-                            Mantén tu información segura. Nunca compartas tus credenciales y actualiza tu contraseña
-                            periódicamente.
-                        </p>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
