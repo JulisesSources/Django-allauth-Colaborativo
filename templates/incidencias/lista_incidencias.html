@@ -20,12 +20,19 @@
                     Nueva Incidencia
                 </a>
                  <!-- Botón Nuevo Tipo de Incidencia (solo ADMIN) -->
-            {% if request.user.perfil.es_admin %}
-            <a href="{% url 'incidencias:crear_tipo_incidencia' %}" 
-               class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 shadow">
-                <i class="fas fa-tag mr-2"></i> Tipo de Incidencia
-            </a>
-            {% endif %}
+                {% if request.user.perfil.es_admin %}
+                    <!-- Crear Tipo -->
+                    <a href="{% url 'incidencias:crear_tipo_incidencia' %}" 
+                    class="inline-flex items-center px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 shadow mr-2">
+                        <i class="fas fa-tag mr-2"></i> Nuevo Tipo
+                    </a>
+
+                    <!-- Editar Tipos -->
+                    <a href="{% url 'incidencias:lista_tipos_incidencia' %}" 
+                    class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 shadow">
+                        <i class="fas fa-edit mr-2"></i> Editar Tipos
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>
