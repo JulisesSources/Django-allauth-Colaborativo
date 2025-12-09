@@ -30,8 +30,8 @@ def index(request):
         return redirect('incidencias:lista_incidencias')
 
     if perfil.es_jefe():
-        print("Redirigiendo a autorizar_incidencias")
-        return redirect('incidencias:autorizar_incidencias')
+        print("Redirigiendo a lista_incidencias (jefe)")
+        return redirect('incidencias:lista_incidencias')
 
     if perfil.es_trabajador():
         print("Redirigiendo a mis_incidencias")
@@ -63,22 +63,30 @@ def lista_incidencias(request):
         else:
             incidencias = Incidencia.objects.none()
     
+    # Preparar queryset de unidades para el formulario
+    from apps.unidades.models import UnidadAdministrativa
+    from apps.trabajadores.models import Trabajador
+    
+    if perfil.es_admin():
+        unidades_queryset = UnidadAdministrativa.objects.all()
+    else:
+        unidades_queryset = UnidadAdministrativa.objects.none()
+    
     # Aplicar filtros del formulario
-    form = FiltroIncidenciaForm(request.GET)
+    form = FiltroIncidenciaForm(request.GET, unidades_queryset=unidades_queryset)
     if form.is_valid():
+        unidad = form.cleaned_data.get('unidad')
         trabajador = form.cleaned_data.get('trabajador')
         tipo_incidencia = form.cleaned_data.get('tipo_incidencia')
         estado = form.cleaned_data.get('estado')
         fecha_desde = form.cleaned_data.get('fecha_desde')
         fecha_hasta = form.cleaned_data.get('fecha_hasta')
         
+        if unidad:
+            incidencias = incidencias.filter(id_trabajador__id_unidad=unidad)
+        
         if trabajador:
-            incidencias = incidencias.filter(
-                Q(id_trabajador__nombre__icontains=trabajador) |
-                Q(id_trabajador__apellido_paterno__icontains=trabajador) |
-                Q(id_trabajador__apellido_materno__icontains=trabajador) |
-                Q(id_trabajador__numero_empleado__icontains=trabajador)
-            )
+            incidencias = incidencias.filter(id_trabajador=trabajador)
         
         if tipo_incidencia:
             incidencias = incidencias.filter(id_tipo_incidencia=tipo_incidencia)
@@ -92,12 +100,29 @@ def lista_incidencias(request):
         if fecha_hasta:
             incidencias = incidencias.filter(fecha_fin__lte=fecha_hasta)
     
-    # Estadísticas
+    # Preparar trabajadores agrupados por unidad para el template
+    if perfil.es_admin():
+        todos_trabajadores = Trabajador.objects.filter(activo=True).select_related('id_unidad').order_by('id_unidad', 'nombre', 'apellido_paterno')
+    else:
+        todos_trabajadores = Trabajador.objects.none()
+    
+    trabajadores = Trabajador.objects.filter(activo=True).select_related('id_unidad')
+    if perfil.es_jefe() and perfil.id_trabajador and perfil.id_trabajador.id_unidad:
+        trabajadores = trabajadores.filter(id_unidad=perfil.id_trabajador.id_unidad)
+    
+    # Estadísticas filtradas según el rol y unidad
+    incidencias_para_stats = incidencias
+    if perfil.es_jefe() and perfil.id_trabajador and perfil.id_trabajador.id_unidad:
+        # Jefe ve estadísticas solo de su unidad (sin filtros aplicados)
+        incidencias_para_stats = Incidencia.objects.filter(
+            id_trabajador__id_unidad=perfil.id_trabajador.id_unidad
+        )
+    
     estadisticas = {
-        'total': incidencias.count(),
-        'pendientes': incidencias.filter(estado='pendiente').count(),
-        'autorizadas': incidencias.filter(estado='autorizada').count(),
-        'rechazadas': incidencias.filter(estado='rechazada').count(),
+        'total': incidencias_para_stats.count(),
+        'pendientes': incidencias_para_stats.filter(estado='pendiente').count(),
+        'autorizadas': incidencias_para_stats.filter(estado='autorizada').count(),
+        'rechazadas': incidencias_para_stats.filter(estado='rechazada').count(),
     }
     
     incidencias = incidencias.select_related(
@@ -112,6 +137,11 @@ def lista_incidencias(request):
         'form': form,
         'estadisticas': estadisticas,
         'perfil': perfil,
+        'trabajadores': trabajadores,
+        'todos_trabajadores': todos_trabajadores,
+        'unidades': unidades_queryset,
+        'es_admin': perfil.es_admin(),
+        'es_jefe': perfil.es_jefe(),
     }
     return render(request, 'incidencias/lista_incidencias.html', context)
 
@@ -121,6 +151,9 @@ def detalle_incidencia(request, pk):
     """Vista para ver el detalle de una incidencia"""
     incidencia = get_object_or_404(Incidencia, pk=pk)
     perfil = request.user.perfil
+    
+    # Detectar si viene desde mis_incidencias
+    from_mis_incidencias = request.GET.get('from') == 'mis_incidencias'
     
     # Verificar permisos
     puede_ver = False
@@ -142,6 +175,7 @@ def detalle_incidencia(request, pk):
         'incidencia': incidencia,
         'puede_autorizar': perfil.puede_autorizar_incidencias and incidencia.puede_ser_autorizada,
         'puede_editar': perfil.puede_autorizar_incidencias and incidencia.puede_ser_editada,
+        'from_mis_incidencias': from_mis_incidencias,
     }
     return render(request, 'incidencias/detalle_incidencia.html', context)
 
@@ -149,8 +183,11 @@ def detalle_incidencia(request, pk):
 @login_required
 def crear_incidencia(request):
     """Vista para crear una nueva incidencia"""
+    # Detectar si viene desde mis_incidencias
+    from_mis_incidencias = request.GET.get('from') == 'mis_incidencias'
+    
     if request.method == 'POST':
-        form = IncidenciaForm(request.POST, user=request.user)
+        form = IncidenciaForm(request.POST, user=request.user, from_mis_incidencias=from_mis_incidencias)
         if form.is_valid():
             try:
                 incidencia = form.save(commit=False)
@@ -165,16 +202,23 @@ def crear_incidencia(request):
                 
                 incidencia.save()
                 messages.success(request, 'Incidencia creada exitosamente.')
-                return redirect('incidencias:detalle_incidencia', pk=incidencia.pk)
+                
+                # Si viene desde mis_incidencias, redirigir al detalle con ese parámetro
+                if from_mis_incidencias:
+                    return redirect(f"{reverse('incidencias:detalle_incidencia', args=[incidencia.pk])}?from=mis_incidencias")
+                else:
+                    return redirect('incidencias:detalle_incidencia', pk=incidencia.pk)
             except Exception as e:
                 messages.error(request, f'Error al crear la incidencia: {str(e)}')
     else:
-        form = IncidenciaForm(user=request.user)
+        form = IncidenciaForm(user=request.user, from_mis_incidencias=from_mis_incidencias)
     
     context = {
         'form': form,
         'titulo': 'Crear Nueva Incidencia',
-        'boton': 'Crear Incidencia'
+        'boton': 'Crear Incidencia',
+        'from_mis_incidencias': from_mis_incidencias,
+        'trabajador_bloqueado': from_mis_incidencias and request.user.perfil.id_trabajador
     }
     return render(request, 'incidencias/form_incidencia.html', context)
 
@@ -367,9 +411,9 @@ def autorizar_incidencias(request):
     return render(request, 'incidencias/autorizar_incidencias.html', context)
 
 
-@admin_requerido
+@jefe_o_admin_requerido
 def crear_tipo_incidencia(request):
-    """Vista para registrar un nuevo tipo de incidencia (solo admin)"""
+    """Vista para registrar un nuevo tipo de incidencia (admin o jefe)"""
 
     if request.method == 'POST':
         form = TipoIncidenciaForm(request.POST)
