@@ -3,302 +3,712 @@
 {% block title %}Dashboard - SCA-B123{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y-5">
 
-    <!-- Welcome Banner -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg overflow-hidden relative">
+    {% if user.perfil.rol == 'espera' %}
+    <!-- Mensaje para usuarios en espera -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl shadow-lg overflow-hidden relative">
         <div class="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-10"></div>
-        <div class="relative z-10 px-8 py-10 flex items-center gap-6">
-            <div class="w-16 h-16 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <i class="fas fa-home text-3xl text-white"></i>
-            </div>
-            <div class="text-white">
-                <h1 class="text-3xl font-bold mb-1">¡Bienvenido, {{ user.get_full_name|default:user.username }}!</h1>
-                <p class="text-blue-100 text-sm">
-                    Sistema de Control de Asistencia - Apartado B del Artículo 123 Constitucional
+        <div class="relative z-10 px-8 py-12 text-white text-center">
+            <div class="max-w-2xl mx-auto">
+                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-hourglass-half text-4xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold mb-4">Cuenta en Espera de Asignación</h1>
+                <p class="text-blue-50 text-lg mb-6 leading-relaxed">
+                    Tu cuenta ha sido creada exitosamente, pero aún no tiene un rol asignado.
+                    Un administrador del sistema debe asignarte un rol para que puedas acceder a las funcionalidades del sistema.
+                </p>
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-left">
+                    <h3 class="font-semibold text-lg mb-3 flex items-center gap-2">
+                        <i class="fas fa-info-circle"></i>
+                        ¿Qué significa esto?
+                    </h3>
+                    <ul class="space-y-2 text-blue-50">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle mt-1 flex-shrink-0"></i>
+                            <span>Tu cuenta está activa y segura</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-clock mt-1 flex-shrink-0"></i>
+                            <span>Estás en espera de que un administrador te asigne un rol apropiado</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-user-shield mt-1 flex-shrink-0"></i>
+                            <span>Una vez asignado tu rol, tendrás acceso completo al sistema</span>
+                        </li>
+                    </ul>
+                </div>
+                <p class="text-sm text-blue-100 mt-6">
+                    Si tienes dudas, contacta al administrador del sistema.
                 </p>
             </div>
         </div>
-
-        <!-- Decorative circles -->
-        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-        <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+    </div>
+    {% elif user.perfil.rol == 'jefe' and not user.perfil.id_trabajador %}
+    <!-- Mensaje para jefes sin trabajador -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-500 rounded-xl shadow-lg overflow-hidden relative">
+        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-10"></div>
+        <div class="relative z-10 px-8 py-12 text-white text-center">
+            <div class="max-w-2xl mx-auto">
+                <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-user-tie text-4xl"></i>
+                </div>
+                <h1 class="text-3xl font-bold mb-4">Trabajador No Asignado</h1>
+                <p class="text-blue-50 text-lg mb-6 leading-relaxed">
+                    Tu cuenta tiene el rol de Jefe de Área/Supervisor, pero aún no tienes un trabajador asignado.
+                    Un administrador debe asociar tu cuenta con un trabajador para determinar tu unidad administrativa y darte acceso al sistema.
+                </p>
+                <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-left">
+                    <h3 class="font-semibold text-lg mb-3 flex items-center gap-2">
+                        <i class="fas fa-info-circle"></i>
+                        ¿Qué significa esto?
+                    </h3>
+                    <ul class="space-y-2 text-blue-50">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle mt-1 flex-shrink-0"></i>
+                            <span>Tu cuenta está activa y segura</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-user-tie mt-1 flex-shrink-0"></i>
+                            <span>Necesitas estar asociado a un trabajador que defina tu unidad administrativa</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-building mt-1 flex-shrink-0"></i>
+                            <span>Tu unidad administrativa determina qué trabajadores y datos puedes gestionar</span>
+                        </li>
+                    </ul>
+                </div>
+                <p class="text-sm text-blue-100 mt-6">
+                    Si tienes dudas, contacta al administrador del sistema.
+                </p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    
+    {% if perfil.es_admin %}
+    <!-- ============================================ -->
+    <!--          DASHBOARD ADMINISTRADOR             -->
+    <!-- ============================================ -->
+    
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-red-100 dark:bg-red-500/10 rounded-lg flex items-center justify-center">
+                <i class="fas fa-user-shield text-red-600 dark:text-red-400 text-base"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Dashboard Administrativo</h1>
+                <p class="text-xs text-gray-500 dark:text-dark-400">Visión general del sistema</p>
+            </div>
+        </div>
     </div>
 
-    <!-- Stats Cards (Admin only) -->
-    {% if es_admin or user.perfil.rol == 'admin' or user.is_staff %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Total Usuarios -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-users text-blue-600 dark:text-blue-400 text-xl"></i>
+    <!-- Estadísticas Principales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-gradient-to-br from-primary-900/40 to-gray-900 dark:from-primary-900/30 dark:to-dark-900 border border-primary-700/50 dark:border-primary-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-primary-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-primary-400 dark:text-primary-300 uppercase tracking-wider font-medium">Total Usuarios</p>
+                    <p class="text-3xl font-bold text-primary-400 dark:text-primary-300 mt-1">{{ total_usuarios }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Activos</p>
                 </div>
-                <span
-                    class="bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 text-xs font-bold px-2 py-1 rounded-full">
-                    Sistema
-                </span>
+                <div class="w-12 h-12 bg-primary-900/50 dark:bg-primary-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-users text-primary-500 dark:text-primary-400 text-xl"></i>
+                </div>
             </div>
-            <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">{{ total_usuarios }}</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Total de Usuarios</p>
         </div>
 
-        <!-- Total Trabajadores -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-user-tie text-green-600 dark:text-green-400 text-xl"></i>
+        <div class="bg-gradient-to-br from-emerald-900/40 to-gray-900 dark:from-emerald-900/30 dark:to-dark-900 border border-emerald-700/50 dark:border-emerald-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-emerald-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-emerald-400 dark:text-emerald-300 uppercase tracking-wider font-medium">Trabajadores</p>
+                    <p class="text-3xl font-bold text-emerald-400 dark:text-emerald-300 mt-1">{{ total_trabajadores }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Activos</p>
                 </div>
-                <span
-                    class="bg-green-100 text-green-600 dark:bg-green-900/40 dark:text-green-400 text-xs font-bold px-2 py-1 rounded-full">
-                    Activos
-                </span>
+                <div class="w-12 h-12 bg-emerald-900/50 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-user-tie text-emerald-500 dark:text-emerald-400 text-xl"></i>
+                </div>
             </div>
-            <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">{{ total_trabajadores }}</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Trabajadores Registrados</p>
         </div>
 
-        <!-- Asistencias Hoy -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-clipboard-check text-orange-600 dark:text-orange-400 text-xl"></i>
+        <div class="bg-gradient-to-br from-indigo-900/40 to-gray-900 dark:from-indigo-900/30 dark:to-dark-900 border border-indigo-700/50 dark:border-indigo-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-indigo-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-indigo-400 dark:text-indigo-300 uppercase tracking-wider font-medium">Unidades</p>
+                    <p class="text-3xl font-bold text-indigo-400 dark:text-indigo-300 mt-1">{{ total_unidades }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Administrativas</p>
                 </div>
-                <span
-                    class="bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400 text-xs font-bold px-2 py-1 rounded-full">
-                    Hoy
-                </span>
+                <div class="w-12 h-12 bg-indigo-900/50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-building text-indigo-500 dark:text-indigo-400 text-xl"></i>
+                </div>
             </div>
-            <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">--</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Asistencias Registradas</p>
         </div>
 
-        <!-- Faltas de hoy -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
-            <div class="flex items-center justify-between mb-4">
-                <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-user-times text-red-600 dark:text-red-400 text-xl"></i>
+        <div class="bg-gradient-to-br from-amber-900/40 to-gray-900 dark:from-amber-900/30 dark:to-dark-900 border border-amber-700/50 dark:border-amber-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-amber-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-amber-400 dark:text-amber-300 uppercase tracking-wider font-medium">Pendientes</p>
+                    <p class="text-3xl font-bold text-amber-400 dark:text-amber-300 mt-1">{{ incidencias_pendientes }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Incidencias</p>
                 </div>
-                <span
-                    class="bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400 text-xs font-bold px-2 py-1 rounded-full">
-                    Hoy
-                </span>
+                <div class="w-12 h-12 bg-amber-900/50 dark:bg-amber-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-amber-500 dark:text-amber-400 text-xl"></i>
+                </div>
             </div>
-            <h3 class="text-3xl font-bold text-gray-800 dark:text-gray-100">--</h3>
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Faltas Registradas</p>
+        </div>
+    </div>
+
+    <!-- Asistencias del Día -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-2 mb-4">
+            <i class="fas fa-calendar-day text-primary-600 dark:text-primary-400 text-sm"></i>
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Asistencias de Hoy</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-emerald-700 dark:text-emerald-300 font-medium">Presentes</p>
+                        <p class="text-2xl font-bold text-emerald-900 dark:text-emerald-100 mt-1">{{ asistencias_hoy }}</p>
+                    </div>
+                    <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-amber-700 dark:text-amber-300 font-medium">Retardos</p>
+                        <p class="text-2xl font-bold text-amber-900 dark:text-amber-100 mt-1">{{ retardos_hoy }}</p>
+                    </div>
+                    <i class="fas fa-clock text-amber-600 dark:text-amber-400 text-2xl"></i>
+                </div>
+            </div>
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-red-700 dark:text-red-300 font-medium">Faltas</p>
+                        <p class="text-2xl font-bold text-red-900 dark:text-red-100 mt-1">{{ faltas_hoy }}</p>
+                    </div>
+                    <i class="fas fa-times-circle text-red-600 dark:text-red-400 text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Accesos Directos -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-bolt text-primary-600 dark:text-primary-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Accesos Rápidos</h2>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="{% url 'trabajadores:crear' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-500/10 rounded flex items-center justify-center group-hover:bg-emerald-200 dark:group-hover:bg-emerald-500/20 transition">
+                            <i class="fas fa-user-plus text-emerald-600 dark:text-emerald-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Nuevo Trabajador</span>
+                    </div>
+                </a>
+                <a href="{% url 'accounts:lista_usuarios' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-primary-500 dark:hover:border-primary-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-primary-100 dark:bg-primary-500/10 rounded flex items-center justify-center group-hover:bg-primary-200 dark:group-hover:bg-primary-500/20 transition">
+                            <i class="fas fa-users-cog text-primary-600 dark:text-primary-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Gestionar Usuarios</span>
+                    </div>
+                </a>
+                <a href="{% url 'incidencias:lista_incidencias' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-amber-500 dark:hover:border-amber-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-amber-100 dark:bg-amber-500/10 rounded flex items-center justify-center group-hover:bg-amber-200 dark:group-hover:bg-amber-500/20 transition">
+                            <i class="fas fa-check-double text-amber-600 dark:text-amber-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Autorizar Incidencias</span>
+                    </div>
+                </a>
+                <a href="{% url 'reportes:reporte_asistencias' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-purple-500 dark:hover:border-purple-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-purple-100 dark:bg-purple-500/10 rounded flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-500/20 transition">
+                            <i class="fas fa-chart-bar text-purple-600 dark:text-purple-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Ver Reportes</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Últimas Asistencias -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-history text-primary-600 dark:text-primary-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Últimos Registros</h2>
+            </div>
+            <div class="space-y-2">
+                {% for asistencia in ultimas_asistencias %}
+                <div class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-dark-800 last:border-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gray-100 dark:bg-dark-800 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-gray-600 dark:text-dark-400 text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-gray-900 dark:text-white">{{ asistencia.id_trabajador.nombre }}</p>
+                            <p class="text-[10px] text-gray-500 dark:text-dark-400">{{ asistencia.id_trabajador.id_unidad.nombre }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        {% if asistencia.estatus == 'ASI' %}
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded text-[10px] font-medium">
+                            <i class="fas fa-check text-[8px]"></i>
+                            Presente
+                        </span>
+                        {% elif asistencia.estatus == 'RET' %}
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded text-[10px] font-medium">
+                            <i class="fas fa-clock text-[8px]"></i>
+                            Retardo
+                        </span>
+                        {% elif asistencia.estatus == 'FAL' %}
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-[10px] font-medium">
+                            <i class="fas fa-times text-[8px]"></i>
+                            Falta
+                        </span>
+                        {% endif %}
+                        <p class="text-[10px] text-gray-500 dark:text-dark-400 mt-0.5">{{ asistencia.fecha|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-xs text-gray-500 dark:text-dark-400 text-center py-4">No hay registros recientes</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    {% elif perfil.es_jefe %}
+    <!-- ============================================ -->
+    <!--          DASHBOARD JEFE DE UNIDAD            -->
+    <!-- ============================================ -->
+    
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary-100 dark:bg-primary-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-user-tie text-primary-600 dark:text-primary-400 text-base"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Dashboard de Supervisión</h1>
+                    <p class="text-xs text-gray-500 dark:text-dark-400">{{ mi_unidad.nombre }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas de la Unidad -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-gradient-to-br from-primary-900/40 to-gray-900 dark:from-primary-900/30 dark:to-dark-900 border border-primary-700/50 dark:border-primary-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-primary-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-primary-400 dark:text-primary-300 uppercase tracking-wider font-medium">Personal</p>
+                    <p class="text-3xl font-bold text-primary-400 dark:text-primary-300 mt-1">{{ total_trabajadores_unidad }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Trabajadores</p>
+                </div>
+                <div class="w-12 h-12 bg-primary-900/50 dark:bg-primary-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-users text-primary-500 dark:text-primary-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-emerald-900/40 to-gray-900 dark:from-emerald-900/30 dark:to-dark-900 border border-emerald-700/50 dark:border-emerald-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-emerald-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-emerald-400 dark:text-emerald-300 uppercase tracking-wider font-medium">Presentes Hoy</p>
+                    <p class="text-3xl font-bold text-emerald-400 dark:text-emerald-300 mt-1">{{ asistencias_hoy }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Asistencias</p>
+                </div>
+                <div class="w-12 h-12 bg-emerald-900/50 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-check-circle text-emerald-500 dark:text-emerald-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-amber-900/40 to-gray-900 dark:from-amber-900/30 dark:to-dark-900 border border-amber-700/50 dark:border-amber-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-amber-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-amber-400 dark:text-amber-300 uppercase tracking-wider font-medium">Retardos Hoy</p>
+                    <p class="text-3xl font-bold text-amber-400 dark:text-amber-300 mt-1">{{ retardos_hoy }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Con demora</p>
+                </div>
+                <div class="w-12 h-12 bg-amber-900/50 dark:bg-amber-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clock text-amber-500 dark:text-amber-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-red-900/40 to-gray-900 dark:from-red-900/30 dark:to-dark-900 border border-red-700/50 dark:border-red-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-red-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-red-400 dark:text-red-300 uppercase tracking-wider font-medium">Por Autorizar</p>
+                    <p class="text-3xl font-bold text-red-400 dark:text-red-300 mt-1">{{ incidencias_pendientes }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Incidencias</p>
+                </div>
+                <div class="w-12 h-12 bg-red-900/50 dark:bg-red-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-red-500 dark:text-red-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Accesos Directos -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-bolt text-primary-600 dark:text-primary-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Accesos Rápidos</h2>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="{% url 'trabajadores:index' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-500/10 rounded flex items-center justify-center group-hover:bg-emerald-200 dark:group-hover:bg-emerald-500/20 transition">
+                            <i class="fas fa-users text-emerald-600 dark:text-emerald-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Mi Personal</span>
+                    </div>
+                </a>
+                <a href="{% url 'asistencias:lista' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-primary-500 dark:hover:border-primary-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-primary-100 dark:bg-primary-500/10 rounded flex items-center justify-center group-hover:bg-primary-200 dark:group-hover:bg-primary-500/20 transition">
+                            <i class="fas fa-clipboard-list text-primary-600 dark:text-primary-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Asistencias</span>
+                    </div>
+                </a>
+                <a href="{% url 'incidencias:lista_incidencias' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-amber-500 dark:hover:border-amber-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-amber-100 dark:bg-amber-500/10 rounded flex items-center justify-center group-hover:bg-amber-200 dark:group-hover:bg-amber-500/20 transition">
+                            <i class="fas fa-check-double text-amber-600 dark:text-amber-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Autorizar</span>
+                    </div>
+                </a>
+                <a href="{% url 'reportes:reporte_asistencias' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-purple-500 dark:hover:border-purple-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-purple-100 dark:bg-purple-500/10 rounded flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-500/20 transition">
+                            <i class="fas fa-chart-bar text-purple-600 dark:text-purple-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Reportes</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Últimas Asistencias de la Unidad -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-history text-primary-600 dark:text-primary-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Últimos Registros</h2>
+            </div>
+            <div class="space-y-2">
+                {% for asistencia in ultimas_asistencias %}
+                <div class="flex items-center justify-between py-2 border-b border-gray-100 dark:border-dark-800 last:border-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-gray-100 dark:bg-dark-800 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user text-gray-600 dark:text-dark-400 text-xs"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-gray-900 dark:text-white">{{ asistencia.id_trabajador.nombre }}</p>
+                            <p class="text-[10px] text-gray-500 dark:text-dark-400">{{ asistencia.fecha|date:"d/m/Y" }}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        {% if asistencia.estatus == 'ASI' %}
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded text-[10px] font-medium">
+                            <i class="fas fa-check text-[8px]"></i>
+                            Presente
+                        </span>
+                        {% elif asistencia.estatus == 'RET' %}
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded text-[10px] font-medium">
+                            <i class="fas fa-clock text-[8px]"></i>
+                            Retardo
+                        </span>
+                        {% elif asistencia.estatus == 'FAL' %}
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-[10px] font-medium">
+                            <i class="fas fa-times text-[8px]"></i>
+                            Falta
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-xs text-gray-500 dark:text-dark-400 text-center py-4">No hay registros recientes</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal de la Unidad -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-2 mb-4">
+            <i class="fas fa-users text-primary-600 dark:text-primary-400 text-sm"></i>
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Personal Asignado</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {% for trabajador in trabajadores_unidad %}
+            <div class="bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user text-emerald-600 dark:text-emerald-400 text-sm"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-medium text-gray-900 dark:text-white truncate">{{ trabajador.nombre }}</p>
+                        <p class="text-[10px] text-gray-500 dark:text-dark-400 truncate">{{ trabajador.id_puesto.nombre_puesto }}</p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-xs text-gray-500 dark:text-dark-400 col-span-3 text-center py-4">No hay trabajadores asignados</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% elif perfil.es_trabajador %}
+    <!-- ============================================ -->
+    <!--          DASHBOARD TRABAJADOR                -->
+    <!-- ============================================ -->
+    
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-primary-100 dark:bg-primary-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-user text-primary-600 dark:text-primary-400 text-base"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Mi Dashboard</h1>
+                    <p class="text-xs text-gray-500 dark:text-dark-400">{{ mi_trabajador.nombre }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Personales -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-gradient-to-br from-emerald-900/40 to-gray-900 dark:from-emerald-900/30 dark:to-dark-900 border border-emerald-700/50 dark:border-emerald-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-emerald-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-emerald-400 dark:text-emerald-300 uppercase tracking-wider font-medium">Asistencias</p>
+                    <p class="text-3xl font-bold text-emerald-400 dark:text-emerald-300 mt-1">{{ asistencias_mes }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Este mes</p>
+                </div>
+                <div class="w-12 h-12 bg-emerald-900/50 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-check-circle text-emerald-500 dark:text-emerald-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-amber-900/40 to-gray-900 dark:from-amber-900/30 dark:to-dark-900 border border-amber-700/50 dark:border-amber-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-amber-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-amber-400 dark:text-amber-300 uppercase tracking-wider font-medium">Retardos</p>
+                    <p class="text-3xl font-bold text-amber-400 dark:text-amber-300 mt-1">{{ retardos_mes }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Este mes</p>
+                </div>
+                <div class="w-12 h-12 bg-amber-900/50 dark:bg-amber-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clock text-amber-500 dark:text-amber-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-red-900/40 to-gray-900 dark:from-red-900/30 dark:to-dark-900 border border-red-700/50 dark:border-red-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-red-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-red-400 dark:text-red-300 uppercase tracking-wider font-medium">Faltas</p>
+                    <p class="text-3xl font-bold text-red-400 dark:text-red-300 mt-1">{{ faltas_mes }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Este mes</p>
+                </div>
+                <div class="w-12 h-12 bg-red-900/50 dark:bg-red-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-times-circle text-red-500 dark:text-red-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-purple-900/40 to-gray-900 dark:from-purple-900/30 dark:to-dark-900 border border-purple-700/50 dark:border-purple-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-purple-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-purple-400 dark:text-purple-300 uppercase tracking-wider font-medium">Estado Hoy</p>
+                    {% if asistencia_hoy %}
+                        {% if asistencia_hoy.estatus == 'ASI' %}
+                        <p class="text-2xl font-bold text-purple-400 dark:text-purple-300 mt-1">Presente</p>
+                        {% elif asistencia_hoy.estatus == 'RET' %}
+                        <p class="text-2xl font-bold text-purple-400 dark:text-purple-300 mt-1">Retardo</p>
+                        {% else %}
+                        <p class="text-2xl font-bold text-purple-400 dark:text-purple-300 mt-1">Falta</p>
+                        {% endif %}
+                    {% else %}
+                    <p class="text-2xl font-bold text-purple-400 dark:text-purple-300 mt-1">Sin registro</p>
+                    {% endif %}
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Asistencia</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-900/50 dark:bg-purple-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-calendar-day text-purple-500 dark:text-purple-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Accesos Directos -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-bolt text-primary-600 dark:text-primary-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Accesos Rápidos</h2>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+                <a href="{% url 'asistencias:mi_registro' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-emerald-100 dark:bg-emerald-500/10 rounded flex items-center justify-center group-hover:bg-emerald-200 dark:group-hover:bg-emerald-500/20 transition">
+                            <i class="fas fa-fingerprint text-emerald-600 dark:text-emerald-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Registrar</span>
+                    </div>
+                </a>
+                <a href="{% url 'incidencias:mis_incidencias' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-primary-500 dark:hover:border-primary-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-primary-100 dark:bg-primary-500/10 rounded flex items-center justify-center group-hover:bg-primary-200 dark:group-hover:bg-primary-500/20 transition">
+                            <i class="fas fa-file-alt text-primary-600 dark:text-primary-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Incidencias</span>
+                    </div>
+                </a>
+                <a href="{% url 'jornadas:mi_jornada' %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-amber-500 dark:hover:border-amber-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-amber-100 dark:bg-amber-500/10 rounded flex items-center justify-center group-hover:bg-amber-200 dark:group-hover:bg-amber-500/20 transition">
+                            <i class="fas fa-calendar-alt text-amber-600 dark:text-amber-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Mi Horario</span>
+                    </div>
+                </a>
+                <a href="{% url 'asistencias:resumen' mi_trabajador.numero_empleado %}" class="group bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-3 hover:border-purple-500 dark:hover:border-purple-500 transition-all">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-purple-100 dark:bg-purple-500/10 rounded flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-500/20 transition">
+                            <i class="fas fa-history text-purple-600 dark:text-purple-400 text-sm"></i>
+                        </div>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Historial</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Incidencias Pendientes -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+            <div class="flex items-center gap-2 mb-4">
+                <i class="fas fa-exclamation-circle text-primary-600 dark:text-primary-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Mis Incidencias</h2>
+            </div>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-clock text-amber-600 dark:text-amber-400 text-sm"></i>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Pendientes</span>
+                    </div>
+                    <span class="text-lg font-bold text-amber-600 dark:text-amber-400">{{ mis_incidencias_pendientes }}</span>
+                </div>
+                <div class="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-times-circle text-red-600 dark:text-red-400 text-sm"></i>
+                        <span class="text-xs font-medium text-gray-900 dark:text-white">Rechazadas</span>
+                    </div>
+                    <span class="text-lg font-bold text-red-600 dark:text-red-400">{{ mis_incidencias_rechazadas }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mi Jornada Laboral -->
+    {% if mi_jornada %}
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-2 mb-4">
+            <i class="fas fa-briefcase text-primary-600 dark:text-primary-400 text-sm"></i>
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Mi Jornada Laboral</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-4">
+                <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Horario de Entrada</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ mi_jornada.horario_entrada|time:"H:i" }}</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-4">
+                <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Horario de Salida</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ mi_jornada.horario_salida|time:"H:i" }}</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-4">
+                <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Días Laborales</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ mi_jornada.dias_laborales }}</p>
+            </div>
         </div>
     </div>
     {% endif %}
 
-    <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-        <!-- Left Column: User Info & Quick Stats -->
-        <div class="lg:col-span-2 space-y-6">
-
-            <!-- Mi Información Laboral (si existe) -->
-            {% if mi_trabajador %}
-            <div
-                class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="p-6 border-b border-gray-100 dark:border-gray-700">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <i class="fas fa-id-card text-blue-500"></i>
-                        Mi Información Laboral
-                    </h2>
-                </div>
-                <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Número de Empleado</p>
-                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{
-                                mi_trabajador.numero_empleado }}</p>
-                        </div>
-                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Departamento</p>
-                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ mi_trabajador.departamento
-                                }}</p>
-                        </div>
-                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Puesto</p>
-                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{ mi_trabajador.puesto }}
-                            </p>
-                        </div>
-                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Fecha de Ingreso</p>
-                            <p class="text-lg font-semibold text-gray-900 dark:text-white">{{
-                                mi_trabajador.fecha_ingreso|date:"d/m/Y" }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-        <!-- Right Column: Quick Actions & Info -->
-        <div class="space-y-6">
-
-            <!-- Accesos Rápidos -->
-            <div
-                class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="p-6 border-b border-gray-100 dark:border-gray-700">
-                    <h3 class="font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                        <i class="fas fa-bolt text-yellow-500"></i>
-                        Accesos Rápidos
-                    </h3>
-                </div>
-                <div class="p-4 space-y-2">
-                    {% if user.perfil.rol == 'admin' or user.is_staff %}
-                    <!-- Gestionar Usuarios (Admin) -->
-                    <a href="{% url 'accounts:lista_usuarios' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-users-cog text-sm"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Gestionar Usuarios</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    
-                    <!-- Ver Trabajadores (Admin) -->
-                    <a href="{% url 'trabajadores:index' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-user-tie text-sm"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ver Trabajadores</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    
-                    <!-- Ver Asistencias (Admin/Jefe) -->
-                    <a href="{% url 'asistencias:index' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-clipboard-check text-sm"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ver Asistencias</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    
-                    <!-- Ver Reportes (Admin/Jefe) -->
-                    <a href="{% url 'reportes:index' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-chart-bar text-sm"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ver Reportes</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    {% elif user.perfil.rol == 'jefe' %}
-                    <!-- Ver Asistencias (Jefe) -->
-                    <a href="{% url 'asistencias:index' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-clipboard-check text-sm"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ver Asistencias</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    
-                    <!-- Mis Incidencias (Jefe) -->
-                    <a href="{% url 'incidencias:index' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-exclamation-triangle text-sm"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Gestionar Incidencias</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    
-                    <!-- Ver Reportes (Jefe) -->
-                    <a href="{% url 'reportes:index' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-chart-bar text-sm"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Ver Reportes</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    {% else %}
-                    <!-- Mis Incidencias (Trabajador) -->
-                    <a href="{% url 'incidencias:index' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-exclamation-triangle text-sm"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Mis Incidencias</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    
-                    <!-- Mi Perfil (Trabajador) -->
-                    <a href="{% url 'accounts:mi_perfil' %}"
-                        class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/30 transition-colors group">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-user-circle text-sm"></i>
-                            </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Mi Perfil</span>
-                        </div>
-                        <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- System Info -->
-            <div
-                class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-6">
-                <div class="flex items-start gap-3">
-                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
-                    <div>
-                        <h4 class="font-semibold text-blue-900 dark:text-blue-100 text-sm mb-2">Información del Sistema
-                        </h4>
-                        <div class="space-y-2 text-xs text-blue-800 dark:text-blue-200">
-                            <div class="flex items-center gap-2">
-                                <i class="fas fa-user w-4"></i>
-                                <span>Usuario: <strong>{{ user.username }}</strong></span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <i class="fas fa-tag w-4"></i>
-                                <span>Rol: <strong>{{ user.perfil.rol|default:"Sin rol" }}</strong></span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <i class="fas fa-clock w-4"></i>
-                                <span>Último acceso: <strong>{{ user.last_login|date:"d/m/Y H:i" }}</strong></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+    <!-- Últimas Asistencias -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-2 mb-4">
+            <i class="fas fa-history text-primary-600 dark:text-primary-400 text-sm"></i>
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Mis Últimos Registros</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs">
+                <thead>
+                    <tr class="border-b border-gray-200 dark:border-dark-800">
+                        <th class="text-left py-2 px-3 text-gray-600 dark:text-dark-400 font-medium">Fecha</th>
+                        <th class="text-left py-2 px-3 text-gray-600 dark:text-dark-400 font-medium">Entrada</th>
+                        <th class="text-left py-2 px-3 text-gray-600 dark:text-dark-400 font-medium">Salida</th>
+                        <th class="text-left py-2 px-3 text-gray-600 dark:text-dark-400 font-medium">Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for asistencia in mis_ultimas_asistencias %}
+                    <tr class="border-b border-gray-100 dark:border-dark-800 last:border-0 hover:bg-gray-50 dark:hover:bg-dark-800 transition">
+                        <td class="py-2 px-3 text-gray-900 dark:text-white">{{ asistencia.fecha|date:"d/m/Y" }}</td>
+                        <td class="py-2 px-3 text-gray-900 dark:text-white">{{ asistencia.hora_entrada|time:"H:i" }}</td>
+                        <td class="py-2 px-3 text-gray-900 dark:text-white">
+                            {% if asistencia.hora_salida %}
+                            {{ asistencia.hora_salida|time:"H:i" }}
+                            {% else %}
+                            <span class="text-gray-400 dark:text-dark-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-2 px-3">
+                            {% if asistencia.estatus == 'ASI' %}
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded text-[10px] font-medium">
+                                <i class="fas fa-check text-[8px]"></i>
+                                Presente
+                            </span>
+                            {% elif asistencia.estatus == 'RET' %}
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded text-[10px] font-medium">
+                                <i class="fas fa-clock text-[8px]"></i>
+                                Retardo
+                            </span>
+                            {% elif asistencia.estatus == 'FAL' %}
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-[10px] font-medium">
+                                <i class="fas fa-times text-[8px]"></i>
+                                Falta
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="py-4 text-center text-gray-500 dark:text-dark-400">No hay registros de asistencia</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+
+    {% endif %}
+    
+    {% endif %}
 
 </div>
 {% endblock %}

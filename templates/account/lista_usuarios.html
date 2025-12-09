@@ -3,54 +3,58 @@
 {% block title %}Gestión de Usuarios - SCA-B123{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-900 dark:to-blue-950 shadow-xl rounded-xl p-6 text-white transition-all duration-300">
-        <div class="flex flex-col md:flex-row items-center justify-between">
-            <div class="mb-4 md:mb-0">
-                <h1 class="text-3xl md:text-4xl font-bold flex items-center">
-                    <i class="fas fa-users-cog mr-3"></i>
-                    Gestión de Usuarios
-                </h1>
-                <p class="text-blue-100 mt-2">Administra y controla los usuarios del sistema</p>
+<div class="space-y-5">
+    
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl shadow-sm border border-gray-200 dark:border-dark-800 p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                    <i class="fas fa-users-cog text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        Gestión de Usuarios
+                    </h1>
+                    <p class="text-sm text-gray-600 dark:text-dark-300 mt-1">
+                        Administra y controla los usuarios del sistema
+                    </p>
+                </div>
             </div>
-            <div class="text-center md:text-right bg-white/20 dark:bg-black/20 rounded-lg px-6 py-4 backdrop-blur-sm">
-                <p class="text-4xl font-bold">{{ usuarios.count }}</p>
-                <p class="text-sm text-blue-100 mt-1">Total de usuarios</p>
+            <div class="text-center bg-indigo-50 dark:bg-indigo-500/10 rounded-lg px-6 py-3 border border-indigo-200 dark:border-indigo-500/20">
+                <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{{ usuarios.count }}</p>
+                <p class="text-xs text-gray-600 dark:text-dark-400 mt-1">Total usuarios</p>
             </div>
         </div>
     </div>
     
-    <!-- Filtros y Búsqueda -->
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 transition-colors duration-300">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
-            <i class="fas fa-filter text-blue-600 dark:text-blue-400 mr-2"></i>
+    <!-- Filtros y Búsqueda Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl shadow-sm border border-gray-200 dark:border-dark-800 p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
+            <i class="fas fa-filter text-indigo-600 dark:text-indigo-400"></i>
             Filtros y Búsqueda
         </h2>
-        <form method="get" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <form method="get" class="space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div class="md:col-span-2">
-                    <label for="q" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        <i class="fas fa-search mr-1"></i> Buscar Usuario
+                    <label for="q" class="block text-sm font-medium text-gray-700 dark:text-dark-300 mb-2">
+                        Buscar Usuario
                     </label>
-                    <div class="relative">
-                        <input type="text" 
-                               name="q" 
-                               id="q" 
-                               value="{{ query }}"
-                               placeholder="Buscar por username o email..."
-                               class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition duration-200">
-                        <i class="fas fa-search absolute left-3 top-4 text-gray-400 dark:text-gray-500"></i>
-                    </div>
+                    <input type="text" 
+                           name="q" 
+                           id="q" 
+                           value="{{ query }}"
+                           placeholder="Buscar por username o email..."
+                           class="w-full h-11 px-4 py-2.5 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-dark-500">
                 </div>
                 
                 <div>
-                    <label for="rol" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        <i class="fas fa-user-tag mr-1"></i> Filtrar por Rol
+                    <label for="rol" class="block text-sm font-medium text-gray-700 dark:text-dark-300 mb-2">
+                        Filtrar por Rol
                     </label>
                     <select name="rol" 
                             id="rol"
-                            class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition duration-200">
+                            class="w-full h-11 px-4 py-2.5 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-dark-800 text-gray-900 dark:text-white">
                         <option value="">Todos los roles</option>
                         {% for codigo, nombre in roles %}
                         <option value="{{ codigo }}" {% if rol_filtro == codigo %}selected{% endif %}>
@@ -61,139 +65,153 @@
                 </div>
             </div>
             
-            <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+            <div class="flex items-center gap-3">
                 <button type="submit" 
-                        class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 dark:from-blue-600 dark:to-blue-800 dark:hover:from-blue-700 dark:hover:to-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 shadow-md transition duration-200 transform hover:scale-105">
-                    <i class="fas fa-search mr-2"></i>
-                    Buscar
+                        class="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium shadow-sm">
+                    <i class="fas fa-search"></i>
+                    <span>Buscar</span>
                 </button>
                 <a href="{% url 'accounts:lista_usuarios' %}" 
-                   class="px-6 py-3 bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-500 transition duration-200 text-center">
-                    <i class="fas fa-times mr-2"></i>
-                    Limpiar
+                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white rounded-lg transition-colors text-sm font-medium shadow-sm">
+                    <i class="fas fa-times"></i>
+                    <span>Limpiar</span>
                 </a>
             </div>
         </form>
     </div>
 
     <!-- Tabla de Usuarios -->
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden transition-colors duration-300">
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+        
+        <!-- Header -->
+        <div class="px-5 py-3 border-b border-gray-200 dark:border-dark-800">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-users text-indigo-600 dark:text-indigo-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Lista de Usuarios</h2>
+            </div>
+        </div>
+
         {% if usuarios %}
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 dark:bg-dark-800/50 text-gray-700 dark:text-dark-300 border-b border-gray-200 dark:border-dark-700">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
-                            <i class="fas fa-user mr-1"></i> Usuario
+                        <th scope="col" class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Usuario
                         </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
-                            <i class="fas fa-shield-alt mr-1"></i> Rol
+                        <th scope="col" class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Rol
                         </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
-                            <i class="fas fa-id-badge mr-1"></i> Trabajador
+                        <th scope="col" class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Trabajador
                         </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
-                            <i class="fas fa-toggle-on mr-1"></i> Estado
+                        <th scope="col" class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Estado
                         </th>
-                        <th class="px-6 py-4 text-left text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
-                            <i class="fas fa-calendar-alt mr-1"></i> Registro
+                        <th scope="col" class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Registro
                         </th>
-                        <th class="px-6 py-4 text-center text-xs font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
-                            <i class="fas fa-cog mr-1"></i> Acciones
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Acciones
                         </th>
                     </tr>
                 </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                <tbody class="bg-white dark:bg-dark-900 divide-y divide-gray-200 dark:divide-dark-800">
                     {% for usuario in usuarios %}
-                    <tr class="hover:bg-blue-50 dark:hover:bg-gray-700/50 transition duration-150">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center">
-                                <div class="flex-shrink-0 h-12 w-12">
-                                    <div class="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-lg shadow-md">
-                                        {{ usuario.username|first|upper|default:"?" }}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-800/50 transition-colors duration-150">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    {% if usuario.perfil.avatar %}
+                                    <img class="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-dark-700" 
+                                         src="{{ usuario.perfil.avatar.url }}" 
+                                         alt="{{ usuario.username }}">
+                                    {% else %}
+                                    <div class="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-500/10 flex items-center justify-center border-2 border-indigo-200 dark:border-indigo-500/20">
+                                        <i class="fas fa-user text-indigo-600 dark:text-indigo-400"></i>
                                     </div>
+                                    {% endif %}
                                 </div>
-                                <div class="ml-4 break-all sm:break-normal">
-                                    <div class="text-sm font-semibold text-gray-900 dark:text-white">
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
                                         {{ usuario.username }}
                                     </div>
-                                    <div class="text-sm text-gray-500 dark:text-gray-400">
-                                        <i class="fas fa-envelope text-gray-400 dark:text-gray-500 mr-1"></i>
+                                    <div class="text-sm text-gray-500 dark:text-dark-400">
                                         {{ usuario.email }}
                                     </div>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full shadow-sm
-                                {% if usuario.perfil.rol == 'admin' %}bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300
-                                {% elif usuario.perfil.rol == 'jefe' %}bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300
-                                {% elif usuario.perfil.rol == 'trabajador' %}bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300
-                                {% else %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300{% endif %}">
-                                <i class="fas fa-user-shield mr-1"></i>
-                                {{ usuario.perfil.get_rol_display }}
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            {% if usuario.perfil.rol == 'admin' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-500/10 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20">
+                                <i class="fas fa-crown"></i>
+                                Administrador
                             </span>
+                            {% elif usuario.perfil.rol == 'jefe' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-500/10 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">
+                                <i class="fas fa-user-tie"></i>
+                                Jefe de Área / Supervisor
+                            </span>
+                            {% elif usuario.perfil.rol == 'trabajador' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                                <i class="fas fa-user"></i>
+                                Trabajador
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-500/10 dark:text-gray-400 border border-gray-200 dark:border-gray-500/20">
+                                <i class="fas fa-question"></i>
+                                Sin rol
+                            </span>
+                            {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {% if usuario.perfil.id_trabajador %}
-                                <div class="flex items-center">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
-                                        <i class="fas fa-check-circle mr-1"></i>
-                                        {{ usuario.perfil.id_trabajador.numero_empleado }}
-                                    </span>
-                                </div>
+                            <span class="text-sm text-gray-900 dark:text-white font-medium">
+                                {{ usuario.perfil.id_trabajador.nombre }} {{ usuario.perfil.id_trabajador.apellido_paterno }}
+                            </span>
                             {% else %}
-                                <div class="flex items-center text-gray-400 dark:text-gray-500">
-                                    <i class="fas fa-times-circle mr-1"></i>
-                                    No asignado
-                                </div>
+                            <span class="text-sm text-gray-400 dark:text-dark-500 italic">
+                                No asignado
+                            </span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4">
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {% if usuario.is_active %}
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 shadow-sm">
-                                    <i class="fas fa-check-circle mr-1"></i> Activo
-                                </span>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                                <i class="fas fa-check-circle"></i>
+                                Activo
+                            </span>
                             {% else %}
-                                <span class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 shadow-sm">
-                                    <i class="fas fa-times-circle mr-1"></i> Inactivo
-                                </span>
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-500/10 dark:text-red-400 border border-red-200 dark:border-red-500/20">
+                                <i class="fas fa-times-circle"></i>
+                                Inactivo
+                            </span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
-                            <i class="fas fa-calendar text-gray-400 dark:text-gray-500 mr-1"></i>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-dark-400">
                             {{ usuario.date_joined|date:"d/m/Y" }}
                         </td>
-                        <td class="px-6 py-4 text-center text-sm font-medium">
-                            <div class="flex items-center justify-center space-x-2">
-                                {% if es_admin %}
-                                <!-- Botón de editar rol -->
+                        <td class="px-4 py-3 whitespace-nowrap text-center">
+                            <div class="flex items-center justify-center gap-1">
                                 <a href="{% url 'accounts:asignar_rol' usuario.id %}" 
-                                   class="px-3 py-2 text-white font-semibold bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-md transition duration-200 transform hover:scale-105"
+                                   class="inline-flex items-center justify-center w-8 h-8 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors duration-200"
                                    title="Editar rol">
-                                    <i class="fas fa-edit"></i>
+                                    <i class="fas fa-user-edit text-sm"></i>
                                 </a>
-                                <!-- Botón activar/desactivar -->
+                                
                                 {% if usuario.is_active %}
-                                <form method="post" action="{% url 'accounts:desactivar_usuario' usuario.id %}" class="inline">
-                                    {% csrf_token %}
-                                    <button type="submit" 
-                                            class="px-3 py-2 text-white font-semibold bg-gradient-to-r from-red-500 to-red-600 rounded-lg hover:from-red-600 hover:to-red-700 shadow-md transition duration-200 transform hover:scale-105"
-                                            title="Desactivar usuario"
-                                            onclick="return confirm('¿Estás seguro de desactivar este usuario?')">
-                                        <i class="fas fa-user-slash"></i>
-                                    </button>
-                                </form>
+                                <button onclick="confirmarCambioEstado({{ usuario.id }}, '{{ usuario.username }}', false)"
+                                        class="inline-flex items-center justify-center w-8 h-8 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-500/10 rounded-lg transition-colors duration-200"
+                                        title="Desactivar usuario">
+                                    <i class="fas fa-user-slash text-sm"></i>
+                                </button>
                                 {% else %}
-                                <form method="post" action="{% url 'accounts:activar_usuario' usuario.id %}" class="inline">
-                                    {% csrf_token %}
-                                    <button type="submit" 
-                                            class="px-3 py-2 text-white font-semibold bg-gradient-to-r from-green-500 to-green-600 rounded-lg hover:from-green-600 hover:to-green-700 shadow-md transition duration-200 transform hover:scale-105"
-                                            title="Activar usuario">
-                                        <i class="fas fa-user-check"></i>
-                                    </button>
-                                </form>
-                                {% endif %}
+                                <button onclick="confirmarCambioEstado({{ usuario.id }}, '{{ usuario.username }}', true)"
+                                        class="inline-flex items-center justify-center w-8 h-8 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-colors duration-200"
+                                        title="Activar usuario">
+                                    <i class="fas fa-check text-sm"></i>
+                                </button>
                                 {% endif %}
                             </div>
                         </td>
@@ -203,67 +221,142 @@
             </table>
         </div>
         {% else %}
-        <div class="text-center py-16 dark:text-gray-300">
-            <div class="inline-block p-6 bg-gray-100 dark:bg-gray-700 rounded-full mb-4">
-                <i class="fas fa-users text-gray-400 dark:text-gray-500 text-6xl"></i>
+        <!-- Empty State -->
+        <div class="text-center py-12">
+            <div class="flex justify-center mb-4">
+                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                    <i class="fas fa-users text-2xl"></i>
+                </div>
             </div>
-            <p class="text-gray-600 dark:text-gray-300 text-xl font-medium">No se encontraron usuarios</p>
-            <p class="text-gray-400 dark:text-gray-500 mt-2">Intenta ajustar los filtros de búsqueda</p>
-            {% if query or rol_filtro %}
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay usuarios</h3>
+            <p class="text-gray-500 dark:text-dark-400 mb-6">
+                {% if query or rol_filtro %}
+                    No se encontraron usuarios con los criterios especificados.
+                {% else %}
+                    No hay usuarios registrados en el sistema.
+                {% endif %}
+            </p>
             <a href="{% url 'accounts:lista_usuarios' %}" 
-               class="inline-block mt-4 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200">
-                <i class="fas fa-list mr-2"></i>
-                Ver todos los usuarios
+               class="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium shadow-sm">
+                <i class="fas fa-users"></i>
+                <span>Ver todos los usuarios</span>
             </a>
-            {% endif %}
         </div>
         {% endif %}
+    </div>
+
+    <!-- Modal de Confirmación de Cambio de Estado -->
+    <div id="modalCambioEstado" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 shadow-2xl max-w-md w-full overflow-hidden">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-dark-800">
+                <div class="flex items-center gap-3">
+                    <div id="modalIcon" class="w-10 h-10 rounded-lg flex items-center justify-center">
+                        <i id="modalIconElement" class="text-base"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white" id="modalTitulo"></h3>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 py-4">
+                <p class="text-sm text-gray-600 dark:text-dark-300 mb-2" id="modalMensaje"></p>
+                
+                <div class="bg-gray-50 dark:bg-dark-800 rounded-lg p-3 my-4">
+                    <div class="text-sm">
+                        <p class="text-gray-500 dark:text-dark-400 text-xs mb-1">Usuario</p>
+                        <p class="text-gray-900 dark:text-white font-medium" id="nombreUsuario"></p>
+                    </div>
+                </div>
+
+                <p class="text-xs mt-3" id="modalAdvertencia">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    <span id="modalAdvertenciaTexto"></span>
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-dark-800/50 rounded-b-xl flex items-center gap-3">
+                <button onclick="cerrarModal()"
+                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white rounded-lg transition-colors text-sm font-medium">
+                    <i class="fas fa-times text-xs"></i>
+                    <span>Cancelar</span>
+                </button>
+                <form id="formCambioEstado" method="post" class="flex-1">
+                    {% csrf_token %}
+                    <button type="submit" id="btnConfirmar"
+                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium">
+                        <i id="btnConfirmarIcon" class="text-xs"></i>
+                        <span id="btnConfirmarTexto"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<!-- Toast de mensajes -->
-<div id="toast-container" class="fixed top-4 right-4 space-y-2 z-50"></div>
-
+{% block extra_scripts %}
 <script>
-    const toastContainer = document.getElementById('toast-container');
+function confirmarCambioEstado(usuarioId, nombreUsuario, activar) {
+    const modal = document.getElementById('modalCambioEstado');
+    const modalIcon = document.getElementById('modalIcon');
+    const modalIconElement = document.getElementById('modalIconElement');
+    const modalTitulo = document.getElementById('modalTitulo');
+    const modalMensaje = document.getElementById('modalMensaje');
+    const modalAdvertencia = document.getElementById('modalAdvertencia');
+    const modalAdvertenciaTexto = document.getElementById('modalAdvertenciaTexto');
+    const btnConfirmar = document.getElementById('btnConfirmar');
+    const btnConfirmarIcon = document.getElementById('btnConfirmarIcon');
+    const btnConfirmarTexto = document.getElementById('btnConfirmarTexto');
+    
+    document.getElementById('nombreUsuario').textContent = nombreUsuario;
+    
+    if (activar) {
+        // Configuración para ACTIVAR
+        document.getElementById('formCambioEstado').action = `/accounts/usuarios/${usuarioId}/activar/`;
+        modalIcon.className = 'w-10 h-10 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center';
+        modalIconElement.className = 'fas fa-user-check text-emerald-600 dark:text-emerald-400 text-base';
+        modalTitulo.textContent = 'Activar Usuario';
+        modalMensaje.textContent = '¿Estás seguro de que deseas activar este usuario?';
+        modalAdvertencia.className = 'text-xs text-emerald-600 dark:text-emerald-400 mt-3';
+        modalAdvertenciaTexto.textContent = 'El usuario podrá acceder al sistema nuevamente.';
+        btnConfirmar.className = 'w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded-lg transition-colors text-sm font-medium';
+        btnConfirmarIcon.className = 'fas fa-check text-xs';
+        btnConfirmarTexto.textContent = 'Activar';
+    } else {
+        // Configuración para DESACTIVAR
+        document.getElementById('formCambioEstado').action = `/accounts/usuarios/${usuarioId}/desactivar/`;
+        modalIcon.className = 'w-10 h-10 bg-orange-100 dark:bg-orange-500/10 rounded-lg flex items-center justify-center';
+        modalIconElement.className = 'fas fa-user-slash text-orange-600 dark:text-orange-400 text-base';
+        modalTitulo.textContent = 'Desactivar Usuario';
+        modalMensaje.textContent = '¿Estás seguro de que deseas desactivar este usuario?';
+        modalAdvertencia.className = 'text-xs text-orange-600 dark:text-orange-400 mt-3';
+        modalAdvertenciaTexto.textContent = 'El usuario no podrá acceder al sistema.';
+        btnConfirmar.className = 'w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-medium';
+        btnConfirmarIcon.className = 'fas fa-user-slash text-xs';
+        btnConfirmarTexto.textContent = 'Desactivar';
+    }
+    
+    modal.classList.remove('hidden');
+}
 
-    {% if messages %}
-        {% for message in messages %}
-            const msgDiv = document.createElement('div');
-            msgDiv.className = "px-6 py-4 rounded-lg shadow-xl text-white font-medium text-sm transition-all duration-300 transform flex items-center space-x-2";
-            
-            let icon = '';
-            {% if message.tags == 'success' %}
-                msgDiv.classList.add('bg-gradient-to-r', 'from-green-500', 'to-green-600');
-                icon = '<i class="fas fa-check-circle"></i>';
-            {% elif message.tags == 'error' %}
-                msgDiv.classList.add('bg-gradient-to-r', 'from-red-500', 'to-red-600');
-                icon = '<i class="fas fa-exclamation-circle"></i>';
-            {% elif message.tags == 'warning' %}
-                msgDiv.classList.add('bg-gradient-to-r', 'from-yellow-500', 'to-yellow-600');
-                icon = '<i class="fas fa-exclamation-triangle"></i>';
-            {% else %}
-                msgDiv.classList.add('bg-gradient-to-r', 'from-gray-500', 'to-gray-600');
-                icon = '<i class="fas fa-info-circle"></i>';
-            {% endif %}
-            
-            msgDiv.innerHTML = icon + '<span class="ml-2">{{ message }}</span>';
-            toastContainer.appendChild(msgDiv);
+function cerrarModal() {
+    document.getElementById('modalCambioEstado').classList.add('hidden');
+}
 
-            // Animación de entrada
-            setTimeout(() => {
-                msgDiv.style.transform = 'translateX(0)';
-            }, 100);
+// Cerrar modal al hacer clic fuera de él
+document.getElementById('modalCambioEstado').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModal();
+    }
+});
 
-            // Desaparecer después de 4s
-            setTimeout(() => {
-                msgDiv.style.opacity = '0';
-                msgDiv.style.transform = 'translateX(100%)';
-                setTimeout(() => msgDiv.remove(), 300);
-            }, 4000);
-        {% endfor %}
-    {% endif %}
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModal();
+    }
+});
 </script>
 {% endblock %}
