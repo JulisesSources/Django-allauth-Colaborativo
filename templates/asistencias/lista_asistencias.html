@@ -2,46 +2,59 @@
 
 {% block title %}Registros de Asistencia - SCA-B123{% endblock %}
 
-{% block page_title %}Registros de Asistencia{% endblock %}
-{% block page_subtitle %}Control y seguimiento de asistencias diarias{% endblock %}
-
 {% block content %}
-<div class="space-y-6">
+<div class="space-y-5">
+    
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary-100 dark:bg-primary-500/10 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400">
+                <i class="fas fa-clipboard-list text-base"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Registros de Asistencia</h1>
+                <p class="text-xs text-gray-500 dark:text-dark-400">Control y seguimiento de asistencias diarias</p>
+            </div>
+        </div>
+    </div>
     
     <!-- Estadísticas del día -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-gradient-to-br from-green-900/40 to-gray-900 border border-green-700/50 rounded-xl p-5 shadow-lg">
+        <div class="bg-gradient-to-br from-emerald-900/40 to-gray-900 dark:from-emerald-900/30 dark:to-dark-900 border border-emerald-700/50 dark:border-emerald-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-emerald-600/60 transition-all duration-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-green-400 uppercase tracking-wider">Asistencias Hoy</p>
-                    <p class="text-3xl font-bold text-green-400 mt-1">{{ asistencias_hoy }}</p>
+                    <p class="text-xs text-emerald-400 dark:text-emerald-300 uppercase tracking-wider font-medium">Asistencias Hoy</p>
+                    <p class="text-3xl font-bold text-emerald-400 dark:text-emerald-300 mt-1">{{ asistencias_hoy }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Presentes</p>
                 </div>
-                <div class="w-12 h-12 bg-green-900/50 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                <div class="w-12 h-12 bg-emerald-900/50 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-check-circle text-emerald-500 dark:text-emerald-400 text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-yellow-900/40 to-gray-900 border border-yellow-700/50 rounded-xl p-5 shadow-lg">
+        <div class="bg-gradient-to-br from-amber-900/40 to-gray-900 dark:from-amber-900/30 dark:to-dark-900 border border-amber-700/50 dark:border-amber-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-amber-600/60 transition-all duration-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-yellow-400 uppercase tracking-wider">Retardos Hoy</p>
-                    <p class="text-3xl font-bold text-yellow-400 mt-1">{{ retardos_hoy }}</p>
+                    <p class="text-xs text-amber-400 dark:text-amber-300 uppercase tracking-wider font-medium">Retardos Hoy</p>
+                    <p class="text-3xl font-bold text-amber-400 dark:text-amber-300 mt-1">{{ retardos_hoy }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Con demora</p>
                 </div>
-                <div class="w-12 h-12 bg-yellow-900/50 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-clock text-yellow-500 text-xl"></i>
+                <div class="w-12 h-12 bg-amber-900/50 dark:bg-amber-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clock text-amber-500 dark:text-amber-400 text-xl"></i>
                 </div>
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-red-900/40 to-gray-900 border border-red-700/50 rounded-xl p-5 shadow-lg">
+        <div class="bg-gradient-to-br from-red-900/40 to-gray-900 dark:from-red-900/30 dark:to-dark-900 border border-red-700/50 dark:border-red-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-red-600/60 transition-all duration-200">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-red-400 uppercase tracking-wider">Faltas Hoy</p>
-                    <p class="text-3xl font-bold text-red-400 mt-1">{{ faltas_hoy }}</p>
+                    <p class="text-xs text-red-400 dark:text-red-300 uppercase tracking-wider font-medium">Faltas Hoy</p>
+                    <p class="text-3xl font-bold text-red-400 dark:text-red-300 mt-1">{{ faltas_hoy }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Ausencias</p>
                 </div>
-                <div class="w-12 h-12 bg-red-900/50 rounded-lg flex items-center justify-center">
-                    <i class="fas fa-times-circle text-red-500 text-xl"></i>
+                <div class="w-12 h-12 bg-red-900/50 dark:bg-red-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-times-circle text-red-500 dark:text-red-400 text-xl"></i>
                 </div>
             </div>
         </div>
@@ -50,172 +63,270 @@
     <!-- Acciones rápidas -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <a href="{% url 'asistencias:registro_rapido' %}" 
-           class="group bg-gradient-to-br from-blue-900/30 to-gray-800 border border-blue-700/50 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-blue-600 transition-all">
+           class="group bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl p-5 hover:border-primary-500 dark:hover:border-primary-500 transition-all">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-blue-900/50 rounded-xl flex items-center justify-center group-hover:bg-blue-800/50 transition">
-                        <i class="fas fa-bolt text-blue-400 text-2xl"></i>
+                    <div class="w-12 h-12 bg-primary-100 dark:bg-primary-500/10 rounded-lg flex items-center justify-center group-hover:bg-primary-200 dark:group-hover:bg-primary-500/20 transition">
+                        <i class="fas fa-bolt text-primary-600 dark:text-primary-400 text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-white group-hover:text-blue-300 transition">Registro Rápido</h3>
-                        <p class="text-sm text-gray-400">Checador rápido de entrada/salida</p>
+                        <h3 class="text-base font-semibold text-gray-900 dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition">Registro Rápido</h3>
+                        <p class="text-xs text-gray-500 dark:text-dark-400">Checador rápido de entrada/salida</p>
                     </div>
                 </div>
-                <div class="text-blue-500 group-hover:translate-x-1 transition-transform">
-                    <i class="fas fa-chevron-right text-xl"></i>
+                <div class="text-primary-600 dark:text-primary-400 group-hover:translate-x-1 transition-transform">
+                    <i class="fas fa-chevron-right text-lg"></i>
                 </div>
             </div>
         </a>
 
         <a href="{% url 'asistencias:registrar' %}" 
-           class="group bg-gradient-to-br from-green-900/30 to-gray-800 border border-green-700/50 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-green-600 transition-all">
+           class="group bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl p-5 hover:border-emerald-500 dark:hover:border-emerald-500 transition-all">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <div class="w-14 h-14 bg-green-900/50 rounded-xl flex items-center justify-center group-hover:bg-green-800/50 transition">
-                        <i class="fas fa-user-clock text-green-400 text-2xl"></i>
+                    <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center group-hover:bg-emerald-200 dark:group-hover:bg-emerald-500/20 transition">
+                        <i class="fas fa-user-clock text-emerald-600 dark:text-emerald-400 text-xl"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-semibold text-white group-hover:text-green-300 transition">Registro Completo</h3>
-                        <p class="text-sm text-gray-400">Formulario detallado de asistencia</p>
+                        <h3 class="text-base font-semibold text-gray-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">Registro Completo</h3>
+                        <p class="text-xs text-gray-500 dark:text-dark-400">Formulario detallado de asistencia</p>
                     </div>
                 </div>
-                <div class="text-green-500 group-hover:translate-x-1 transition-transform">
-                    <i class="fas fa-chevron-right text-xl"></i>
+                <div class="text-emerald-600 dark:text-emerald-400 group-hover:translate-x-1 transition-transform">
+                    <i class="fas fa-chevron-right text-lg"></i>
                 </div>
             </div>
         </a>
     </div>
 
     <!-- Filtros -->
-    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg p-5">
-        <h3 class="text-lg font-semibold text-white mb-4 flex items-center">
-            <i class="fas fa-filter text-blue-400 mr-3"></i>Filtrar Registros
-        </h3>
-        <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-            <div class="space-y-1">
-                <label class="text-xs text-gray-400">Fecha Inicio</label>
-                <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}"
-                       class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-2 mb-4">
+            <i class="fas fa-filter text-primary-600 dark:text-primary-400 text-sm"></i>
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Filtrar Registros</h2>
+        </div>
+        
+        <form method="get" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                {% if request.user.perfil.es_admin %}
+                <!-- Unidad Administrativa -->
+                <div class="space-y-1">
+                    <label for="filtro-unidad" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Unidad Administrativa
+                    </label>
+                    <div class="relative">
+                        <i class="fas fa-building absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs z-10"></i>
+                        <select id="filtro-unidad" name="unidad"
+                                class="w-full pl-9 pr-8 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 appearance-none">
+                            <option value="">Todas las unidades</option>
+                            {% for unidad in unidades %}
+                                <option value="{{ unidad.id_unidad }}" {% if request.GET.unidad == unidad.id_unidad|stringformat:'s' %}selected{% endif %}>
+                                    {{ unidad.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Trabajador (Admin) -->
+                <div class="space-y-1">
+                    <label for="filtro-trabajador" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Trabajador
+                    </label>
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs z-10"></i>
+                        <select id="filtro-trabajador" name="trabajador"
+                                class="w-full pl-9 pr-8 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 appearance-none">
+                            <option value="">Todos los trabajadores</option>
+                            {% for trabajador in todos_trabajadores %}
+                                <option value="{{ trabajador.id_trabajador }}" 
+                                        data-unidad="{{ trabajador.id_unidad.id_unidad }}"
+                                        {% if request.GET.trabajador == trabajador.id_trabajador|stringformat:'s' %}selected{% endif %}>
+                                    {{ trabajador.nombre_completo }} - {{ trabajador.numero_empleado }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+                    {% elif request.user.perfil.es_jefe %}
+                <!-- Trabajador (Jefe) -->
+                <div class="space-y-1">
+                    <label for="filtro-trabajador" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Trabajador
+                    </label>
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs z-10"></i>
+                        <select id="filtro-trabajador" name="trabajador"
+                                class="w-full pl-9 pr-8 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 appearance-none">
+                            <option value="">Todos los trabajadores</option>
+                            {% for trabajador in trabajadores %}
+                                <option value="{{ trabajador.id_trabajador }}" 
+                                        {% if request.GET.trabajador == trabajador.id_trabajador|stringformat:'s' %}selected{% endif %}>
+                                    {{ trabajador.nombre_completo }} - {{ trabajador.numero_empleado }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Estatus -->
+                <div class="space-y-1">
+                    <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">Estatus</label>
+                    <div class="relative">
+                        <i class="fas fa-circle-dot absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs z-10"></i>
+                        <select name="estatus"
+                                class="w-full pl-9 pr-8 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 appearance-none">
+                            <option value="">Todos los estatus</option>
+                            <option value="ASI" {% if request.GET.estatus == 'ASI' %}selected{% endif %}>Asistencia</option>
+                            <option value="RET" {% if request.GET.estatus == 'RET' %}selected{% endif %}>Retardo</option>
+                            <option value="FAL" {% if request.GET.estatus == 'FAL' %}selected{% endif %}>Falta</option>
+                            <option value="JUS" {% if request.GET.estatus == 'JUS' %}selected{% endif %}>Justificada</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Fecha Inicio -->
+                <div class="space-y-1">
+                    <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">Fecha Desde</label>
+                    <div class="relative">
+                        <i class="fas fa-calendar absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs"></i>
+                        <input type="date" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}"
+                               class="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                    </div>
+                </div>
+                
+                <!-- Fecha Fin -->
+                <div class="space-y-1">
+                    <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">Fecha Hasta</label>
+                    <div class="relative">
+                        <i class="fas fa-calendar absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs"></i>
+                        <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin }}"
+                               class="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                    </div>
+                </div>
             </div>
-            <div class="space-y-1">
-                <label class="text-xs text-gray-400">Fecha Fin</label>
-                <input type="date" name="fecha_fin" value="{{ request.GET.fecha_fin }}"
-                       class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
+            
+            <div class="flex flex-wrap items-center gap-2 pt-2">
+                <button type="submit" 
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                    <i class="fas fa-search text-xs"></i>
+                    Buscar
+                </button>
+                <a href="{% url 'asistencias:lista' %}"
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                    <i class="fas fa-times text-xs"></i>
+                    Limpiar
+                </a>
             </div>
-            <div class="space-y-1">
-                <label class="text-xs text-gray-400">Estatus</label>
-                <select name="estatus"
-                        class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
-                    <option value="">Todos</option>
-                    <option value="ASI" {% if request.GET.estatus == 'ASI' %}selected{% endif %}>Asistencia</option>
-                    <option value="RET" {% if request.GET.estatus == 'RET' %}selected{% endif %}>Retardo</option>
-                    <option value="FAL" {% if request.GET.estatus == 'FAL' %}selected{% endif %}>Falta</option>
-                    <option value="JUS" {% if request.GET.estatus == 'JUS' %}selected{% endif %}>Justificada</option>
-                </select>
-            </div>
-            <div class="space-y-1">
-                <label class="text-xs text-gray-400">Trabajador</label>
-                <select name="trabajador"
-                        class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500">
-                    <option value="">Todos</option>
-                    {% for t in filtro_form.trabajador.field.queryset %}
-                    <option value="{{ t.pk }}" {% if request.GET.trabajador == t.pk|stringformat:"s" %}selected{% endif %}>
-                        {{ t.nombre_completo }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit" 
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition flex items-center justify-center">
-                <i class="fas fa-search mr-2"></i>Filtrar
-            </button>
         </form>
     </div>
 
     <!-- Lista de registros -->
-    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
-        <div class="p-5 border-b border-gray-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h2 class="text-lg font-semibold text-white flex items-center">
-                    <i class="fas fa-clipboard-list text-blue-400 mr-3"></i>Lista de Registros
-                </h2>
-                <p class="text-sm text-gray-400">Mostrando registros de los últimos 7 días</p>
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+        
+        <!-- Header -->
+        <div class="px-5 py-3 border-b border-gray-200 dark:border-dark-800">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-list text-primary-600 dark:text-primary-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Registros de Asistencia</h2>
             </div>
         </div>
 
+        {% if registros %}
         <div class="overflow-x-auto">
-            <table class="w-full">
-                <thead class="bg-gray-900/50">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 dark:bg-dark-800/50 text-gray-700 dark:text-dark-300 border-b border-gray-200 dark:border-dark-700">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Trabajador</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Fecha</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Entrada</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Salida</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Estatus</th>
-                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Acciones</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">Trabajador</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">Fecha</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">Entrada</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">Salida</th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">Estatus</th>
+                        <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">Acciones</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-700">
+                <tbody class="bg-white dark:bg-dark-900 divide-y divide-gray-200 dark:divide-dark-800">
                     {% for registro in registros %}
-                    <tr class="hover:bg-gray-700/30 transition-colors">
-                        <td class="px-6 py-4">
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-800/50 transition-colors duration-150">
+                        
+                        <!-- Trabajador -->
+                        <td class="px-4 py-3 whitespace-nowrap">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center shadow">
-                                    <span class="text-white font-bold">{{ registro.id_trabajador.nombre|slice:":1"|upper }}</span>
+                                <div class="h-8 w-8 rounded-lg bg-primary-100 dark:bg-primary-500/10 flex items-center justify-center text-primary-600 dark:text-primary-400 font-semibold text-xs">
+                                    {{ registro.id_trabajador.nombre|slice:":1" }}{{ registro.id_trabajador.apellido_paterno|slice:":1" }}
                                 </div>
                                 <div>
-                                    <p class="text-white font-medium">{{ registro.id_trabajador.nombre_completo }}</p>
-                                    <p class="text-xs text-gray-500">{{ registro.id_trabajador.numero_empleado }}</p>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ registro.id_trabajador.nombre_completo }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-dark-400">
+                                        {{ registro.id_trabajador.numero_empleado }}
+                                    </div>
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-gray-300">
-                            {{ registro.fecha|date:"d/m/Y" }}
+                        
+                        <!-- Fecha -->
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="text-sm text-gray-900 dark:text-white">
+                                {{ registro.fecha|date:"d/m/Y" }}
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-dark-400">
+                                {{ registro.fecha|date:"l" }}
+                            </div>
                         </td>
-                        <td class="px-6 py-4">
+                        
+                        <!-- Entrada -->
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {% if registro.hora_entrada %}
-                            <span class="font-mono text-green-400">{{ registro.hora_entrada|time:"H:i" }}</span>
+                            <span class="font-mono text-sm text-emerald-600 dark:text-emerald-400">{{ registro.hora_entrada|time:"H:i" }}</span>
                             {% else %}
-                            <span class="text-gray-500">—</span>
+                            <span class="text-gray-400 dark:text-dark-500 text-sm">—</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4">
+                        
+                        <!-- Salida -->
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {% if registro.hora_salida %}
-                            <span class="font-mono text-red-400">{{ registro.hora_salida|time:"H:i" }}</span>
+                            <span class="font-mono text-sm text-red-600 dark:text-red-400">{{ registro.hora_salida|time:"H:i" }}</span>
                             {% else %}
-                            <span class="text-gray-500">—</span>
+                            <span class="text-gray-400 dark:text-dark-500 text-sm">—</span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4">
+                        
+                        <!-- Estatus -->
+                        <td class="px-4 py-3 whitespace-nowrap">
                             {% if registro.estatus == 'ASI' %}
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-900/50 text-green-400">
-                                <i class="fas fa-check mr-1"></i>{{ registro.get_estatus_display }}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                                <i class="fas fa-check text-xs"></i> Asistencia
                             </span>
                             {% elif registro.estatus == 'RET' %}
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-900/50 text-yellow-400">
-                                <i class="fas fa-clock mr-1"></i>{{ registro.get_estatus_display }}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                                <i class="fas fa-clock text-xs"></i> Retardo
                             </span>
                             {% elif registro.estatus == 'FAL' %}
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-900/50 text-red-400">
-                                <i class="fas fa-times mr-1"></i>{{ registro.get_estatus_display }}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20">
+                                <i class="fas fa-times text-xs"></i> Falta
                             </span>
                             {% else %}
-                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-900/50 text-blue-400">
-                                <i class="fas fa-info mr-1"></i>{{ registro.get_estatus_display }}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-500/20">
+                                <i class="fas fa-info text-xs"></i> {{ registro.get_estatus_display }}
                             </span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4">
-                            <div class="flex items-center justify-end gap-2">
+                        
+                        <!-- Acciones -->
+                        <td class="px-4 py-3 whitespace-nowrap text-center">
+                            <div class="flex items-center justify-center gap-1">
                                 <a href="{% url 'asistencias:detalle' registro.pk %}" 
-                                   class="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-900/30 rounded-lg transition"
+                                   class="inline-flex items-center justify-center w-8 h-8 text-primary-600 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-colors duration-200"
                                    title="Ver detalle">
-                                    <i class="fas fa-eye"></i>
-                                </a>
-                                <a href="{% url 'asistencias:resumen' registro.id_trabajador.numero_empleado %}" 
-                                   class="p-2 text-purple-400 hover:text-purple-300 hover:bg-purple-900/30 rounded-lg transition"
-                                   title="Ver resumen">
-                                    <i class="fas fa-chart-bar"></i>
+                                    <i class="fas fa-eye text-sm"></i>
                                 </a>
                             </div>
                         </td>
@@ -224,11 +335,11 @@
                     <tr>
                         <td colspan="6" class="px-6 py-12 text-center">
                             <div class="flex flex-col items-center">
-                                <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mb-4">
-                                    <i class="fas fa-clipboard text-gray-500 text-2xl"></i>
+                                <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-dark-800 rounded-full mb-4">
+                                    <i class="fas fa-clipboard text-gray-400 dark:text-dark-500 text-2xl"></i>
                                 </div>
-                                <p class="text-gray-400 font-medium">No hay registros para mostrar</p>
-                                <p class="text-gray-500 text-sm mt-1">Ajusta los filtros o registra nuevas asistencias</p>
+                                <p class="text-gray-600 dark:text-dark-300 font-medium">No hay registros para mostrar</p>
+                                <p class="text-gray-500 dark:text-dark-400 text-sm mt-1">Ajusta los filtros o registra nuevas asistencias</p>
                             </div>
                         </td>
                     </tr>
@@ -236,30 +347,66 @@
                 </tbody>
             </table>
         </div>
-
-        <!-- Paginación -->
-        {% if is_paginated %}
-        <div class="px-6 py-4 border-t border-gray-700 flex justify-between items-center">
-            <span class="text-sm text-gray-400">
-                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-            </span>
-            <div class="flex gap-2">
-                {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}"
-                   class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm transition">
-                    <i class="fas fa-chevron-left mr-1"></i>Anterior
-                </a>
-                {% endif %}
-                {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}"
-                   class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg text-sm transition">
-                    Siguiente<i class="fas fa-chevron-right ml-1"></i>
-                </a>
-                {% endif %}
+        
+        {% else %}
+        <div class="text-center py-12 px-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-dark-800 rounded-full mb-4">
+                <i class="fas fa-clipboard text-gray-400 dark:text-dark-500 text-2xl"></i>
             </div>
+            <p class="text-gray-600 dark:text-dark-300 font-medium">No hay registros de asistencia</p>
+            <p class="text-gray-500 dark:text-dark-400 text-sm mt-1">Comienza registrando la primera asistencia</p>
         </div>
         {% endif %}
     </div>
-
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Filtrado dinámico de trabajadores según unidad (solo admin)
+    document.addEventListener('DOMContentLoaded', function() {
+        const isAdmin = {{ request.user.perfil.es_admin|yesno:"true,false" }};
+        
+        if (isAdmin) {
+            const unidadSelect = document.getElementById('filtro-unidad');
+            const trabajadorSelect = document.getElementById('filtro-trabajador');
+            
+            if (unidadSelect && trabajadorSelect) {
+                // Guardar todas las opciones de trabajadores
+                const todasOpciones = Array.from(trabajadorSelect.options);
+                
+                // Función para filtrar trabajadores
+                function filtrarTrabajadores() {
+                    const unidadId = unidadSelect.value;
+                    const valorActual = trabajadorSelect.value;
+                    
+                    // Limpiar el select de trabajadores
+                    trabajadorSelect.innerHTML = '<option value="">Todos los trabajadores</option>';
+                    
+                    // Filtrar opciones según la unidad seleccionada
+                    todasOpciones.forEach(function(option) {
+                        if (option.value === '') return; // Saltar la opción por defecto
+                        
+                        const trabajadorUnidad = option.getAttribute('data-unidad');
+                        
+                        // Si no hay unidad seleccionada o coincide con la unidad del trabajador
+                        if (!unidadId || trabajadorUnidad === unidadId) {
+                            const newOption = option.cloneNode(true);
+                            if (newOption.value === valorActual) {
+                                newOption.selected = true;
+                            }
+                            trabajadorSelect.appendChild(newOption);
+                        }
+                    });
+                }
+                
+                // Aplicar filtro inicial si hay una unidad seleccionada
+                filtrarTrabajadores();
+                
+                // Escuchar cambios en la unidad
+                unidadSelect.addEventListener('change', filtrarTrabajadores);
+            }
+        }
+    });
+</script>
 {% endblock %}
