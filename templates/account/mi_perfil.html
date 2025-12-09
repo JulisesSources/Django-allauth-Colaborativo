@@ -1,195 +1,246 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Mi Perfil - SCA-B123{% endblock %}
+{% block title %}
+  Mi Perfil - SCA-B123
+{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-
-    <!-- Header / Banner -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg overflow-hidden relative">
-        <div class="absolute inset-0 bg-white/10 backdrop-blur-sm opacity-10"></div>
-        <div class="relative z-10 px-8 py-10 flex flex-col md:flex-row items-center gap-6">
-            <div class="relative">
-                <div class="w-24 h-24 bg-white rounded-full p-1 shadow-xl">
-                    <div class="w-full h-full rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
-                        {% if user.profile_image %}
-                        <img src="{{ user.profile_image.url }}" alt="Profile" class="w-full h-full object-cover">
-                        {% else %}
-                        <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=0D8ABC&color=fff&size=128"
-                            alt="Profile" class="w-full h-full object-cover">
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-2 border-white rounded-full"
-                    title="Activo"></div>
+  <div class="space-y-5">
+    <!-- Profile Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+      <div class="p-6">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+          <!-- Avatar -->
+          <div class="relative flex-shrink-0">
+            <div class="w-20 h-20 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 p-0.5 shadow-lg">
+              <div class="w-full h-full rounded-xl bg-white dark:bg-dark-800 flex items-center justify-center overflow-hidden">
+                {% if user.profile_image %}
+                  <img src="{{ user.profile_image.url }}" alt="Profile" class="w-full h-full object-cover" />
+                {% else %}
+                  <span class="text-2xl font-bold text-gray-400 dark:text-dark-400">{{ user.username|slice:':1'|upper }}</span>
+                {% endif %}
+              </div>
             </div>
-
-            <div class="text-center md:text-left text-white">
-                <h1 class="text-3xl font-bold mb-1">{{ user.get_full_name|default:user.username }}</h1>
-                <div class="flex flex-wrap justify-center md:justify-start gap-3 text-blue-100 text-sm">
-                    <span class="bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">
-                        <i class="fas fa-user-tag mr-1"></i> {{ perfil.get_rol_display }}
-                    </span>
-                    <span class="bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">
-                        <i class="fas fa-envelope mr-1"></i> {{ user.email }}
-                    </span>
-                </div>
+            <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-2 border-white dark:border-dark-900 rounded-lg shadow-sm" title="Activo">
+              <i class="fas fa-check text-white text-xs flex items-center justify-center h-full"></i>
             </div>
+          </div>
+
+          <!-- User Info -->
+          <div class="flex-1 text-center sm:text-left">
+            <h1 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">{{ user.get_full_name|default:user.username }}</h1>
+            <div class="flex flex-wrap justify-center sm:justify-start gap-2">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary-50 dark:bg-primary-500/10 text-primary-700 dark:text-primary-400 rounded-lg text-xs font-medium">
+                <i class="fas fa-user-tag text-xs"></i>
+                {{ perfil.get_rol_display }}
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 dark:bg-dark-800 text-gray-700 dark:text-gray-300 rounded-lg text-xs font-medium">
+                <i class="fas fa-envelope text-xs"></i>
+                {{ user.email }}
+              </span>
+            </div>
+          </div>
         </div>
-
-        <!-- Decorative circles -->
-        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
-        <div class="absolute bottom-0 left-0 -mb-10 -ml-10 w-40 h-40 bg-white/10 rounded-full blur-2xl"></div>
+      </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <!-- Left Column: Edit Form -->
+      <div>
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+          <div class="p-5 border-b border-gray-200 dark:border-dark-800">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <i class="fas fa-user-edit text-primary-500 text-sm"></i>
+              Información Personal
+            </h2>
+          </div>
 
-        <!-- Left Column: Info & Stats -->
-        <div class="space-y-6">
-            <!-- Quick Stats -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Resumen</h3>
-                <div class="space-y-4">
-                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Registro</span>
-                        </div>
-                        <span class="text-sm font-semibold text-gray-900 dark:text-white">
-                            {{ user.date_joined|date:"d/m/Y" }}</span>
-                    </div>
-                    <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                        <div class="flex items-center gap-3">
-                            <div
-                                class="w-8 h-8 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-clock"></i>
-                            </div>
-                            <span class="text-sm text-gray-600 dark:text-gray-300">Último acceso</span>
-                        </div>
-                        <span class="text-sm font-semibold text-gray-900 dark:text-white">
-                            {{ user.last_login|date:"d/m/Y H:i" }}</span>
-                    </div>
+          <div class="p-5">
+            <form method="post" class="space-y-5">
+              {% csrf_token %}
+
+              <div class="space-y-4">
+                <!-- Username -->
+                <div>
+                  <label for="id_username" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Nombre de usuario</label>
+                  <input type="text" name="username" id="id_username" value="{{ form.username.value|default:'' }}" class="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-gray-900 dark:text-white transition-colors" />
+                  {% if form.username.errors %}
+                    <p class="mt-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <i class="fas fa-exclamation-circle"></i>
+                      {{ form.username.errors.0 }}
+                    </p>
+                  {% endif %}
                 </div>
-            </div>
 
-            <!-- Security Actions -->
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Seguridad</h3>
-                <a href="{% url 'account_change_password' %}"
-                    class="group flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded-xl hover:border-blue-500 dark:hover:border-blue-500 transition-all duration-200">
-                    <div class="flex items-center gap-4">
-                        <div
-                            class="w-10 h-10 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                            <i class="fas fa-key"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold text-gray-900 dark:text-white">Contraseña</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Actualizar contraseña</p>
-                        </div>
+                <!-- Email (Read-only) -->
+                <div>
+                  <label for="id_email" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                  <div class="relative">
+                    <input type="email" name="email" id="id_email" value="{{ user.email }}" disabled class="w-full px-3 py-2 text-sm bg-gray-100 dark:bg-dark-800/50 border border-gray-200 dark:border-dark-700 rounded-lg text-gray-500 dark:text-dark-400 cursor-not-allowed" />
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                      <i class="fas fa-lock text-xs text-gray-400 dark:text-dark-500"></i>
                     </div>
-                    <i class="fas fa-chevron-right text-gray-300 group-hover:text-blue-500 transition-colors"></i>
-                </a>
-            </div>
+                  </div>
+                  <input type="hidden" name="email" value="{{ user.email }}" />
+                  {% if form.email.errors %}
+                    <p class="mt-1.5 text-xs text-red-600 dark:text-red-400 flex items-center gap-1">
+                      <i class="fas fa-exclamation-circle"></i>
+                      {{ form.email.errors.0 }}
+                    </p>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="pt-4 flex items-center gap-3 border-t border-gray-200 dark:border-dark-800">
+                <button type="submit" class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-dark-900">
+                  <i class="fas fa-save text-xs mr-2"></i>
+                  Guardar Cambios
+                </button>
+                <a href="{% url 'accounts:dashboard' %}" class="px-5 py-2 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg hover:bg-gray-200 dark:hover:bg-dark-700 transition-colors duration-200 text-center">Cancelar</a>
+              </div>
+            </form>
+          </div>
         </div>
 
-        <!-- Right Column: Edit Form -->
-        <div class="lg:col-span-2">
-            <div
-                class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-                <div class="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-                    <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-                        <i class="fas fa-user-edit text-blue-500 mr-2"></i>
-                        Información Personal
-                    </h2>
+        <!-- Account Info Card -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5 mt-5">
+          <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide flex items-center gap-2">
+            <i class="fas fa-info-circle text-primary-500"></i>
+            Información de Cuenta
+          </h3>
+          <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-dark-800 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 bg-primary-100 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-calendar-alt text-xs"></i>
                 </div>
-
-                <div class="p-6">
-                    <form method="post" class="space-y-6">
-                        {% csrf_token %}
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Username -->
-                            <div>
-                                <label for="id_username"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Nombre de usuario
-                                </label>
-                                <input type="text" name="username" id="id_username"
-                                    value="{{ form.username.value|default:'' }}"
-                                    class="w-full px-4 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white">
-                                {% if form.username.errors %}
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.username.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-
-                            <!-- Email (Read-only) -->
-                            <div>
-                                <label for="id_email"
-                                    class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                                    Email
-                                </label>
-                                <input type="email" name="email" id="id_email" value="{{ user.email }}" disabled
-                                    class="w-full px-4 py-2.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-500 dark:text-gray-400 cursor-not-allowed">
-                                <!-- Campo oculto para enviar el valor en el POST -->
-                                <input type="hidden" name="email" value="{{ user.email }}">
-                                {% if form.email.errors %}
-                                <p class="mt-1 text-sm text-red-600 dark:text-red-400">{{ form.email.errors.0 }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Worker Info (if available) -->
-                        {% if perfil.id_trabajador %}
-                        <div class="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
-                            <h3
-                                class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
-                                Información Laboral
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div
-                                    class="p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-gray-700">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase">No. Empleado</p>
-                                    <p class="font-medium text-gray-900 dark:text-white">{{
-                                        perfil.id_trabajador.numero_empleado }}</p>
-                                </div>
-                                <div
-                                    class="p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-gray-700">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase">RFC</p>
-                                    <p class="font-medium text-gray-900 dark:text-white">{{ perfil.id_trabajador.rfc }}
-                                    </p>
-                                </div>
-                                <div
-                                    class="p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-100 dark:border-gray-700 md:col-span-2">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 uppercase">Puesto & Unidad</p>
-                                    <p class="font-medium text-gray-900 dark:text-white">
-                                        {{ perfil.id_trabajador.id_puesto.nombre_puesto }} - {{
-                                        perfil.id_trabajador.id_unidad.nombre }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        <!-- Actions -->
-                        <div class="pt-6 flex items-center gap-4">
-                            <button type="submit"
-                                class="flex-1 md:flex-none px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm hover:shadow transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <i class="fas fa-save mr-2"></i>
-                                Guardar Cambios
-                            </button>
-                            <a href="{% url 'accounts:dashboard' %}"
-                                class="flex-1 md:flex-none px-6 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200 text-center">
-                                Cancelar
-                            </a>
-                        </div>
-                    </form>
-                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-400">Registro</span>
+              </div>
+              <span class="text-xs font-medium text-gray-900 dark:text-white">{{ user.date_joined|date:'d/m/Y' }}</span>
             </div>
+            <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-dark-800 rounded-lg">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg flex items-center justify-center">
+                  <i class="fas fa-clock text-xs"></i>
+                </div>
+                <span class="text-xs text-gray-600 dark:text-gray-400">Último acceso</span>
+              </div>
+              <span class="text-xs font-medium text-gray-900 dark:text-white">{{ user.last_login|date:'d/m/Y H:i' }}</span>
+            </div>
+          </div>
         </div>
+
+        <!-- Security Card -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5 mt-5">
+          <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide flex items-center gap-2">
+            <i class="fas fa-shield-alt text-primary-500"></i>
+            Seguridad
+          </h3>
+          <a href="{% url 'account_change_password' %}" class="group flex items-center justify-between p-3 bg-gray-50 dark:bg-dark-800 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-500/10 border border-transparent hover:border-primary-200 dark:hover:border-primary-500/30 transition-all duration-200">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 bg-primary-100 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400 rounded-lg flex items-center justify-center group-hover:bg-primary-600 group-hover:text-white transition-colors">
+                <i class="fas fa-key text-xs"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-medium text-gray-900 dark:text-white">Cambiar Contraseña</h4>
+                <p class="text-xs text-gray-500 dark:text-dark-400">Actualizar credenciales</p>
+              </div>
+            </div>
+            <i class="fas fa-chevron-right text-xs text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Right Column: Worker Info -->
+      <div>
+        {% if perfil.id_trabajador %}
+          <!-- Worker Info Card -->
+          <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+            <h3 class="text-xs font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide flex items-center gap-2">
+              <i class="fas fa-briefcase text-primary-500"></i>
+              Información Laboral Completa
+            </h3>
+            <div class="space-y-3">
+              <!-- Número de Empleado -->
+              <div class="p-3 bg-gradient-to-r from-primary-50 to-primary-100/50 dark:from-primary-900/20 dark:to-primary-900/10 border border-primary-200 dark:border-primary-800 rounded-lg">
+                <p class="text-xs text-primary-600 dark:text-primary-400 mb-1 font-medium">No. Empleado</p>
+                <p class="text-base font-bold text-primary-700 dark:text-primary-300">{{ perfil.id_trabajador.numero_empleado }}</p>
+              </div>
+
+              <!-- Nombre Completo -->
+              <div class="p-3 bg-gray-50 dark:bg-dark-800 rounded-lg">
+                <p class="text-xs text-gray-500 dark:text-dark-400 mb-1 flex items-center gap-1">
+                  <i class="fas fa-user text-xs"></i>
+                  Nombre Completo
+                </p>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ perfil.id_trabajador.nombre_completo }}</p>
+              </div>
+
+              <!-- Grid de Información -->
+              <div class="grid grid-cols-2 gap-3">
+                <div class="p-3 bg-gray-50 dark:bg-dark-800 rounded-lg">
+                  <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">RFC</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ perfil.id_trabajador.rfc }}</p>
+                </div>
+                <div class="p-3 bg-gray-50 dark:bg-dark-800 rounded-lg">
+                  <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">CURP</p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ perfil.id_trabajador.curp|default:"-" }}</p>
+                </div>
+              </div>
+
+              <!-- Puesto -->
+              <div class="p-3 bg-gray-50 dark:bg-dark-800 rounded-lg">
+                <p class="text-xs text-gray-500 dark:text-dark-400 mb-1 flex items-center gap-1">
+                  <i class="fas fa-user-tie text-xs"></i>
+                  Puesto
+                </p>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ perfil.id_trabajador.id_puesto.nombre_puesto }}</p>
+              </div>
+
+              <!-- Unidad Administrativa -->
+              <div class="p-3 bg-gray-50 dark:bg-dark-800 rounded-lg">
+                <p class="text-xs text-gray-500 dark:text-dark-400 mb-1 flex items-center gap-1">
+                  <i class="fas fa-building text-xs"></i>
+                  Unidad Administrativa
+                </p>
+                <p class="text-sm font-medium text-gray-900 dark:text-white">{{ perfil.id_trabajador.id_unidad.nombre }}</p>
+                <p class="text-xs text-gray-500 dark:text-dark-400 mt-1">{{ perfil.id_trabajador.id_unidad.clave }}</p>
+              </div>
+
+              <!-- Estado -->
+              <div class="p-3 bg-gray-50 dark:bg-dark-800 rounded-lg">
+                <p class="text-xs text-gray-500 dark:text-dark-400 mb-2 flex items-center gap-1">
+                  <i class="fas fa-circle-notch text-xs"></i>
+                  Estado
+                </p>
+                {% if perfil.id_trabajador.activo %}
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-medium">
+                    <i class="fas fa-check-circle text-xs"></i>
+                    Activo
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg text-xs font-medium">
+                    <i class="fas fa-times-circle text-xs"></i>
+                    Inactivo
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <!-- No Worker Info -->
+          <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-8 text-center">
+            <div class="w-16 h-16 bg-gray-100 dark:bg-dark-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-briefcase text-gray-400 dark:text-dark-400 text-2xl"></i>
+            </div>
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Sin Información Laboral</h3>
+            <p class="text-xs text-gray-500 dark:text-dark-400">No tienes un perfil de trabajador asignado</p>
+          </div>
+        {% endif %}
+      </div>
     </div>
-</div>
+  </div>
 {% endblock %}

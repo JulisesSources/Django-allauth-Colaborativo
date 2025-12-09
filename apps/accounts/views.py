@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.db.models import Q
+from django.db.models import Q, Count
+from datetime import datetime, timedelta
 from .models import PerfilUsuario
 from .decorators import admin_requerido, jefe_o_admin_requerido
 from .forms import PerfilUsuarioForm, AsignarRolForm
@@ -22,16 +23,137 @@ def dashboard(request):
     
     # Estadísticas según el rol
     if perfil.es_admin():
+        # Importar modelos necesarios
+        from apps.trabajadores.models import Trabajador
+        from apps.asistencias.models import RegistroAsistencia
+        from apps.incidencias.models import Incidencia
+        from apps.unidades.models import UnidadAdministrativa
+        
+        # Estadísticas generales
         context['total_usuarios'] = User.objects.filter(is_active=True).count()
-        context['total_trabajadores'] = perfil.id_trabajador.__class__.objects.filter(activo=True).count() if perfil.id_trabajador else 0
+        context['total_trabajadores'] = Trabajador.objects.filter(activo=True).count()
+        context['total_unidades'] = UnidadAdministrativa.objects.count()
+        
+        # Asistencias del día
+        hoy = datetime.now().date()
+        asistencias_hoy = RegistroAsistencia.objects.filter(fecha=hoy)
+        context['asistencias_hoy'] = asistencias_hoy.filter(estatus='ASI').count()
+        context['retardos_hoy'] = asistencias_hoy.filter(estatus='RET').count()
+        context['faltas_hoy'] = asistencias_hoy.filter(estatus='FAL').count()
+        
+        # Incidencias pendientes
+        context['incidencias_pendientes'] = Incidencia.objects.filter(
+            estado='pendiente'
+        ).count()
+        
+        # Usuarios por rol
+        context['usuarios_por_rol'] = PerfilUsuario.objects.values('rol').annotate(
+            total=Count('id_perfil')
+        ).order_by('rol')
+        
+        # Últimas asistencias registradas (últimas 5)
+        context['ultimas_asistencias'] = RegistroAsistencia.objects.select_related(
+            'id_trabajador', 'id_trabajador__id_unidad'
+        ).order_by('-fecha', '-hora_entrada')[:5]
         
     elif perfil.es_jefe():
         if perfil.id_trabajador:
-            context['mi_unidad'] = perfil.id_trabajador.id_unidad
+            from apps.trabajadores.models import Trabajador
+            from apps.asistencias.models import RegistroAsistencia
+            from apps.incidencias.models import Incidencia
+            
+            mi_unidad = perfil.id_trabajador.id_unidad
+            context['mi_unidad'] = mi_unidad
+            
+            # Trabajadores de la unidad
+            trabajadores_unidad = Trabajador.objects.filter(
+                id_unidad=mi_unidad,
+                activo=True
+            )
+            context['total_trabajadores_unidad'] = trabajadores_unidad.count()
+            
+            # Asistencias del día en la unidad
+            hoy = datetime.now().date()
+            asistencias_hoy = RegistroAsistencia.objects.filter(
+                fecha=hoy,
+                id_trabajador__id_unidad=mi_unidad
+            )
+            context['asistencias_hoy'] = asistencias_hoy.filter(estatus='ASI').count()
+            context['retardos_hoy'] = asistencias_hoy.filter(estatus='RET').count()
+            context['faltas_hoy'] = asistencias_hoy.filter(estatus='FAL').count()
+            
+            # Incidencias pendientes de autorización de la unidad
+            context['incidencias_pendientes'] = Incidencia.objects.filter(
+                id_trabajador__id_unidad=mi_unidad,
+                estado='pendiente'
+            ).count()
+            
+            # Últimas asistencias de la unidad
+            context['ultimas_asistencias'] = RegistroAsistencia.objects.filter(
+                id_trabajador__id_unidad=mi_unidad
+            ).select_related(
+                'id_trabajador'
+            ).order_by('-fecha', '-hora_entrada')[:5]
+            
+            # Trabajadores de la unidad
+            context['trabajadores_unidad'] = trabajadores_unidad.select_related(
+                'id_puesto'
+            )[:10]
     
     elif perfil.es_trabajador():
         if perfil.id_trabajador:
-            context['mi_trabajador'] = perfil.id_trabajador
+            from apps.asistencias.models import RegistroAsistencia
+            from apps.incidencias.models import Incidencia
+            from apps.jornadas_laborales.models import TrabajadorJornada
+            
+            mi_trabajador = perfil.id_trabajador
+            context['mi_trabajador'] = mi_trabajador
+            
+            # Asistencias del mes actual
+            hoy = datetime.now().date()
+            inicio_mes = hoy.replace(day=1)
+            
+            mis_asistencias = RegistroAsistencia.objects.filter(
+                id_trabajador=mi_trabajador,
+                fecha__gte=inicio_mes,
+                fecha__lte=hoy
+            )
+            
+            context['asistencias_mes'] = mis_asistencias.filter(estatus='ASI').count()
+            context['retardos_mes'] = mis_asistencias.filter(estatus='RET').count()
+            context['faltas_mes'] = mis_asistencias.filter(estatus='FAL').count()
+            
+            # Asistencia de hoy
+            context['asistencia_hoy'] = RegistroAsistencia.objects.filter(
+                id_trabajador=mi_trabajador,
+                fecha=hoy
+            ).first()
+            
+            # Mis incidencias
+            context['mis_incidencias_pendientes'] = Incidencia.objects.filter(
+                id_trabajador=mi_trabajador,
+                estado='pendiente'
+            ).count()
+            
+            context['mis_incidencias_rechazadas'] = Incidencia.objects.filter(
+                id_trabajador=mi_trabajador,
+                estado='rechazada'
+            ).count()
+            
+            # Jornada asignada (vigente = sin fecha_fin o con fecha_fin futura)
+            jornada_asignada = TrabajadorJornada.objects.filter(
+                id_trabajador=mi_trabajador
+            ).filter(
+                Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
+            ).select_related('id_jornada').first()
+            
+            if jornada_asignada:
+                context['mi_jornada'] = jornada_asignada.id_jornada
+            
+            # Últimas asistencias
+            context['mis_ultimas_asistencias'] = RegistroAsistencia.objects.filter(
+                id_trabajador=mi_trabajador
+            ).order_by('-fecha')[:7]
     
     return render(request, 'account/dashboard.html', context)
 

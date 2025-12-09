@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -12,18 +12,45 @@
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <!-- Tailwind Configuration -->
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
                     colors: {
                         primary: {
-                            50: '#f0f9ff',
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
                             500: '#3b82f6',
                             600: '#2563eb',
                             700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                        },
+                        dark: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
                         }
                     }
                 }
@@ -35,89 +62,92 @@
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
 
     {% block extra_head %}{% endblock %}
+    
+    <style>
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #475569 #1e293b;
+        }
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        *::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        *::-webkit-scrollbar-thumb {
+            background-color: #475569;
+            border-radius: 4px;
+        }
+        *::-webkit-scrollbar-thumb:hover {
+            background-color: #64748b;
+        }
+    </style>
 </head>
-
-<body class="bg-slate-100 dark:bg-gray-900 font-sans text-gray-600 dark:text-gray-300 transition-colors duration-300">
-    <div class="flex h-screen overflow-hidden">
+<body class="bg-gray-100 dark:bg-dark-950 font-sans antialiased">
+    <div class="flex h-screen overflow-hidden p-3 gap-3">
         <!-- Sidebar -->
         <aside id="sidebar"
-            class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden md:flex flex-col z-10 transition-colors duration-300">
+            class="w-64 bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-2xl hidden md:flex flex-col z-10 transition-colors duration-200 shadow-lg overflow-hidden">
             <!-- Logo -->
-            <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-gray-700">
-                <div class="flex items-center gap-2 font-bold text-xl text-gray-800 dark:text-white">
-                    <span class="text-2xl">🕒</span>
-                    <span>SCA-B123</span>
+            <div class="h-16 flex items-center px-6 border-b border-gray-100 dark:border-dark-800">
+                <div class="flex items-center gap-3 font-semibold text-lg text-gray-800 dark:text-white">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-lg shadow-primary-500/20">
+                        <i class="fas fa-clock text-white text-sm"></i>
+                    </div>
+                    <span class="tracking-tight">SCA-B123</span>
                 </div>
             </div>
 
             <!-- Navigation -->
-            <div class="flex-1 overflow-y-auto py-4">
-                <nav class="px-4 space-y-8">
-                    <!-- Principal -->
+            <div class="flex-1 overflow-y-auto py-6">
+                <nav class="px-3 space-y-6">
+                    <!-- Dashboard - Siempre visible -->
                     <div>
-                        <h3
-                            class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-2">
-                            Principal
+                        <h3 class="text-xs font-semibold text-gray-400 dark:text-dark-500 uppercase tracking-wider mb-2 px-3 select-none">
+                            Inicio
                         </h3>
-                        <ul class="space-y-1">
+                        <ul class="space-y-0.5">
                             <li>
-                                <a href="{% url 'home' %}"
-                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
-                                    <i class="fas fa-th-large w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                <a href="{% url 'accounts:dashboard' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-home w-4 text-gray-400 dark:text-dark-400 group-hover:text-primary-500"></i>
                                     <span class="font-medium">Dashboard</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
 
-                    <!-- Gestión -->
-                    <div>
-                        <h3
-                            class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-2">
-                            Gestión</h3>
-                        <ul class="space-y-1">
-                            <li>
-                                <a href="{% url 'trabajadores:index' %}"
-                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
-                                    <i class="fas fa-users w-5 text-gray-400 group-hover:text-blue-500"></i>
-                                    <span class="font-medium">Trabajadores</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'unidades:lista' %}"
-                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
-                                    <i class="fas fa-building w-5 text-gray-400 group-hover:text-blue-500"></i>
-                                    <span class="font-medium">Unidades Admin.</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'jornadas:list' %}"
-                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
-                                    <i class="fas fa-clock w-5 text-gray-400 group-hover:text-blue-500"></i>
-                                    <span class="font-medium">Jornadas y Horarios</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Personal - Visible para usuarios con trabajador asociado -->
+                    {% if user.perfil.rol != 'espera' %}
+                    
+                    <!-- ============================================ -->
+                    <!-- SECCIÓN PERSONAL - Para trabajadores -->
+                    <!-- ============================================ -->
                     {% if user.perfil.id_trabajador %}
                     <div>
-                        <h3
-                            class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-2">
-                            Personal</h3>
-                        <ul class="space-y-1">
+                        <h3 class="text-xs font-semibold text-emerald-500 dark:text-emerald-400 uppercase tracking-wider mb-2 px-3 select-none flex items-center gap-2">
+                            <i class="fas fa-user text-[10px]"></i>
+                            Mi Información
+                        </h3>
+                        <ul class="space-y-0.5">
                             <li>
                                 <a href="{% url 'asistencias:mi_registro' %}"
-                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
-                                    <i class="fas fa-user-clock w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-user-clock w-4 text-gray-400 dark:text-dark-400 group-hover:text-emerald-500"></i>
                                     <span class="font-medium">Mi Asistencia</span>
                                 </a>
                             </li>
                             <li>
+                                <a href="{% url 'incidencias:mis_incidencias' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-file-medical w-4 text-gray-400 dark:text-dark-400 group-hover:text-emerald-500"></i>
+                                    <span class="font-medium">Mis Incidencias</span>
+                                </a>
+                            </li>
+                            <li>
                                 <a href="{% url 'jornadas:mi_jornada' %}"
-                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
-                                    <i class="fas fa-calendar-alt w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-calendar-alt w-4 text-gray-400 dark:text-dark-400 group-hover:text-emerald-500"></i>
                                     <span class="font-medium">Mi Jornada</span>
                                 </a>
                             </li>
@@ -125,159 +155,360 @@
                     </div>
                     {% endif %}
 
-                    <!-- Control -->
+                    <!-- ============================================ -->
+                    <!-- ADMINISTRADOR - Vista completa -->
+                    <!-- ============================================ -->
+                    {% if user.perfil.es_admin %}
+                    
+                    <!-- Gestión de Personal -->
                     <div>
-                        <h3
-                            class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-2">
-                            Control</h3>
-                        <ul class="space-y-1">
+                        <h3 class="text-xs font-semibold text-primary-500 dark:text-primary-400 uppercase tracking-wider mb-2 px-3 select-none flex items-center gap-2">
+                            <i class="fas fa-users-cog text-[10px]"></i>
+                            Gestión de Personal
+                        </h3>
+                        <ul class="space-y-0.5">
+                            <li>
+                                <a href="{% url 'trabajadores:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-users w-4 text-gray-400 dark:text-dark-400 group-hover:text-primary-500"></i>
+                                    <span class="font-medium">Trabajadores</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'unidades:lista' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-building w-4 text-gray-400 dark:text-dark-400 group-hover:text-primary-500"></i>
+                                    <span class="font-medium">Unidades</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'trabajadores:puestos-lista' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-briefcase w-4 text-gray-400 dark:text-dark-400 group-hover:text-primary-500"></i>
+                                    <span class="font-medium">Puestos</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'trabajadores:nombramientos-lista' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-file-contract w-4 text-gray-400 dark:text-dark-400 group-hover:text-primary-500"></i>
+                                    <span class="font-medium">Nombramientos</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Control y Seguimiento -->
+                    <div>
+                        <h3 class="text-xs font-semibold text-indigo-500 dark:text-indigo-400 uppercase tracking-wider mb-2 px-3 select-none flex items-center gap-2">
+                            <i class="fas fa-tasks text-[10px]"></i>
+                            Control y Seguimiento
+                        </h3>
+                        <ul class="space-y-0.5">
                             <li>
                                 <a href="{% url 'asistencias:index' %}"
-                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
-                                    <i class="fas fa-clipboard-check w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-clipboard-check w-4 text-gray-400 dark:text-dark-400 group-hover:text-indigo-500"></i>
                                     <span class="font-medium">Asistencias</span>
                                 </a>
                             </li>
                             <li>
                                 <a href="{% url 'incidencias:index' %}"
-                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
-                                    <i
-                                        class="fas fa-exclamation-triangle w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-exclamation-triangle w-4 text-gray-400 dark:text-dark-400 group-hover:text-indigo-500"></i>
                                     <span class="font-medium">Incidencias</span>
                                 </a>
                             </li>
                             <li>
+                                <a href="{% url 'jornadas:list' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-clock w-4 text-gray-400 dark:text-dark-400 group-hover:text-indigo-500"></i>
+                                    <span class="font-medium">Jornadas</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'jornadas:calendario' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-calendar-day w-4 text-gray-400 dark:text-dark-400 group-hover:text-indigo-500"></i>
+                                    <span class="font-medium">Calendario</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Análisis y Reportes -->
+                    <div>
+                        <h3 class="text-xs font-semibold text-purple-500 dark:text-purple-400 uppercase tracking-wider mb-2 px-3 select-none flex items-center gap-2">
+                            <i class="fas fa-chart-line text-[10px]"></i>
+                            Análisis
+                        </h3>
+                        <ul class="space-y-0.5">
+                            <li>
                                 <a href="{% url 'reportes:index' %}"
-                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
-                                    <i class="fas fa-chart-bar w-5 text-gray-400 group-hover:text-blue-500"></i>
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-chart-bar w-4 text-gray-400 dark:text-dark-400 group-hover:text-purple-500"></i>
                                     <span class="font-medium">Reportes</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
-                    {% if user.is_staff %}
-                    <!-- Administración -->
+                    
+                    {% endif %}
+
+                    <!-- ============================================ -->
+                    <!-- JEFE DE ÁREA - Vista de su unidad -->
+                    <!-- ============================================ -->
+                    {% if user.perfil.es_jefe and user.perfil.id_trabajador %}
+                    
+                    <!-- Mi Unidad Administrativa -->
                     <div>
-                        <h3
-                            class="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-2">
-                            Sistema</h3>
-                        <ul class="space-y-1">
+                        <h3 class="text-xs font-semibold text-primary-500 dark:text-primary-400 uppercase tracking-wider mb-2 px-3 select-none flex items-center gap-2">
+                            <i class="fas fa-building text-[10px]"></i>
+                            Mi Unidad
+                        </h3>
+                        <ul class="space-y-0.5">
                             <li>
-                                <a href="{% url 'admin:index' %}"
-                                    class="flex items-center gap-3 px-3 py-2.5 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-700 rounded-lg transition-all group">
-                                    <i class="fas fa-cog w-5 text-gray-400 group-hover:text-blue-500"></i>
-                                    <span class="font-medium">Administración</span>
+                                <a href="{% url 'trabajadores:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-users w-4 text-gray-400 dark:text-dark-400 group-hover:text-primary-500"></i>
+                                    <span class="font-medium">Personal</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'asistencias:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-clipboard-check w-4 text-gray-400 dark:text-dark-400 group-hover:text-primary-500"></i>
+                                    <span class="font-medium">Asistencias</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'incidencias:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-exclamation-triangle w-4 text-gray-400 dark:text-dark-400 group-hover:text-primary-500"></i>
+                                    <span class="font-medium">Incidencias</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'jornadas:list' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-clock w-4 text-gray-400 dark:text-dark-400 group-hover:text-primary-500"></i>
+                                    <span class="font-medium">Jornadas</span>
                                 </a>
                             </li>
                         </ul>
                     </div>
+
+                    <!-- Consulta - Solo lectura -->
+                    <div>
+                        <h3 class="text-xs font-semibold text-gray-500 dark:text-dark-400 uppercase tracking-wider mb-2 px-3 select-none flex items-center gap-2">
+                            <i class="fas fa-eye text-[10px]"></i>
+                            Consulta
+                        </h3>
+                        <ul class="space-y-0.5">
+                            <li>
+                                <a href="{% url 'trabajadores:puestos-lista' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-dark-800/50 rounded-lg transition-all group">
+                                    <i class="fas fa-briefcase w-4 text-gray-400 dark:text-dark-500"></i>
+                                    <span class="font-medium">Puestos</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'trabajadores:nombramientos-lista' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-dark-800/50 rounded-lg transition-all group">
+                                    <i class="fas fa-file-contract w-4 text-gray-400 dark:text-dark-500"></i>
+                                    <span class="font-medium">Nombramientos</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'jornadas:calendario' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-dark-800/50 rounded-lg transition-all group">
+                                    <i class="fas fa-calendar-day w-4 text-gray-400 dark:text-dark-500"></i>
+                                    <span class="font-medium">Calendario</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    {% endif %}
+
+                    <!-- ============================================ -->
+                    <!-- SISTEMA - Solo para staff -->
+                    <!-- ============================================ -->
+                    {% if user.is_staff %}
+                    <div>
+                        <h3 class="text-xs font-semibold text-red-500 dark:text-red-400 uppercase tracking-wider mb-2 px-3 select-none flex items-center gap-2">
+                            <i class="fas fa-shield-alt text-[10px]"></i>
+                            Sistema
+                        </h3>
+                        <ul class="space-y-0.5">
+                            <li>
+                                <a href="{% url 'accounts:lista_usuarios' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-users-cog w-4 text-gray-400 dark:text-dark-400 group-hover:text-red-500"></i>
+                                    <span class="font-medium">Usuarios</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'admin:index' %}"
+                                    class="flex items-center gap-3 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all group">
+                                    <i class="fas fa-cog w-4 text-gray-400 dark:text-dark-400 group-hover:text-red-500"></i>
+                                    <span class="font-medium">Admin Django</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                    
                     {% endif %}
                 </nav>
             </div>
         </aside>
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-2xl shadow-lg">
             <!-- Top Navbar -->
-            <header
-                class="h-16 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between px-6 z-10 transition-colors duration-300">
-                <!-- Left: Mobile Menu -->
+            <header class="h-16 bg-white dark:bg-dark-900 border-b border-gray-200 dark:border-dark-800 flex items-center justify-between px-6 z-10 transition-colors duration-200">
+                <!-- Left: Welcome Message -->
                 <div class="flex items-center gap-4">
-                    <button id="mobileMenuToggle"
-                        class="md:hidden text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    <button id="sidebarToggle" class="md:hidden w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 transition-all">
                         <i class="fas fa-bars text-xl"></i>
                     </button>
+                    <div class="hidden md:block">
+                        <h1 class="text-sm font-medium text-gray-600 dark:text-gray-400">
+                            Hola, <span class="text-gray-900 dark:text-white font-semibold">{{ user.get_full_name|default:user.username|default:"Usuario" }}</span> 👋
+                        </h1>
+                        <p class="text-xs text-gray-500 dark:text-dark-400" id="welcomeDate"></p>
+                    </div>
+                    
+                    <!-- Indicador de Unidad Administrativa (Solo para Jefes) -->
+                    {% if user.perfil.es_jefe and user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad %}
+                    <div class="hidden lg:flex items-center gap-2 ml-4 px-4 py-2 bg-gradient-to-r from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 border border-primary-200 dark:border-primary-700/30 rounded-lg">
+                        <div class="w-8 h-8 bg-primary-100 dark:bg-primary-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-building text-primary-600 dark:text-primary-400 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-primary-600 dark:text-primary-400 font-medium uppercase tracking-wider">Unidad Activa</p>
+                            <p class="text-xs font-semibold text-primary-900 dark:text-primary-300">{{ user.perfil.id_trabajador.id_unidad.nombre }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
 
-                <!-- Center: Live Clock -->
-                <div id="liveClock"
-                    class="hidden md:block font-mono text-sm font-medium text-gray-600 dark:text-gray-300 tracking-wide">
-                </div>
+                <!-- Right: Controls & Profile -->
+                <div class="flex items-center gap-4">
+                    <!-- Live Clock -->
+                    <div id="liveClock" class="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-gray-50 dark:bg-dark-800/50 border border-gray-200 dark:border-dark-700/50 rounded-lg">
+                        <i class="far fa-clock text-primary-500 dark:text-primary-400 text-xs"></i>
+                        <span class="font-mono text-xs font-medium text-gray-700 dark:text-gray-300 tracking-tight"></span>
+                    </div>
 
-                <!-- Right: Icons & Profile -->
-                <div class="flex items-center gap-6">
                     <!-- Dark Mode Toggle -->
                     <button id="darkModeToggle"
-                        class="text-gray-400 hover:text-blue-600 dark:hover:text-yellow-400 transition-colors">
-                        <i id="sunIcon" class="fas fa-sun text-lg hidden"></i>
-                        <i id="moonIcon" class="fas fa-moon text-lg"></i>
+                        class="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-dark-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 transition-all">
+                        <i id="sunIcon" class="fas fa-sun text-base hidden"></i>
+                        <i id="moonIcon" class="fas fa-moon text-base"></i>
                     </button>
 
-                    <div class="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
+                    <div class="h-6 w-px bg-gray-200 dark:bg-dark-800"></div>
 
-                    <!-- User Profile Dropdown -->
+                    <!-- User Profile Button -->
                     <div class="relative">
-                        <button id="userMenuButton" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+                        <button id="userMenuButton" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
                             <div class="text-right hidden sm:block">
-                                <p class="text-sm font-semibold text-gray-700 dark:text-gray-200">
-                                    {{ user.get_full_name|default:user.username|default:"Usuario" }}</p>
-                                <p class="text-xs text-gray-500 dark:text-gray-400">
-                                    {% if user.is_staff %}Admin{% else%}Personal{% endif %}</p>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
+                                    {{ user.get_full_name|default:user.username|default:"Usuario" }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-dark-400">
+                                    {{ user.perfil.get_rol_display }}
+                                </p>
                             </div>
-                            <div
-                                class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 overflow-hidden border-2 border-white dark:border-gray-600 shadow-sm flex items-center justify-center text-white font-semibold">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-primary-500/25 ring-2 ring-white dark:ring-dark-900">
                                 {{ user.username|default:'U'|slice:":1"|upper }}
                             </div>
                         </button>
-
-                        <!-- Dropdown Menu -->
-                        <div id="userMenu"
-                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-2 hidden z-50">
-                            <a href="{% url 'accounts:mi_perfil' %}"
-                                class="block px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer">
-                                <i class="fas fa-user-circle mr-2"></i>Perfil
-                            </a>
-                            <a href="{% url 'account_logout' %}"
-                                class="block px-4 py-2.5 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors cursor-pointer">
-                                <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
-                            </a>
-                        </div>
                     </div>
                 </div>
             </header>
 
+            <!-- Indicador de Unidad Administrativa Móvil (Solo para Jefes - Pantallas pequeñas) -->
+            {% if user.perfil.es_jefe and user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad %}
+            <div class="lg:hidden px-6 py-3 bg-white dark:bg-dark-900 border-b border-gray-200 dark:border-dark-800">
+                <div class="flex items-center gap-3 p-3 bg-gradient-to-r from-primary-50 to-blue-50 dark:from-primary-900/20 dark:to-blue-900/20 border border-primary-200 dark:border-primary-700/30 rounded-lg">
+                    <div class="w-10 h-10 bg-primary-100 dark:bg-primary-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-building text-primary-600 dark:text-primary-400"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[10px] text-primary-600 dark:text-primary-400 font-medium uppercase tracking-wider">Unidad Administrativa Activa</p>
+                        <p class="text-sm font-semibold text-primary-900 dark:text-primary-300 truncate">{{ user.perfil.id_trabajador.id_unidad.nombre }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Page Content -->
-            <main
-                class="flex-1 overflow-x-hidden overflow-y-auto bg-slate-100 dark:bg-gray-900 p-6 transition-colors duration-300">
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-dark-950 p-6 transition-colors duration-200">
                 {% if messages %}
-                <div class="mb-6 space-y-2">
+                <div class="mb-6 space-y-2 max-w-7xl mx-auto">
                     {% for message in messages %}
-                    <div
-                        class="p-4 rounded-lg flex items-start gap-3 {% if message.tags == 'success' %}bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800{% elif message.tags == 'error' %}bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800{% elif message.tags == 'warning' %}bg-yellow-50 dark:bg-yellow-900/20 text-yellow-800 dark:text-yellow-200 border border-yellow-200 dark:border-yellow-800{% else %}bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800{% endif %}">
-                        <i
-                            class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mt-0.5"></i>
-                        <span>{{ message }}</span>
+                    <div class="p-4 rounded-xl flex items-start gap-3 backdrop-blur-sm {% if message.tags == 'success' %}bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-500/30{% elif message.tags == 'error' %}bg-red-50 dark:bg-red-500/10 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-500/30{% elif message.tags == 'warning' %}bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-500/30{% else %}bg-blue-50 dark:bg-blue-500/10 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-500/30{% endif %}">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} mt-0.5 text-sm"></i>
+                        <span class="text-sm">{{ message }}</span>
                     </div>
                     {% endfor %}
                 </div>
                 {% endif %}
 
-                {% block content %}
-                {% endblock %}
+                <div class="max-w-7xl mx-auto">
+                    {% block content %}
+                    {% endblock %}
+                </div>
             </main>
         </div>
     </div>
 
+    <!-- User Menu Dropdown (Portal - Fixed positioning) -->
+    <div id="userMenu"
+        class="fixed bg-white dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-xl shadow-2xl py-2 hidden z-[9999] overflow-hidden w-52">
+        <div class="px-4 py-3 border-b border-gray-100 dark:border-dark-700">
+            <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">{{ user.get_full_name|default:user.username }}</p>
+            <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">{{ user.email }}</p>
+        </div>
+        <a href="{% url 'accounts:mi_perfil' %}"
+            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-700 transition-colors">
+            <i class="fas fa-user-circle w-4 text-gray-400"></i>
+            <span>Mi Perfil</span>
+        </a>
+        <div class="h-px bg-gray-100 dark:bg-dark-700 my-1"></div>
+        <a href="{% url 'account_logout' %}"
+            class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors">
+            <i class="fas fa-sign-out-alt w-4"></i>
+            <span>Cerrar Sesión</span>
+        </a>
+    </div>
+
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
     <script>
-        // Dark Mode Logic
+        // Dark Mode Logic - Default to dark mode
         const darkModeToggle = document.getElementById('darkModeToggle');
         const sunIcon = document.getElementById('sunIcon');
         const moonIcon = document.getElementById('moonIcon');
         const html = document.documentElement;
 
-        // Check local storage or system preference
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
-            sunIcon.classList.remove('hidden');
-            moonIcon.classList.add('hidden');
-        } else {
+        // Initialize dark mode (default to dark if no preference set)
+        if (localStorage.theme === 'light') {
             html.classList.remove('dark');
             sunIcon.classList.add('hidden');
             moonIcon.classList.remove('hidden');
+        } else {
+            localStorage.theme = 'dark';
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
         }
 
+        // Toggle dark mode
         darkModeToggle.addEventListener('click', () => {
             html.classList.toggle('dark');
             if (html.classList.contains('dark')) {
@@ -291,14 +522,29 @@
             }
         });
 
-        // User Menu Dropdown
+        // User Menu Dropdown - Posicionamiento dinámico
         const userMenuButton = document.getElementById('userMenuButton');
         const userMenu = document.getElementById('userMenu');
+
+        function positionUserMenu() {
+            if (!userMenu.classList.contains('hidden')) {
+                const buttonRect = userMenuButton.getBoundingClientRect();
+                userMenu.style.top = `${buttonRect.bottom + 8}px`;
+                userMenu.style.left = `${buttonRect.right - userMenu.offsetWidth}px`;
+            }
+        }
 
         userMenuButton.addEventListener('click', (e) => {
             e.stopPropagation();
             userMenu.classList.toggle('hidden');
+            if (!userMenu.classList.contains('hidden')) {
+                positionUserMenu();
+            }
         });
+
+        // Reposicionar al hacer scroll o resize
+        window.addEventListener('scroll', positionUserMenu, true);
+        window.addEventListener('resize', positionUserMenu);
 
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
@@ -307,37 +553,60 @@
             }
         });
 
-        // Live Clock Logic
-        function updateClock() {
+        // Welcome Date
+        function updateWelcomeDate() {
             const now = new Date();
-            const options = {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            };
-            const timeString = now.toLocaleString('es-ES', options).replace(',', ' -');
-
-            const clockElement = document.getElementById('liveClock');
-            if (clockElement) {
-                clockElement.textContent = timeString;
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateString = now.toLocaleDateString('es-ES', options);
+            const welcomeDateElement = document.getElementById('welcomeDate');
+            if (welcomeDateElement) {
+                welcomeDateElement.textContent = dateString.charAt(0).toUpperCase() + dateString.slice(1);
             }
         }
 
-        // Update immediately and then every second
+        // Live Clock Logic
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+
+            const clockElement = document.getElementById('liveClock');
+            if (clockElement) {
+                const timeSpan = clockElement.querySelector('span.font-mono');
+                if (timeSpan) {
+                    timeSpan.textContent = timeString;
+                }
+            }
+        }
+
+        // Initialize on load
+        updateWelcomeDate();
         updateClock();
         setInterval(updateClock, 1000);
 
-        // Mobile Menu Toggle (basic implementation)
+        // Mobile Menu Toggle
         const mobileMenuToggle = document.getElementById('mobileMenuToggle');
         const sidebar = document.getElementById('sidebar');
 
         mobileMenuToggle?.addEventListener('click', () => {
             sidebar.classList.toggle('hidden');
             sidebar.classList.toggle('flex');
+            // Add backdrop for mobile
+            if (!sidebar.classList.contains('hidden')) {
+                const backdrop = document.createElement('div');
+                backdrop.id = 'sidebarBackdrop';
+                backdrop.className = 'fixed inset-0 bg-black/50 z-5 md:hidden';
+                backdrop.onclick = () => {
+                    sidebar.classList.add('hidden');
+                    sidebar.classList.remove('flex');
+                    backdrop.remove();
+                };
+                document.body.appendChild(backdrop);
+            } else {
+                document.getElementById('sidebarBackdrop')?.remove();
+            }
         });
     </script>
     {% block extra_scripts %}{% endblock %}

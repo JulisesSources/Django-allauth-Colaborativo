@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Reporte de Asistencias - Sistema de Control{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+    
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a href="{% url 'reportes:index' %}" class="w-10 h-10 bg-gray-100 dark:bg-dark-800 hover:bg-gray-200 dark:hover:bg-dark-700 rounded-lg flex items-center justify-center transition-colors">
+                    <i class="fas fa-arrow-left text-gray-600 dark:text-dark-400 text-sm"></i>
+                </a>
+                <div class="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-600 dark:text-purple-400">
+                    <i class="fas fa-chart-line text-base"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Reporte de Asistencias</h1>
+                    <p class="text-xs text-gray-500 dark:text-dark-400">Del {{ fecha_inicio }} al {{ fecha_fin }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+    <!-- Formulario de filtros -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <form method="get" action="{% url 'reportes:reporte_asistencias' %}">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-filter text-purple-600 dark:text-purple-400 text-sm"></i>
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Filtros de Búsqueda</h2>
+                </div>
+                <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    <i class="fas fa-search text-xs"></i>
+                    <span>Aplicar Filtros</span>
+                </button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Filtro de trabajador -->
+                <div>
+                    <label for="trabajador" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Trabajador
+                    </label>
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs z-10"></i>
+                        <select name="trabajador" id="trabajador" class="w-full h-11 pl-9 pr-8 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 appearance-none">
+                            <option value="">Todos los trabajadores</option>
+                            {% for trabajador in trabajadores %}
+                            <option value="{{ trabajador.id_trabajador }}" {% if trabajador_seleccionado == trabajador.id_trabajador|stringformat:"s" %}selected{% endif %}>
+                                {{ trabajador.nombre_completo }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Filtro de unidad -->
+                <div>
+                    <label for="unidad" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Unidad Administrativa
+                    </label>
+                    <div class="relative">
+                        <i class="fas fa-building absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs z-10"></i>
+                        <select name="unidad" id="unidad" class="w-full h-11 pl-9 pr-8 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200 appearance-none">
+                            <option value="">Todas las unidades</option>
+                            {% for unidad in unidades %}
+                            <option value="{{ unidad.id_unidad }}" {% if unidad_seleccionada == unidad.id_unidad|stringformat:"s" %}selected{% endif %}>
+                                {{ unidad.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Fecha inicio -->
+                <div>
+                    <label for="fecha_inicio" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Fecha Inicio
+                    </label>
+                    <div class="relative">
+                        <i class="fas fa-calendar absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs z-10"></i>
+                        <input type="date" name="fecha_inicio" id="fecha_inicio" value="{{ fecha_inicio }}" class="w-full h-11 pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200">
+                    </div>
+                </div>
+
+                <!-- Fecha fin -->
+                <div>
+                    <label for="fecha_fin" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Fecha Fin
+                    </label>
+                    <div class="relative">
+                        <i class="fas fa-calendar absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs z-10"></i>
+                        <input type="date" name="fecha_fin" id="fecha_fin" value="{{ fecha_fin }}" class="w-full h-11 pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent transition-all duration-200">
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-4 mt-4 border-t border-gray-200 dark:border-dark-800">
+                <a href="{% url 'reportes:reporte_asistencias' %}" class="inline-flex items-center gap-2 px-4 h-11 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    <i class="fas fa-times text-xs"></i>
+                    <span>Limpiar Filtros</span>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Estadísticas resumidas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Total de registros -->
+        <div class="bg-gradient-to-br from-purple-900/40 to-gray-900 dark:from-purple-900/30 dark:to-dark-900 border border-purple-700/50 dark:border-purple-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-purple-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-purple-400 dark:text-purple-300 uppercase tracking-wider font-medium">Total Registros</p>
+                    <p class="text-3xl font-bold text-purple-400 dark:text-purple-300 mt-1">{{ total_registros }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">Periodo completo</p>
+                </div>
+                <div class="w-12 h-12 bg-purple-900/50 dark:bg-purple-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clipboard-list text-purple-500 dark:text-purple-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asistencias normales -->
+        <div class="bg-gradient-to-br from-emerald-900/40 to-gray-900 dark:from-emerald-900/30 dark:to-dark-900 border border-emerald-700/50 dark:border-emerald-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-emerald-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-emerald-400 dark:text-emerald-300 uppercase tracking-wider font-medium">Asistencias</p>
+                    <p class="text-3xl font-bold text-emerald-400 dark:text-emerald-300 mt-1">{{ asistencias_normales }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">{{ porcentaje_asistencia }}% del total</p>
+                </div>
+                <div class="w-12 h-12 bg-emerald-900/50 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-check-circle text-emerald-500 dark:text-emerald-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Retardos -->
+        <div class="bg-gradient-to-br from-amber-900/40 to-gray-900 dark:from-amber-900/30 dark:to-dark-900 border border-amber-700/50 dark:border-amber-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-amber-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-amber-400 dark:text-amber-300 uppercase tracking-wider font-medium">Retardos</p>
+                    <p class="text-3xl font-bold text-amber-400 dark:text-amber-300 mt-1">{{ retardos }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">{{ porcentaje_retardos }}% del total</p>
+                </div>
+                <div class="w-12 h-12 bg-amber-900/50 dark:bg-amber-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clock text-amber-500 dark:text-amber-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Faltas -->
+        <div class="bg-gradient-to-br from-red-900/40 to-gray-900 dark:from-red-900/30 dark:to-dark-900 border border-red-700/50 dark:border-red-700/30 rounded-xl p-5 shadow-lg hover:shadow-xl hover:border-red-600/60 transition-all duration-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-red-400 dark:text-red-300 uppercase tracking-wider font-medium">Faltas</p>
+                    <p class="text-3xl font-bold text-red-400 dark:text-red-300 mt-1">{{ faltas }}</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-400 mt-1">{{ porcentaje_faltas }}% del total</p>
+                </div>
+                <div class="w-12 h-12 bg-red-900/50 dark:bg-red-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-times-circle text-red-500 dark:text-red-400 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de resultados -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+        <!-- Header -->
+        <div class="px-5 py-3 border-b border-gray-200 dark:border-dark-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-table text-purple-600 dark:text-purple-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Detalle de Asistencias ({{ total_registros }} registros)</h2>
+            </div>
+            {% if total_registros > 0 %}
+            <a href="{% url 'reportes:exportar_asistencias_csv' %}?trabajador={{ trabajador_seleccionado|default:'' }}&unidad={{ unidad_seleccionada|default:'' }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-download text-xs"></i>
+                <span>Exportar CSV</span>
+            </a>
+            {% endif %}
+        </div>
+
+        {% if total_registros > 0 %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 dark:bg-dark-800/50 text-gray-700 dark:text-dark-300 border-b border-gray-200 dark:border-dark-700">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold">Fecha</th>
+                        <th class="px-4 py-3 text-left font-semibold">Trabajador</th>
+                        <th class="px-4 py-3 text-left font-semibold">Unidad</th>
+                        <th class="px-4 py-3 text-left font-semibold">Entrada</th>
+                        <th class="px-4 py-3 text-left font-semibold">Salida</th>
+                        <th class="px-4 py-3 text-left font-semibold">Estatus</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-dark-700">
+                    {% for asistencia in asistencias %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-800/50 transition-colors">
+                        <td class="px-4 py-3 text-gray-900 dark:text-white">
+                            {{ asistencia.fecha|date:"d/m/Y" }}
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-900 dark:text-white">
+                                {{ asistencia.id_trabajador.nombre_completo }}
+                            </div>
+                            <div class="text-xs text-gray-500 dark:text-dark-400">
+                                {{ asistencia.id_trabajador.numero_empleado }}
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-400">
+                            {{ asistencia.id_trabajador.id_unidad.nombre }}
+                        </td>
+                        <td class="px-4 py-3 text-gray-900 dark:text-white">
+                            {% if asistencia.hora_entrada %}
+                                {{ asistencia.hora_entrada|date:"H:i" }}
+                            {% else %}
+                                <span class="text-gray-400 dark:text-dark-500">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-gray-900 dark:text-white">
+                            {% if asistencia.hora_salida %}
+                                {{ asistencia.hora_salida|date:"H:i" }}
+                            {% else %}
+                                <span class="text-gray-400 dark:text-dark-500">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if asistencia.estatus == 'ASI' %}
+                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded text-xs font-medium">
+                                <i class="fas fa-check text-[10px]"></i>
+                                {{ asistencia.get_estatus_display }}
+                            </span>
+                            {% elif asistencia.estatus == 'RET' %}
+                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 rounded text-xs font-medium">
+                                <i class="fas fa-clock text-[10px]"></i>
+                                {{ asistencia.get_estatus_display }}
+                            </span>
+                            {% elif asistencia.estatus == 'FAL' %}
+                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded text-xs font-medium">
+                                <i class="fas fa-times text-[10px]"></i>
+                                {{ asistencia.get_estatus_display }}
+                            </span>
+                            {% elif asistencia.estatus == 'JUS' %}
+                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 rounded text-xs font-medium">
+                                <i class="fas fa-info-circle text-[10px]"></i>
+                                {{ asistencia.get_estatus_display }}
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="px-6 py-12 text-center">
+            <div class="w-16 h-16 mx-auto bg-gray-100 dark:bg-dark-800 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-inbox text-gray-400 dark:text-dark-500 text-2xl"></i>
+            </div>
+            <p class="text-sm text-gray-600 dark:text-dark-400 font-medium">
+                No se encontraron registros con los filtros seleccionados
+            </p>
+            <p class="text-xs text-gray-500 dark:text-dark-500 mt-1">
+                Intenta ajustar los filtros o el rango de fechas
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

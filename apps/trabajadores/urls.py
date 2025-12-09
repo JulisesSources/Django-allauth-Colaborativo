@@ -7,7 +7,9 @@ app_name = "trabajadores"
 urlpatterns = [
     path('', views.TrabajadorListView.as_view(), name='index'),
     path('crear/', views.TrabajadorCreateView.as_view(), name='crear'),
+    path('<int:pk>/detalle/', views.TrabajadorDetailView.as_view(), name='detalle'),
     path('<int:pk>/editar/', views.TrabajadorUpdateView.as_view(), name='editar'),
+    path('<int:pk>/toggle-activo/', views.TrabajadorToggleActivoView.as_view(), name='toggle-activo'),
     path('<int:pk>/eliminar/', views.TrabajadorDeleteView.as_view(), name='eliminar'),
     
     # --- PUESTOS ---
@@ -22,3 +24,4 @@ urlpatterns = [
     path('nombramientos/<int:pk>/editar/', views.NombramientoUpdateView.as_view(), name='nombramientos-editar'),
     path('nombramientos/<int:pk>/eliminar/', views.NombramientoDeleteView.as_view(), name='nombramientos-eliminar'),
 ]
+

@@ -53,6 +53,7 @@ class IncidenciaForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
+        from_mis_incidencias = kwargs.pop('from_mis_incidencias', False)
         super().__init__(*args, **kwargs)
 
         perfil = getattr(self.user, 'perfil', None)
@@ -61,25 +62,35 @@ class IncidenciaForm(forms.ModelForm):
         self.fields['id_tipo_incidencia'].queryset = TipoIncidencia.objects.filter(activo=True)
 
         # ===========================================================
-        #  SECCIÓN DE TRABAJADORES — DESACTIVADA TEMPORALMENTE
+        #  SECCIÓN DE TRABAJADORES
         # ===========================================================
         
         queryset_trab = Trabajador.objects.filter(activo=True)
         
         if perfil:
-            if perfil.es_admin():
-                 self.fields['id_trabajador'].queryset = queryset_trab
+            # Si viene desde mis_incidencias, cualquier usuario con trabajador asociado
+            # debe tener su trabajador pre-seleccionado y bloqueado
+            if from_mis_incidencias and perfil.id_trabajador:
+                self.fields['id_trabajador'].queryset = queryset_trab.filter(pk=perfil.id_trabajador.pk)
+                self.fields['id_trabajador'].initial = perfil.id_trabajador
+            
+            # Si NO viene desde mis_incidencias, aplicar reglas según el rol
+            elif perfil.es_admin():
+                # Admin puede seleccionar cualquier trabajador
+                self.fields['id_trabajador'].queryset = queryset_trab
         
             elif perfil.es_jefe():
-                    if perfil.id_trabajador and perfil.id_trabajador.id_unidad:
-                        unidad = perfil.id_trabajador.id_unidad
-                        self.fields['id_trabajador'].queryset = queryset_trab.filter(id_unidad=unidad)
-                    else:
-                        self.fields['id_trabajador'].queryset = queryset_trab.none()
+                # Jefe puede seleccionar trabajadores de su unidad
+                if perfil.id_trabajador and perfil.id_trabajador.id_unidad:
+                    unidad = perfil.id_trabajador.id_unidad
+                    self.fields['id_trabajador'].queryset = queryset_trab.filter(id_unidad=unidad)
+                else:
+                    self.fields['id_trabajador'].queryset = queryset_trab.none()
         
             elif perfil.es_trabajador():
+                # Trabajador solo puede crear incidencias para sí mismo
                 if perfil.id_trabajador:
-                    self.fields['id_trabajador'].queryset = queryset_trab.filter(id=perfil.id_trabajador.id)
+                    self.fields['id_trabajador'].queryset = queryset_trab.filter(pk=perfil.id_trabajador.pk)
                     self.fields['id_trabajador'].initial = perfil.id_trabajador
                     self.fields['id_trabajador'].widget = forms.HiddenInput()
                 else:
@@ -138,12 +149,19 @@ class FiltroIncidenciaForm(forms.Form):
         ('rechazada', 'Rechazada'),
     ]
 
-    trabajador = forms.CharField(
+    unidad = forms.ModelChoiceField(
+        queryset=None,
         required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Buscar por nombre o número de empleado...'
-        }),
+        empty_label='Todas las unidades',
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        label='Unidad Administrativa'
+    )
+
+    trabajador = forms.ModelChoiceField(
+        queryset=Trabajador.objects.filter(activo=True),
+        required=False,
+        empty_label='Todos los trabajadores',
+        widget=forms.Select(attrs={'class': 'form-control'}),
         label='Trabajador'
     )
 
@@ -173,6 +191,15 @@ class FiltroIncidenciaForm(forms.Form):
         widget=forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
         label='Hasta'
     )
+
+    def __init__(self, *args, **kwargs):
+        unidades_queryset = kwargs.pop('unidades_queryset', None)
+        super().__init__(*args, **kwargs)
+        if unidades_queryset is not None:
+            self.fields['unidad'].queryset = unidades_queryset
+        else:
+            from apps.unidades.models import UnidadAdministrativa
+            self.fields['unidad'].queryset = UnidadAdministrativa.objects.all()
 
 
 class TipoIncidenciaForm(forms.ModelForm):

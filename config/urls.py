@@ -27,6 +27,9 @@ urlpatterns = [
     
     # Redirección para accounts/profile (común en allauth)
     path('accounts/profile/', RedirectView.as_view(url='/', permanent=True)),
+
+    # Required for django-browser-reload
+    path('__reload__/ws/', include('django_browser_reload.urls')),
 ]
 
 # Servir archivos media en desarrollo

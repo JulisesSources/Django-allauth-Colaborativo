@@ -6,19 +6,20 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from apps.accounts.decorators import admin_requerido, jefe_o_admin_requerido
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
 from .models import UnidadAdministrativa
 
-@method_decorator([login_required, jefe_o_admin_requerido], name='dispatch')
+@method_decorator([login_required, admin_requerido], name='dispatch')
 class UnidadListView(ListView):
     model = UnidadAdministrativa
-    template_name = "unidades/index.html"
+    template_name = "unidades/lista_unidades_administrativas.html"
     context_object_name = "unidades"
 
 @method_decorator([login_required, admin_requerido], name='dispatch')
 class UnidadCreateView(CreateView):
     model = UnidadAdministrativa
     fields = ['nombre', 'descripcion']
-    template_name = "unidades/form.html"
+    template_name = "unidades/formulario_unidad_administrativa.html"
     success_url = reverse_lazy('unidades:lista')
 
     def form_valid(self, form):
@@ -30,7 +31,7 @@ class UnidadCreateView(CreateView):
 class UnidadUpdateView(UpdateView):
     model = UnidadAdministrativa
     fields = ['nombre', 'descripcion']
-    template_name = "unidades/form.html"
+    template_name = "unidades/formulario_unidad_administrativa.html"
     success_url = reverse_lazy('unidades:lista')
 
     def form_valid(self, form):
@@ -41,15 +42,19 @@ class UnidadUpdateView(UpdateView):
 @method_decorator([admin_requerido], name='dispatch')
 class UnidadDeleteView(DeleteView):
     model = UnidadAdministrativa
-    template_name = "unidades/eliminar.html"
+    template_name = "unidades/confirmar_eliminar_unidad_administrativa.html"
     success_url = reverse_lazy("unidades:lista")
 
-    def form_valid(self, form):
+    def post(self, request, *args, **kwargs):
         try:
-            return super().form_valid(form)
+            self.object = self.get_object()
+            success_url = self.get_success_url()
+            self.object.delete()
+            messages.success(request, f'La unidad administrativa "{self.object.nombre}" ha sido eliminada correctamente.')
+            return redirect(success_url)
         except ProtectedError:
             messages.error(
-                self.request,
-                "No puedes eliminar esta unidad porque tiene trabajadores relacionados."
+                request,
+                f'No se puede eliminar la unidad administrativa "{self.object.nombre}" porque tiene trabajadores relacionados. Primero debes reasignar o eliminar los trabajadores asociados.'
             )
-            return self.render_to_response(self.get_context_data())
+            return redirect('unidades:lista')

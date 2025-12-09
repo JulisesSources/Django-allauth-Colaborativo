@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}Trabajadores{% endblock %}
+
+{% block page_title %}Trabajadores{% endblock %}
+{% block page_subtitle %}Gestión de personal{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-users text-emerald-600 dark:text-emerald-400 text-base"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Trabajadores</h1>
+                    <p class="text-xs text-gray-500 dark:text-dark-400">Gestiona el personal de la organización</p>
+                </div>
+            </div>
+            {% if request.user.perfil.rol == 'admin' or request.user.perfil.rol == 'jefe' %}
+            <a href="{% url 'trabajadores:crear' %}"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-plus text-xs"></i>
+                <span>Nuevo Trabajador</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Filtros (solo para admin) -->
+    {% if request.user.perfil.rol == 'admin' %}
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <form method="get">
+            <div class="flex flex-col lg:flex-row items-start lg:items-end gap-4">
+                <!-- Filtro por Unidad -->
+                <div class="flex-1 w-full">
+                    <label for="unidad" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        <i class="fas fa-filter text-emerald-600 dark:text-emerald-400 text-xs mr-1"></i>
+                        Filtrar por Unidad Administrativa
+                    </label>
+                    <div class="relative">
+                        <i class="fas fa-building absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs z-10"></i>
+                        <select name="unidad" id="unidad"
+                                class="w-full h-11 pl-9 pr-8 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 dark:focus:ring-emerald-400 focus:border-transparent transition-all duration-200 appearance-none">
+                            <option value="">Todas las unidades</option>
+                            {% for unidad in unidades %}
+                            <option value="{{ unidad.id_unidad }}" {% if request.GET.unidad == unidad.id_unidad|stringformat:"s" %}selected{% endif %}>
+                                {{ unidad.nombre }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="flex items-center gap-3">
+                    <button type="submit" 
+                            class="inline-flex items-center gap-2 px-6 h-11 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-sm font-medium shadow-sm">
+                        <i class="fas fa-search text-xs"></i>
+                        <span>Buscar</span>
+                    </button>
+                    <a href="{% url 'trabajadores:index' %}" 
+                       class="inline-flex items-center gap-2 px-6 h-11 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white rounded-lg transition-colors text-sm font-medium shadow-sm">
+                        <i class="fas fa-times text-xs"></i>
+                        <span>Limpiar</span>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <!-- Lista de Trabajadores -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+        
+        <!-- Header -->
+        <div class="px-5 py-3 border-b border-gray-200 dark:border-dark-800">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-list text-emerald-600 dark:text-emerald-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Lista de Trabajadores</h2>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 dark:bg-dark-800/50 text-gray-700 dark:text-dark-300 border-b border-gray-200 dark:border-dark-700">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold">Nombre</th>
+                        <th class="px-4 py-3 text-left font-semibold">Número</th>
+                        <th class="px-4 py-3 text-left font-semibold">Unidad</th>
+                        <th class="px-4 py-3 text-left font-semibold">Puesto</th>
+                        <th class="px-4 py-3 text-left font-semibold">Nombramiento</th>
+                        <th class="px-4 py-3 text-center font-semibold">Activo</th>
+                        <th class="px-4 py-3 text-center font-semibold">Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody class="divide-y divide-gray-200 dark:divide-dark-700 bg-white dark:bg-dark-900">
+                    {% for trabajador in trabajadores %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-800/50 transition-colors">
+                        <td class="px-4 py-3 text-gray-900 dark:text-white font-medium">{{ trabajador.nombre }} {{ trabajador.apellido_paterno }} {{ trabajador.apellido_materno }}</td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-300">{{ trabajador.numero_empleado }}</td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-300">{{ trabajador.id_unidad.nombre }}</td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-300">{{ trabajador.id_puesto.nombre_puesto }}</td>
+                        <td class="px-4 py-3 text-gray-600 dark:text-dark-300">{{ trabajador.id_tipo_nombramiento.descripcion }}</td>
+                        <td class="px-4 py-3 text-center">
+                            {% if trabajador.activo %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                                <i class="fas fa-check-circle text-xs"></i> Activo
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20">
+                                <i class="fas fa-times-circle text-xs"></i> Inactivo
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex items-center justify-center gap-3">
+                                <a href="{% url 'trabajadores:detalle' trabajador.pk %}"
+                                   class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+                                   title="Ver detalles">
+                                    <i class="fas fa-eye text-sm"></i>
+                                </a>
+                                {% if request.user.perfil.rol == 'admin' or request.user.perfil.rol == 'jefe' %}
+                                <a href="{% url 'trabajadores:editar' trabajador.pk %}"
+                                   class="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                                   title="Editar">
+                                    <i class="fas fa-edit text-sm"></i>
+                                </a>
+                                {% if trabajador.activo %}
+                                <button onclick="confirmarCambioEstado('{{ trabajador.pk }}', '{{ trabajador.nombre }} {{ trabajador.apellido_paterno }}', false)"
+                                        class="text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors"
+                                        title="Desactivar trabajador">
+                                    <i class="fas fa-user-slash text-sm"></i>
+                                </button>
+                                {% else %}
+                                <button onclick="confirmarCambioEstado('{{ trabajador.pk }}', '{{ trabajador.nombre }} {{ trabajador.apellido_paterno }}', true)"
+                                        class="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors"
+                                        title="Activar trabajador">
+                                    <i class="fas fa-user-check text-sm"></i>
+                                </button>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="py-16">
+                            <div class="text-center">
+                                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-dark-800 mb-4">
+                                    <i class="fas fa-users text-2xl text-gray-400 dark:text-dark-500"></i>
+                                </div>
+                                <p class="text-gray-500 dark:text-dark-400 text-sm">No hay trabajadores registrados</p>
+                                {% if request.user.perfil.rol == 'admin' or request.user.perfil.rol == 'jefe' %}
+                                <a href="{% url 'trabajadores:crear' %}"
+                                   class="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors text-sm font-medium">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Crear primer trabajador</span>
+                                </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal de Confirmación de Cambio de Estado -->
+<div id="modalCambioEstado" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-dark-900 rounded-xl shadow-xl max-w-md w-full border border-gray-200 dark:border-dark-800">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-dark-800">
+            <div class="flex items-center gap-3">
+                <div id="modalIcon" class="w-10 h-10 rounded-lg flex items-center justify-center">
+                    <i id="modalIconElement" class="text-base"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white" id="modalTitulo"></h3>
+            </div>
+        </div>
+        
+        <!-- Body -->
+        <div class="px-6 py-5">
+            <p class="text-sm text-gray-600 dark:text-dark-300 mb-2" id="modalMensaje"></p>
+            <p class="text-sm font-semibold text-gray-900 dark:text-white" id="nombreTrabajador"></p>
+            <p class="text-xs mt-3" id="modalAdvertencia">
+                <i class="fas fa-info-circle mr-1"></i>
+                <span id="modalAdvertenciaTexto"></span>
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="px-6 py-4 bg-gray-50 dark:bg-dark-800/50 rounded-b-xl flex items-center gap-3">
+            <button onclick="cerrarModal()"
+                    class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white rounded-lg transition-colors text-sm font-medium">
+                <i class="fas fa-times text-xs"></i>
+                <span>Cancelar</span>
+            </button>
+            <form id="formCambioEstado" method="post" class="flex-1">
+                {% csrf_token %}
+                <button type="submit" id="btnConfirmar"
+                        class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium">
+                    <i id="btnConfirmarIcon" class="text-xs"></i>
+                    <span id="btnConfirmarTexto"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarCambioEstado(trabajadorId, nombreTrabajador, activar) {
+    const modal = document.getElementById('modalCambioEstado');
+    const modalIcon = document.getElementById('modalIcon');
+    const modalIconElement = document.getElementById('modalIconElement');
+    const modalTitulo = document.getElementById('modalTitulo');
+    const modalMensaje = document.getElementById('modalMensaje');
+    const modalAdvertencia = document.getElementById('modalAdvertencia');
+    const modalAdvertenciaTexto = document.getElementById('modalAdvertenciaTexto');
+    const btnConfirmar = document.getElementById('btnConfirmar');
+    const btnConfirmarIcon = document.getElementById('btnConfirmarIcon');
+    const btnConfirmarTexto = document.getElementById('btnConfirmarTexto');
+    
+    document.getElementById('nombreTrabajador').textContent = nombreTrabajador;
+    document.getElementById('formCambioEstado').action = `/trabajadores/${trabajadorId}/toggle-activo/`;
+    
+    if (activar) {
+        // Configuración para ACTIVAR
+        modalIcon.className = 'w-10 h-10 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center';
+        modalIconElement.className = 'fas fa-user-check text-emerald-600 dark:text-emerald-400 text-base';
+        modalTitulo.textContent = 'Activar Trabajador';
+        modalMensaje.textContent = '¿Estás seguro de que deseas activar al trabajador?';
+        modalAdvertencia.className = 'text-xs text-emerald-600 dark:text-emerald-400 mt-3';
+        modalAdvertenciaTexto.textContent = 'El trabajador podrá realizar asistencias y tener incidencias.';
+        btnConfirmar.className = 'w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded-lg transition-colors text-sm font-medium';
+        btnConfirmarIcon.className = 'fas fa-check text-xs';
+        btnConfirmarTexto.textContent = 'Activar';
+    } else {
+        // Configuración para DESACTIVAR
+        modalIcon.className = 'w-10 h-10 bg-orange-100 dark:bg-orange-500/10 rounded-lg flex items-center justify-center';
+        modalIconElement.className = 'fas fa-user-slash text-orange-600 dark:text-orange-400 text-base';
+        modalTitulo.textContent = 'Desactivar Trabajador';
+        modalMensaje.textContent = '¿Estás seguro de que deseas desactivar al trabajador?';
+        modalAdvertencia.className = 'text-xs text-orange-600 dark:text-orange-400 mt-3';
+        modalAdvertenciaTexto.textContent = 'El trabajador no podrá realizar asistencias ni tener incidencias.';
+        btnConfirmar.className = 'w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-medium';
+        btnConfirmarIcon.className = 'fas fa-ban text-xs';
+        btnConfirmarTexto.textContent = 'Desactivar';
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+function cerrarModal() {
+    document.getElementById('modalCambioEstado').classList.add('hidden');
+}
+
+// Cerrar modal al hacer clic fuera de él
+document.getElementById('modalCambioEstado').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModal();
+    }
+});
+
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModal();
+    }
+});
+</script>
+
+{% endblock %}

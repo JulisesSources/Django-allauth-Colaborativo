@@ -2,124 +2,159 @@
 
 {% block title %}Mi Asistencia - SCA-B123{% endblock %}
 
-{% block page_title %}Mi Asistencia{% endblock %}
-{% block page_subtitle %}{{ trabajador.nombre_completo }}{% endblock %}
-
 {% block content %}
-<div class="max-w-6xl mx-auto space-y-6">
+<div class="space-y-5">
+    
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary-100 dark:bg-primary-500/10 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400">
+                <i class="fas fa-user-clock text-base"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Mi Asistencia</h1>
+                <p class="text-xs text-gray-500 dark:text-dark-400">{{ trabajador.nombre_completo }} • {{ fecha_actual|date:"l, d \d\e F \d\e Y" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    {% if not jornada_vigente %}
+    <!-- Sin jornada asignada - Mensaje grande -->
+    <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl p-12 text-center">
+        <div class="w-24 h-24 bg-red-100 dark:bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-calendar-times text-red-600 dark:text-red-400 text-4xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-3">Sin Jornada Asignada</h2>
+        <p class="text-base text-gray-600 dark:text-dark-300 mb-6 max-w-md mx-auto">
+            {{ razon_no_asistir|default:"No tienes una jornada vigente asignada para hoy. Contacta a tu supervisor para que te asigne una jornada laboral." }}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="{% url 'accounts:dashboard' %}" 
+               class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 text-sm font-medium rounded-lg transition-colors duration-200">
+                <i class="fas fa-arrow-left text-xs"></i>
+                Volver al panel
+            </a>
+        </div>
+    </div>
+    
+    {% else %}
     
     <!-- Alerta día inhábil/festivo -->
     {% if es_dia_inhabil %}
-    <div class="bg-amber-900/30 border-2 border-amber-600 rounded-xl p-5 flex items-start gap-4">
-        <div class="w-12 h-12 bg-amber-600/30 rounded-xl flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-calendar-times text-amber-400 text-2xl"></i>
-        </div>
-        <div>
-            <p class="text-amber-300 font-bold text-lg">Día Festivo / Inhábil</p>
-            <p class="text-amber-400">Hoy es un día festivo según el calendario laboral. No es necesario registrar asistencia.</p>
-        </div>
-    </div>
-    {% elif not jornada_vigente %}
-    <div class="bg-red-900/30 border border-red-700 rounded-xl p-4 flex items-start gap-3">
-        <i class="fas fa-exclamation-triangle text-red-400 text-xl mt-0.5"></i>
-        <div>
-            <p class="text-red-300 font-semibold">Sin jornada asignada</p>
-            <p class="text-red-400 text-sm">{{ razon_no_asistir|default:"No tienes una jornada vigente asignada para hoy. Contacta a tu supervisor." }}</p>
+    <div class="bg-amber-50 dark:bg-amber-500/10 border-l-4 border-amber-500 dark:border-amber-400 p-4 rounded-r-xl">
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 bg-amber-100 dark:bg-amber-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-calendar-times text-amber-600 dark:text-amber-400 text-lg"></i>
+            </div>
+            <div>
+                <p class="text-sm font-semibold text-amber-800 dark:text-amber-200">Día Festivo / Inhábil</p>
+                <p class="text-xs text-amber-700 dark:text-amber-300 mt-1">Hoy es un día festivo según el calendario laboral. No es necesario registrar asistencia.</p>
+            </div>
         </div>
     </div>
     {% elif not debe_asistir %}
-    <div class="bg-blue-900/30 border border-blue-700 rounded-xl p-4 flex items-start gap-3">
-        <i class="fas fa-info-circle text-blue-400 text-xl mt-0.5"></i>
-        <div>
-            <p class="text-blue-300 font-semibold">Día no laborable</p>
-            <p class="text-blue-400 text-sm">{{ razon_no_asistir }}</p>
+    <div class="bg-blue-50 dark:bg-blue-500/10 border-l-4 border-blue-500 dark:border-blue-400 p-4 rounded-r-xl">
+        <div class="flex items-start gap-3">
+            <i class="fas fa-info-circle text-blue-600 dark:text-blue-400 text-lg mt-0.5"></i>
+            <div>
+                <p class="text-sm font-semibold text-blue-800 dark:text-blue-200">Día no laborable</p>
+                <p class="text-xs text-blue-700 dark:text-blue-300 mt-1">{{ razon_no_asistir }}</p>
+            </div>
         </div>
     </div>
     {% endif %}
 
     <!-- 2 Recuadros principales -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         
         <!-- ============================================ -->
         <!-- RECUADRO 1: REGISTRAR MI ASISTENCIA -->
         <!-- ============================================ -->
-        <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-                <h2 class="text-lg font-bold text-white flex items-center">
-                    <i class="fas fa-user-clock text-blue-200 mr-3"></i>Registrar Mi Asistencia
-                </h2>
-                <p class="text-blue-200 text-sm mt-1">{{ fecha_actual|date:"l, d \d\e F \d\e Y" }}</p>
+        <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl overflow-hidden shadow-sm">
+            <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-user-clock text-white text-xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white">Registrar Mi Asistencia</h2>
+                </div>
             </div>
             
-            <div class="p-6 space-y-4">
+            <div class="p-6 space-y-5">
                 {% if registro_hoy %}
                     <!-- Estado de entrada -->
-                    <div class="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl border border-gray-700">
+                    <div class="flex items-center justify-between p-5 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/10 rounded-xl border border-emerald-200 dark:border-emerald-700/30 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 {% if registro_hoy.hora_entrada %}bg-green-900/50{% else %}bg-gray-700{% endif %} rounded-lg flex items-center justify-center">
-                                <i class="fas fa-sign-in-alt {% if registro_hoy.hora_entrada %}text-green-400{% else %}text-gray-500{% endif %}"></i>
+                            <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/10 rounded-xl flex items-center justify-center shadow-sm">
+                                <i class="fas fa-sign-in-alt text-emerald-600 dark:text-emerald-400 text-lg"></i>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-400">Entrada</p>
-                                <p class="text-xl font-bold font-mono {% if registro_hoy.hora_entrada %}text-green-400{% else %}text-gray-500{% endif %}">
-                                    {{ registro_hoy.hora_entrada|time:"H:i"|default:"--:--" }}
+                                <p class="text-xs text-emerald-700 dark:text-emerald-500 font-semibold uppercase">Entrada</p>
+                                <p class="text-3xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
+                                    {{ registro_hoy.hora_entrada|time:"H:i" }}
                                 </p>
                             </div>
                         </div>
-                        {% if registro_hoy.hora_entrada %}
-                        <span class="bg-green-900/50 text-green-400 px-3 py-1 rounded-lg text-xs font-medium">
-                            <i class="fas fa-check mr-1"></i>OK
+                        <span class="bg-emerald-600 dark:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg">
+                            <i class="fas fa-check text-xs mr-1"></i>REGISTRADO
                         </span>
-                        {% endif %}
                     </div>
 
                     <!-- Estado de salida -->
-                    <div class="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl border border-gray-700">
+                    <div class="flex items-center justify-between p-5 {% if registro_hoy.hora_salida %}bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/10 border-red-200 dark:border-red-700/30{% else %}bg-gray-50 dark:bg-dark-800 border-gray-200 dark:border-dark-700{% endif %} rounded-xl border shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 {% if registro_hoy.hora_salida %}bg-red-900/50{% else %}bg-gray-700{% endif %} rounded-lg flex items-center justify-center">
-                                <i class="fas fa-sign-out-alt {% if registro_hoy.hora_salida %}text-red-400{% else %}text-gray-500{% endif %}"></i>
+                            <div class="w-12 h-12 {% if registro_hoy.hora_salida %}bg-red-100 dark:bg-red-500/10{% else %}bg-gray-200 dark:bg-dark-700{% endif %} rounded-xl flex items-center justify-center shadow-sm">
+                                <i class="fas fa-sign-out-alt {% if registro_hoy.hora_salida %}text-red-600 dark:text-red-400{% else %}text-gray-400 dark:text-dark-500{% endif %} text-lg"></i>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-400">Salida</p>
-                                <p class="text-xl font-bold font-mono {% if registro_hoy.hora_salida %}text-red-400{% else %}text-gray-500{% endif %}">
+                                <p class="text-xs {% if registro_hoy.hora_salida %}text-red-700 dark:text-red-500{% else %}text-gray-500 dark:text-dark-400{% endif %} font-semibold uppercase">Salida</p>
+                                <p class="text-3xl font-bold font-mono {% if registro_hoy.hora_salida %}text-red-600 dark:text-red-400{% else %}text-gray-400 dark:text-dark-500{% endif %}">
                                     {{ registro_hoy.hora_salida|time:"H:i"|default:"--:--" }}
                                 </p>
                             </div>
                         </div>
                         {% if registro_hoy.hora_salida %}
-                        <span class="bg-green-900/50 text-green-400 px-3 py-1 rounded-lg text-xs font-medium">
-                            <i class="fas fa-check mr-1"></i>OK
+                        <span class="bg-red-600 dark:bg-red-500 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg">
+                            <i class="fas fa-check text-xs mr-1"></i>REGISTRADO
+                        </span>
+                        {% else %}
+                        <span class="bg-gray-200 dark:bg-dark-700 text-gray-500 dark:text-dark-400 px-4 py-2 rounded-xl text-xs font-bold">
+                            <i class="fas fa-clock text-xs mr-1"></i>PENDIENTE
                         </span>
                         {% endif %}
                     </div>
 
                     <!-- Estatus -->
-                    <div class="flex items-center justify-between p-4 bg-purple-900/20 rounded-xl border border-purple-700/50">
+                    <div class="flex items-center justify-between p-5 bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-900/10 rounded-xl border border-purple-200 dark:border-purple-700/30 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-purple-900/50 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-clipboard-check text-purple-400"></i>
+                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-500/10 rounded-xl flex items-center justify-center shadow-sm">
+                                <i class="fas fa-clipboard-check text-purple-600 dark:text-purple-400 text-lg"></i>
                             </div>
                             <div>
-                                <p class="text-sm text-gray-400">Estatus</p>
-                                <p class="text-lg font-bold text-white">{{ registro_hoy.get_estatus_display }}</p>
+                                <p class="text-xs text-purple-700 dark:text-purple-500 font-semibold uppercase">Estatus del Día</p>
+                                <p class="text-xl font-bold text-gray-900 dark:text-white">{{ registro_hoy.get_estatus_display }}</p>
                             </div>
                         </div>
-                        <span class="px-3 py-1.5 rounded-lg text-sm font-medium
-                            {% if registro_hoy.estatus == 'ASI' %}bg-green-900/50 text-green-400
-                            {% elif registro_hoy.estatus == 'RET' %}bg-yellow-900/50 text-yellow-400
-                            {% elif registro_hoy.estatus == 'JUS' %}bg-blue-900/50 text-blue-400
-                            {% else %}bg-red-900/50 text-red-400{% endif %}">
-                            {{ registro_hoy.get_estatus_display }}
+                        <span class="px-4 py-2 rounded-xl text-sm font-bold shadow-lg
+                            {% if registro_hoy.estatus == 'ASI' %}bg-emerald-600 dark:bg-emerald-500 text-white
+                            {% elif registro_hoy.estatus == 'RET' %}bg-amber-600 dark:bg-amber-500 text-white
+                            {% elif registro_hoy.estatus == 'JUS' %}bg-blue-600 dark:bg-blue-500 text-white
+                            {% else %}bg-red-600 dark:bg-red-500 text-white{% endif %}">
+                            {% if registro_hoy.estatus == 'ASI' %}<i class="fas fa-check text-xs mr-1"></i>
+                            {% elif registro_hoy.estatus == 'RET' %}<i class="fas fa-clock text-xs mr-1"></i>
+                            {% elif registro_hoy.estatus == 'JUS' %}<i class="fas fa-file-alt text-xs mr-1"></i>
+                            {% else %}<i class="fas fa-times text-xs mr-1"></i>{% endif %}
+                            {{ registro_hoy.get_estatus_display|upper }}
                         </span>
                     </div>
                 {% else %}
-                    <div class="text-center py-8">
-                        <div class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-clock text-gray-500 text-2xl"></i>
+                    <div class="text-center py-12">
+                        <div class="w-20 h-20 bg-primary-100 dark:bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-clock text-primary-600 dark:text-primary-400 text-3xl"></i>
                         </div>
-                        <p class="text-gray-400 mb-2">Sin registro de hoy</p>
+                        <p class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Sin registro de hoy</p>
                         {% if jornada_vigente and debe_asistir and not es_dia_inhabil %}
-                        <p class="text-gray-500 text-sm">Registra tu entrada para comenzar</p>
+                        <p class="text-sm text-gray-600 dark:text-dark-300">Registra tu entrada para comenzar la jornada</p>
                         {% endif %}
                     </div>
                 {% endif %}
@@ -131,45 +166,45 @@
                     {% if jornada_vigente or registro_hoy %}
                         {% if not registro_hoy or not registro_hoy.hora_salida %}
                         <button type="submit" 
-                                class="w-full bg-gradient-to-r {% if registro_hoy and registro_hoy.hora_entrada %}from-red-600 to-red-700 hover:from-red-700 hover:to-red-800{% else %}from-green-600 to-green-700 hover:from-green-700 hover:to-green-800{% endif %} text-white text-lg font-bold py-4 rounded-xl transition-all shadow-lg flex items-center justify-center gap-3">
+                                class="w-full {% if registro_hoy and registro_hoy.hora_entrada %}bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/30{% else %}bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 shadow-emerald-500/30{% endif %} text-white text-lg font-bold py-5 rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
                             {% if registro_hoy and registro_hoy.hora_entrada and not registro_hoy.hora_salida %}
-                                <i class="fas fa-sign-out-alt"></i>Registrar Salida
+                                <i class="fas fa-sign-out-alt text-xl"></i><span>Registrar Salida</span>
                             {% else %}
-                                <i class="fas fa-sign-in-alt"></i>Registrar Entrada
+                                <i class="fas fa-sign-in-alt text-xl"></i><span>Registrar Entrada</span>
                             {% endif %}
                         </button>
                         {% else %}
-                        <div class="bg-green-900/30 border border-green-700 text-green-400 px-4 py-4 rounded-xl text-center font-medium flex items-center justify-center gap-2">
-                            <i class="fas fa-check-circle text-xl"></i>Tu registro de hoy está completo
+                        <div class="bg-gradient-to-r from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/10 border border-emerald-200 dark:border-emerald-700/30 text-emerald-700 dark:text-emerald-400 px-6 py-5 rounded-xl text-center font-bold flex items-center justify-center gap-3 shadow-sm">
+                            <i class="fas fa-check-circle text-2xl"></i><span>Tu registro de hoy está completo</span>
                         </div>
                         {% endif %}
                     {% else %}
-                    <div class="bg-gray-700 text-gray-400 px-4 py-4 rounded-xl text-center font-medium">
-                        <i class="fas fa-ban mr-2"></i>Registro no disponible
+                    <div class="bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-600 dark:text-dark-300 px-6 py-5 rounded-xl text-center font-bold flex items-center justify-center gap-3">
+                        <i class="fas fa-ban text-xl"></i><span>Registro no disponible</span>
                     </div>
                     {% endif %}
                 </form>
                 {% else %}
-                <div class="bg-amber-900/30 border border-amber-700 text-amber-400 px-4 py-4 rounded-xl text-center font-medium">
-                    <i class="fas fa-calendar-times mr-2"></i>No se registra asistencia en días festivos
+                <div class="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/10 border border-amber-200 dark:border-amber-700/30 text-amber-700 dark:text-amber-400 px-6 py-5 rounded-xl text-center font-bold flex items-center justify-center gap-3 shadow-sm">
+                    <i class="fas fa-calendar-times text-xl"></i><span>No se registra asistencia en días festivos</span>
                 </div>
                 {% endif %}
 
                 <!-- Info de jornada -->
                 {% if jornada_vigente %}
-                <div class="mt-4 pt-4 border-t border-gray-700">
-                    <p class="text-sm text-gray-400 flex items-center gap-2 mb-2">
-                        <i class="fas fa-business-time text-green-400"></i>Tu Jornada
+                <div class="mt-5 pt-5 border-t border-gray-200 dark:border-dark-700">
+                    <p class="text-sm text-gray-700 dark:text-dark-300 font-semibold flex items-center gap-2 mb-3">
+                        <i class="fas fa-business-time text-primary-600 dark:text-primary-400"></i>Tu Jornada Asignada
                     </p>
-                    <div class="flex items-center justify-center gap-6 text-gray-300">
-                        <div class="text-center">
-                            <p class="text-xs text-gray-500">Entrada</p>
-                            <p class="font-mono font-bold text-green-400">{{ jornada_vigente.hora_entrada|time:"H:i" }}</p>
+                    <div class="flex items-center justify-center gap-8 text-gray-900 dark:text-white">
+                        <div class="text-center p-3 bg-emerald-50 dark:bg-emerald-900/10 rounded-xl">
+                            <p class="text-xs text-emerald-700 dark:text-emerald-500 font-semibold mb-1">Entrada</p>
+                            <p class="font-mono font-bold text-xl text-emerald-600 dark:text-emerald-400">{{ jornada_vigente.hora_entrada|time:"H:i" }}</p>
                         </div>
-                        <i class="fas fa-arrow-right text-gray-600"></i>
-                        <div class="text-center">
-                            <p class="text-xs text-gray-500">Salida</p>
-                            <p class="font-mono font-bold text-red-400">{{ jornada_vigente.hora_salida|time:"H:i" }}</p>
+                        <i class="fas fa-arrow-right text-gray-400 dark:text-dark-500"></i>
+                        <div class="text-center p-3 bg-red-50 dark:bg-red-900/10 rounded-xl">
+                            <p class="text-xs text-red-700 dark:text-red-500 font-semibold mb-1">Salida</p>
+                            <p class="font-mono font-bold text-xl text-red-600 dark:text-red-400">{{ jornada_vigente.hora_salida|time:"H:i" }}</p>
                         </div>
                     </div>
                 </div>
@@ -180,54 +215,59 @@
         <!-- ============================================ -->
         <!-- RECUADRO 2: RESUMEN DE MIS ASISTENCIAS -->
         <!-- ============================================ -->
-        <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
-            <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
-                <h2 class="text-lg font-bold text-white flex items-center">
-                    <i class="fas fa-chart-pie text-purple-200 mr-3"></i>Resumen de Mis Asistencias
-                </h2>
-                <p class="text-purple-200 text-sm mt-1">Últimos 30 días</p>
+        <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl overflow-hidden shadow-sm">
+            <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
+                        <i class="fas fa-chart-pie text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Resumen de Mis Asistencias</h2>
+                        <p class="text-indigo-100 text-sm">Últimos 30 días</p>
+                    </div>
+                </div>
             </div>
             
             <div class="p-6">
                 <!-- Estadísticas en grid -->
-                <div class="grid grid-cols-3 gap-4 mb-6">
+                <div class="grid grid-cols-3 gap-5 mb-6">
                     <!-- Asistencias -->
-                    <div class="text-center p-4 bg-green-900/20 rounded-xl border border-green-700/50">
-                        <div class="w-12 h-12 bg-green-900/50 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <i class="fas fa-check text-green-400 text-xl"></i>
+                    <div class="text-center p-5 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-900/20 dark:to-emerald-900/10 rounded-xl border border-emerald-200 dark:border-emerald-700/30 shadow-sm">
+                        <div class="w-14 h-14 bg-emerald-600 dark:bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                            <i class="fas fa-check text-white text-2xl"></i>
                         </div>
-                        <p class="text-2xl font-bold text-green-400">{{ asistencias|default:"0" }}</p>
-                        <p class="text-xs text-gray-400">Asistencias</p>
+                        <p class="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-1">{{ asistencias|default:"0" }}</p>
+                        <p class="text-xs text-emerald-700 dark:text-emerald-500 font-semibold uppercase">Asistencias</p>
                     </div>
                     
                     <!-- Retardos -->
-                    <div class="text-center p-4 bg-yellow-900/20 rounded-xl border border-yellow-700/50">
-                        <div class="w-12 h-12 bg-yellow-900/50 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <i class="fas fa-clock text-yellow-400 text-xl"></i>
+                    <div class="text-center p-5 bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/20 dark:to-amber-900/10 rounded-xl border border-amber-200 dark:border-amber-700/30 shadow-sm">
+                        <div class="w-14 h-14 bg-amber-600 dark:bg-amber-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                            <i class="fas fa-clock text-white text-2xl"></i>
                         </div>
-                        <p class="text-2xl font-bold text-yellow-400">{{ retardos|default:"0" }}</p>
-                        <p class="text-xs text-gray-400">Retardos</p>
+                        <p class="text-3xl font-bold text-amber-600 dark:text-amber-400 mb-1">{{ retardos|default:"0" }}</p>
+                        <p class="text-xs text-amber-700 dark:text-amber-500 font-semibold uppercase">Retardos</p>
                     </div>
                     
                     <!-- Faltas -->
-                    <div class="text-center p-4 bg-red-900/20 rounded-xl border border-red-700/50">
-                        <div class="w-12 h-12 bg-red-900/50 rounded-full flex items-center justify-center mx-auto mb-2">
-                            <i class="fas fa-times text-red-400 text-xl"></i>
+                    <div class="text-center p-5 bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-900/10 rounded-xl border border-red-200 dark:border-red-700/30 shadow-sm">
+                        <div class="w-14 h-14 bg-red-600 dark:bg-red-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
+                            <i class="fas fa-times text-white text-2xl"></i>
                         </div>
-                        <p class="text-2xl font-bold text-red-400">{{ faltas|default:"0" }}</p>
-                        <p class="text-xs text-gray-400">Faltas</p>
+                        <p class="text-3xl font-bold text-red-600 dark:text-red-400 mb-1">{{ faltas|default:"0" }}</p>
+                        <p class="text-xs text-red-700 dark:text-red-500 font-semibold uppercase">Faltas</p>
                     </div>
                 </div>
 
                 <!-- Porcentaje de asistencia -->
-                <div class="bg-gray-900/50 rounded-xl p-4 border border-gray-700">
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-gray-400 text-sm">Porcentaje de Asistencia</span>
-                        <span class="text-2xl font-bold {% if porcentaje_asistencia >= 90 %}text-green-400{% elif porcentaje_asistencia >= 70 %}text-yellow-400{% else %}text-red-400{% endif %}">{{ porcentaje_asistencia|floatformat:0 }}%</span>
+                <div class="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-800 dark:to-dark-900 rounded-xl p-5 border border-gray-200 dark:border-dark-700">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-gray-700 dark:text-dark-300 text-sm font-semibold">Porcentaje de Asistencia</span>
+                        <span class="text-3xl font-bold {% if porcentaje_asistencia >= 90 %}text-emerald-600 dark:text-emerald-400{% elif porcentaje_asistencia >= 70 %}text-amber-600 dark:text-amber-400{% else %}text-red-600 dark:text-red-400{% endif %}">{{ porcentaje_asistencia|floatformat:0 }}%</span>
                     </div>
-                    <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                    <div class="w-full bg-gray-200 dark:bg-dark-700 rounded-full h-4 overflow-hidden shadow-inner">
                         {% widthratio porcentaje_asistencia 100 100 as width_percent %}
-                        <div class="h-full rounded-full transition-all duration-500 {% if porcentaje_asistencia >= 90 %}bg-green-500{% elif porcentaje_asistencia >= 70 %}bg-yellow-500{% else %}bg-red-500{% endif %}"
+                        <div class="h-full rounded-full transition-all duration-500 {% if porcentaje_asistencia >= 90 %}bg-gradient-to-r from-emerald-500 to-emerald-600{% elif porcentaje_asistencia >= 70 %}bg-gradient-to-r from-amber-500 to-amber-600{% else %}bg-gradient-to-r from-red-500 to-red-600{% endif %} shadow-sm"
                              data-width="{{ porcentaje_asistencia|default:0 }}"></div>
                     </div>
                 </div>
@@ -244,8 +284,8 @@
                 <!-- Link a resumen completo -->
                 <div class="mt-6 text-center">
                     <a href="{% url 'asistencias:resumen' trabajador.numero_empleado %}"
-                       class="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition shadow-lg shadow-purple-600/20">
-                        <i class="fas fa-chart-bar mr-2"></i>Ver Resumen Completo
+                       class="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 text-white rounded-lg font-medium transition-colors text-sm shadow-sm">
+                        <i class="fas fa-chart-bar text-xs"></i><span>Ver Resumen Completo</span>
                     </a>
                 </div>
             </div>
@@ -254,41 +294,52 @@
 
     <!-- Últimos registros -->
     {% if ultimos_registros %}
-    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
-        <div class="bg-gradient-to-r from-gray-700 to-gray-800 px-6 py-4 border-b border-gray-700">
-            <h3 class="text-lg font-semibold text-white flex items-center">
-                <i class="fas fa-history text-blue-400 mr-3"></i>Últimos 10 Registros
-            </h3>
+    <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl overflow-hidden shadow-sm">
+        <div class="bg-gradient-to-r from-slate-600 to-slate-700 px-6 py-5">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-history text-white text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Últimos 10 Registros</h3>
+            </div>
         </div>
-        <div class="p-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="p-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {% for registro in ultimos_registros %}
-                <div class="flex items-center justify-between p-4 bg-gray-900/50 rounded-xl border border-gray-700 hover:border-gray-600 transition">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-calendar-day text-gray-400"></i>
+                <div class="flex items-center justify-between p-5 bg-gray-50 dark:bg-dark-800 rounded-xl border border-gray-200 dark:border-dark-700 hover:border-primary-300 dark:hover:border-primary-500/50 transition-colors shadow-sm hover:shadow-md">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-primary-100 dark:bg-primary-500/10 rounded-xl flex items-center justify-center shadow-sm">
+                            <i class="fas fa-calendar-day text-primary-600 dark:text-primary-400 text-lg"></i>
                         </div>
                         <div>
-                            <p class="font-medium text-white">{{ registro.fecha|date:"d/m/Y" }}</p>
-                            <p class="text-sm text-gray-500">
-                                <i class="fas fa-sign-in-alt text-green-500 mr-1"></i>{{ registro.hora_entrada|time:"H:i"|default:"—" }}
-                                <span class="mx-1">|</span>
-                                <i class="fas fa-sign-out-alt text-red-500 mr-1"></i>{{ registro.hora_salida|time:"H:i"|default:"—" }}
+                            <p class="font-bold text-gray-900 dark:text-white text-base">{{ registro.fecha|date:"d/m/Y" }}</p>
+                            <p class="text-sm text-gray-600 dark:text-dark-300 flex items-center gap-3 mt-1">
+                                <span class="flex items-center gap-1">
+                                    <i class="fas fa-sign-in-alt text-emerald-500 text-xs"></i>
+                                    <span class="font-mono">{{ registro.hora_entrada|time:"H:i"|default:"—" }}</span>
+                                </span>
+                                <span class="text-gray-400">•</span>
+                                <span class="flex items-center gap-1">
+                                    <i class="fas fa-sign-out-alt text-red-500 text-xs"></i>
+                                    <span class="font-mono">{{ registro.hora_salida|time:"H:i"|default:"—" }}</span>
+                                </span>
                             </p>
                         </div>
                     </div>
-                    <span class="px-3 py-1 text-xs font-semibold rounded-full
-                        {% if registro.estatus == 'ASI' %}bg-green-900/50 text-green-400
-                        {% elif registro.estatus == 'RET' %}bg-yellow-900/50 text-yellow-400
-                        {% elif registro.estatus == 'JUS' %}bg-blue-900/50 text-blue-400
-                        {% else %}bg-red-900/50 text-red-400{% endif %}">
-                        {{ registro.get_estatus_display }}
+                    <span class="px-3 py-1.5 text-xs font-bold rounded-full shadow-sm
+                        {% if registro.estatus == 'ASI' %}bg-emerald-600 dark:bg-emerald-500 text-white
+                        {% elif registro.estatus == 'RET' %}bg-amber-600 dark:bg-amber-500 text-white
+                        {% elif registro.estatus == 'JUS' %}bg-blue-600 dark:bg-blue-500 text-white
+                        {% else %}bg-red-600 dark:bg-red-500 text-white{% endif %}">
+                        {{ registro.get_estatus_display|upper }}
                     </span>
                 </div>
                 {% endfor %}
             </div>
         </div>
     </div>
+    {% endif %}
+    
     {% endif %}
 
 </div>

@@ -9,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count, Q, Exists, OuterRef
 from django.db.models.deletion import ProtectedError
+from django.utils import timezone
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 )
@@ -21,6 +22,7 @@ from .models import (
 )
 
 from apps.trabajadores.models import Trabajador
+from apps.unidades.models import UnidadAdministrativa
 
 from .forms import (
     JornadaLaboralForm,
@@ -31,7 +33,8 @@ from .forms import (
 from apps.accounts.decorators import (
     rol_requerido,
     requiere_trabajador_y_unidad,
-    jefe_o_admin_requerido
+    jefe_o_admin_requerido,
+    admin_requerido
 )
 
 
@@ -49,29 +52,49 @@ class JornadaListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         hoy = date.today()
-        # Anotamos con trabajadores activos (fecha_fin NULL o futura)
-        qs = JornadaLaboral.objects.prefetch_related('dias').annotate(
-            num_dias=Count('dias', distinct=True),
-            num_trabajadores=Count('trabajadores_asignados', distinct=True),
-            num_trabajadores_activos=Count(
-                'trabajadores_asignados',
-                filter=Q(trabajadores_asignados__fecha_fin__isnull=True) | Q(trabajadores_asignados__fecha_fin__gte=hoy),
-                distinct=True
-            )
-        ).order_by('descripcion')
-
         user = self.request.user
 
-        # 🔹 Si es jefe, filtrar por su unidad
-        if user.perfil.es_jefe():
+        # 🔹 Si es jefe, anotar solo trabajadores de su unidad
+        if user.perfil.es_jefe() and user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
             unidad = user.perfil.id_trabajador.id_unidad
-            # Mostrar jornadas que:
-            # 1. Fueron creadas por el jefe, O
-            # 2. Tienen trabajadores de su unidad asignados
-            qs = qs.filter(
-                Q(created_by=user) |
-                Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
-            ).distinct()
+            # Anotamos con trabajadores de la unidad del jefe
+            qs = JornadaLaboral.objects.prefetch_related('dias').annotate(
+                num_dias=Count('dias', distinct=True),
+                num_trabajadores=Count(
+                    'trabajadores_asignados',
+                    filter=Q(trabajadores_asignados__id_trabajador__id_unidad=unidad),
+                    distinct=True
+                ),
+                num_trabajadores_activos=Count(
+                    'trabajadores_asignados',
+                    filter=(
+                        Q(trabajadores_asignados__id_trabajador__id_unidad=unidad) &
+                        (Q(trabajadores_asignados__fecha_fin__isnull=True) | Q(trabajadores_asignados__fecha_fin__gte=hoy))
+                    ),
+                    distinct=True
+                )
+            ).order_by('descripcion')
+            
+            # Mostrar jornadas que tienen trabajadores de su unidad asignados
+            qs = qs.filter(trabajadores_asignados__id_trabajador__id_unidad=unidad).distinct()
+        else:
+            # Admin ve todo
+            qs = JornadaLaboral.objects.prefetch_related('dias').annotate(
+                num_dias=Count('dias', distinct=True),
+                num_trabajadores=Count('trabajadores_asignados', distinct=True),
+                num_trabajadores_activos=Count(
+                    'trabajadores_asignados',
+                    filter=Q(trabajadores_asignados__fecha_fin__isnull=True) | Q(trabajadores_asignados__fecha_fin__gte=hoy),
+                    distinct=True
+                )
+            ).order_by('descripcion')
+
+        # 🔹 FILTRO desde GET - Solo tipo de jornada
+        tipo = self.request.GET.get('tipo', '')
+
+        # Filtro por tipo de jornada
+        if tipo:
+            qs = qs.filter(descripcion=tipo)
 
         return qs
     
@@ -81,54 +104,83 @@ class JornadaListView(LoginRequiredMixin, ListView):
         hoy = date.today()
 
         # Base queryset según rol
-        if user.perfil.es_jefe():
+        if user.perfil.es_jefe() and user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
             unidad = user.perfil.id_trabajador.id_unidad
+            # Jornadas que tienen trabajadores de la unidad del jefe
             jornadas_qs = JornadaLaboral.objects.filter(
-                Q(created_by=user) |
-                Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
+                trabajadores_asignados__id_trabajador__id_unidad=unidad
             ).distinct()
-            trabajadores_qs = Trabajador.objects.filter(id_unidad=unidad)
+            trabajadores_qs = Trabajador.objects.filter(id_unidad=unidad, activo=True)
+            
+            # Estadísticas específicas para jefes
+            # 1. Total de trabajadores en su unidad
+            context['total_trabajadores_unidad'] = trabajadores_qs.count()
+            
+            # 2. Trabajadores con jornada asignada (de su unidad)
+            trabajadores_con_jornada = TrabajadorJornada.objects.filter(
+                id_trabajador__id_unidad=unidad
+            ).filter(
+                Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
+            ).values_list('id_trabajador', flat=True).distinct()
+            context['trabajadores_con_jornada'] = len(trabajadores_con_jornada)
+            
+            # 3. Trabajadores sin jornada vigente (de su unidad)
+            context['trabajadores_sin_jornada'] = trabajadores_qs.exclude(
+                id_trabajador__in=trabajadores_con_jornada
+            ).count()
+            
+            # 4. Jornadas activas en su unidad
+            context['jornadas_activas_unidad'] = jornadas_qs.filter(
+                trabajadores_asignados__fecha_fin__isnull=True
+            ).distinct().count() or jornadas_qs.filter(
+                trabajadores_asignados__fecha_fin__gte=hoy
+            ).distinct().count()
+            
+            # No mostrar estadísticas globales irrelevantes para jefes
+            context['es_jefe'] = True
         else:
             # Admin ve todo
             jornadas_qs = JornadaLaboral.objects.all()
-            trabajadores_qs = Trabajador.objects.all()
+            trabajadores_qs = Trabajador.objects.filter(activo=True)
 
-        # 1. Total de jornadas
-        context['total_jornadas'] = jornadas_qs.count()
+            # 1. Total de jornadas
+            context['total_jornadas'] = jornadas_qs.count()
 
-        # 2. Jornadas en uso (tienen al menos un trabajador con asignación vigente)
-        jornadas_en_uso = jornadas_qs.filter(
-            Exists(
-                TrabajadorJornada.objects.filter(
-                    id_jornada=OuterRef('pk')
-                ).filter(
-                    Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
+            # 2. Jornadas en uso (tienen al menos un trabajador con asignación vigente)
+            jornadas_en_uso = jornadas_qs.filter(
+                Exists(
+                    TrabajadorJornada.objects.filter(
+                        id_jornada=OuterRef('pk')
+                    ).filter(
+                        Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
+                    )
                 )
-            )
-        ).count()
-        context['jornadas_en_uso'] = jornadas_en_uso
+            ).count()
+            context['jornadas_en_uso'] = jornadas_en_uso
 
-        # 3. Jornadas sin uso (no tienen trabajadores vigentes)
-        context['jornadas_sin_uso'] = context['total_jornadas'] - jornadas_en_uso
+            # 3. Jornadas sin uso (no tienen trabajadores vigentes)
+            context['jornadas_sin_uso'] = context['total_jornadas'] - jornadas_en_uso
 
-        # 4. Trabajadores sin jornada vigente
-        trabajadores_con_jornada = TrabajadorJornada.objects.filter(
-            Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
-        ).values_list('id_trabajador', flat=True)
-        context['trabajadores_sin_jornada'] = trabajadores_qs.exclude(
-            id_trabajador__in=trabajadores_con_jornada
-        ).count()
+            # 4. Trabajadores sin jornada vigente
+            trabajadores_con_jornada = TrabajadorJornada.objects.filter(
+                Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
+            ).values_list('id_trabajador', flat=True)
+            context['trabajadores_sin_jornada'] = trabajadores_qs.exclude(
+                id_trabajador__in=trabajadores_con_jornada
+            ).count()
 
-        # 5. Días inhábiles próximos (próximos 30 días)
-        fecha_limite = hoy + timedelta(days=30)
-        context['dias_inhabiles_proximos'] = CalendarioLaboral.objects.filter(
-            fecha__gte=hoy,
-            fecha__lte=fecha_limite,
-            es_inhabil=True
-        ).count()
+            # 5. Días inhábiles próximos (próximos 30 días)
+            fecha_limite = hoy + timedelta(days=30)
+            context['dias_inhabiles_proximos'] = CalendarioLaboral.objects.filter(
+                fecha__gte=hoy,
+                fecha__lte=fecha_limite,
+                es_inhabil=True
+            ).count()
+            
+            context['es_jefe'] = False
 
-        # 6. Asignaciones para el tab de asignaciones
-        if user.perfil.es_jefe():
+        # Asignaciones para el tab de asignaciones
+        if user.perfil.es_jefe() and user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
             context['asignaciones'] = TrabajadorJornada.objects.filter(
                 id_trabajador__id_unidad=unidad
             ).select_related('id_trabajador', 'id_jornada').order_by('-fecha_inicio')[:20]
@@ -137,7 +189,7 @@ class JornadaListView(LoginRequiredMixin, ListView):
                 'id_trabajador', 'id_jornada'
             ).order_by('-fecha_inicio')[:20]
 
-        # 7. Calendario laboral para el tab de calendario
+        # Calendario laboral para el tab de calendario
         context['dias_calendario'] = CalendarioLaboral.objects.filter(
             fecha__gte=hoy - timedelta(days=30)
         ).order_by('fecha')[:30]
@@ -396,6 +448,7 @@ class CalendarioListView(LoginRequiredMixin, ListView):
             es_inhabil=True,
             fecha__gte=date.today()
         ).order_by('fecha')[:5]
+        context['es_admin'] = self.request.user.perfil.es_admin()
         return context
 
 
@@ -403,11 +456,11 @@ class CalendarioListView(LoginRequiredMixin, ListView):
 #   CALENDARIO LABORAL - CRUD (Jefe + Admin)
 # =========================================================
 
-@method_decorator(jefe_o_admin_requerido, name='dispatch')
+@method_decorator(admin_requerido, name='dispatch')
 class CalendarioCreateView(LoginRequiredMixin, CreateView):
     """
     Crear día en calendario laboral
-    Acceso: Jefe y Admin
+    Acceso: Solo Admin
     """
     model = CalendarioLaboral
     form_class = CalendarioLaboralForm
@@ -425,11 +478,11 @@ class CalendarioCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-@method_decorator(jefe_o_admin_requerido, name='dispatch')
+@method_decorator(admin_requerido, name='dispatch')
 class CalendarioUpdateView(LoginRequiredMixin, UpdateView):
     """
     Editar día del calendario laboral
-    Acceso: Jefe y Admin
+    Acceso: Solo Admin
     """
     model = CalendarioLaboral
     form_class = CalendarioLaboralForm
@@ -447,11 +500,11 @@ class CalendarioUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-@method_decorator(jefe_o_admin_requerido, name='dispatch')
+@method_decorator(admin_requerido, name='dispatch')
 class CalendarioDeleteView(LoginRequiredMixin, DeleteView):
     """
     Eliminar día del calendario laboral
-    Acceso: Jefe y Admin
+    Acceso: Solo Admin
     """
     model = CalendarioLaboral
     template_name = 'jornadas_laborales/calendario/confirmar_eliminar_calendario.html'
@@ -483,17 +536,68 @@ class AsignacionListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self):
         qs = TrabajadorJornada.objects.select_related(
-        'id_trabajador', 'id_jornada'
+            'id_trabajador', 'id_jornada', 'id_trabajador__id_unidad'
         ).order_by('-fecha_inicio')
 
         user = self.request.user
 
-        # 🔹 Filtro por unidad del jefe
-        if user.perfil.es_jefe():
-            unidad = user.perfil.id_trabajador.id_unidad
-            qs = qs.filter(id_trabajador__id_unidad=unidad)
+        # 🔹 Filtro por unidad del jefe (si no es admin)
+        if user.perfil.es_jefe() and not user.perfil.es_admin():
+            if user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
+                unidad = user.perfil.id_trabajador.id_unidad
+                qs = qs.filter(id_trabajador__id_unidad=unidad)
+            else:
+                # Si el jefe no tiene trabajador asignado, no ve nada
+                qs = TrabajadorJornada.objects.none()
+        
+        # 🔹 Filtro por unidad (solo para admin)
+        unidad_id = self.request.GET.get('unidad')
+        if unidad_id and user.perfil.es_admin():
+            qs = qs.filter(id_trabajador__id_unidad_id=unidad_id)
+        
+        # 🔹 Filtro por trabajador (por ID)
+        trabajador_id = self.request.GET.get('trabajador')
+        if trabajador_id:
+            qs = qs.filter(id_trabajador_id=trabajador_id)
+        
+        # 🔹 Filtro por estado (vigente/finalizada)
+        estado = self.request.GET.get('estado')
+        if estado == 'vigente':
+            qs = qs.filter(
+                Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=timezone.now().date())
+            )
+        elif estado == 'finalizada':
+            qs = qs.filter(
+                fecha_fin__lt=timezone.now().date()
+            )
 
         return qs
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Filtrar unidades y trabajadores según el rol
+        if user.perfil.es_admin():
+            context['unidades'] = UnidadAdministrativa.objects.all().order_by('nombre')
+            context['trabajadores'] = Trabajador.objects.filter(activo=True).select_related('id_unidad').order_by('nombre', 'apellido_paterno')
+        elif user.perfil.es_jefe():
+            # Para jefe, solo su unidad y sus trabajadores
+            if user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
+                unidad = user.perfil.id_trabajador.id_unidad
+                context['unidades'] = UnidadAdministrativa.objects.filter(id_unidad=unidad.id_unidad)
+                context['trabajadores'] = Trabajador.objects.filter(
+                    id_unidad=unidad,
+                    activo=True
+                ).order_by('nombre', 'apellido_paterno')
+            else:
+                context['unidades'] = UnidadAdministrativa.objects.none()
+                context['trabajadores'] = Trabajador.objects.none()
+        else:
+            context['unidades'] = UnidadAdministrativa.objects.none()
+            context['trabajadores'] = Trabajador.objects.none()
+        
+        return context
 
 
 @method_decorator(jefe_o_admin_requerido, name='dispatch')
@@ -511,11 +615,15 @@ class AsignacionCreateView(LoginRequiredMixin, CreateView):
         user = self.request.user
 
         if user.perfil.es_jefe():
-            unidad = user.perfil.id_trabajador.id_unidad
-            trabajador = form.cleaned_data['id_trabajador']
+            if user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
+                unidad = user.perfil.id_trabajador.id_unidad
+                trabajador = form.cleaned_data['id_trabajador']
 
-            if trabajador.id_unidad != unidad:
-                messages.error(self.request, "No puedes asignar jornadas a trabajadores de otra unidad.")
+                if trabajador.id_unidad != unidad:
+                    messages.error(self.request, "No puedes asignar jornadas a trabajadores de otra unidad.")
+                    return redirect('jornadas:asignaciones')
+            else:
+                messages.error(self.request, "No tienes un trabajador asignado.")
                 return redirect('jornadas:asignaciones')
 
         obj = form.save(commit=False)
@@ -533,22 +641,71 @@ class AsignacionCreateView(LoginRequiredMixin, CreateView):
         user = self.request.user
 
         if user.perfil.es_jefe():
-            unidad = user.perfil.id_trabajador.id_unidad
-            form.fields['id_trabajador'].queryset = Trabajador.objects.filter(
-                id_unidad=unidad,
-                activo=True
-            )
-            # Filtrar jornadas: las creadas por el jefe o que tengan trabajadores de su unidad
-            form.fields['id_jornada'].queryset = JornadaLaboral.objects.filter(
-                Q(created_by=user) |
-                Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
-            ).distinct()
+            if user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
+                unidad = user.perfil.id_trabajador.id_unidad
+                form.fields['id_trabajador'].queryset = Trabajador.objects.filter(
+                    id_unidad=unidad,
+                    activo=True
+                )
+                # Filtrar jornadas: las creadas por el jefe o que tengan trabajadores de su unidad
+                form.fields['id_jornada'].queryset = JornadaLaboral.objects.filter(
+                    Q(created_by=user) |
+                    Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
+                ).distinct()
+            else:
+                form.fields['id_trabajador'].queryset = Trabajador.objects.none()
+                form.fields['id_jornada'].queryset = JornadaLaboral.objects.none()
         else:
             # Admin → todos
             form.fields['id_trabajador'].queryset = Trabajador.objects.filter(activo=True)
             form.fields['id_jornada'].queryset = JornadaLaboral.objects.all()
 
         return form
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Pasar unidades y trabajadores al contexto
+        if user.perfil.es_admin():
+            context['unidades'] = UnidadAdministrativa.objects.all().order_by('nombre')
+            context['todos_trabajadores'] = Trabajador.objects.filter(activo=True).select_related('id_unidad').order_by('id_unidad', 'nombre', 'apellido_paterno')
+        elif user.perfil.es_jefe():
+            # Para jefe, solo su unidad
+            if user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
+                unidad = user.perfil.id_trabajador.id_unidad
+                context['unidades'] = UnidadAdministrativa.objects.filter(id_unidad=unidad.id_unidad)
+                context['todos_trabajadores'] = Trabajador.objects.filter(
+                    id_unidad=unidad,
+                    activo=True
+                ).order_by('nombre', 'apellido_paterno')
+            else:
+                context['unidades'] = UnidadAdministrativa.objects.none()
+                context['todos_trabajadores'] = Trabajador.objects.none()
+        else:
+            context['unidades'] = UnidadAdministrativa.objects.none()
+            context['todos_trabajadores'] = Trabajador.objects.none()
+        
+        # Agrupar jornadas por tipo
+        jornadas_agrupadas = {}
+        jornadas_queryset = self.get_form().fields['id_jornada'].queryset
+        
+        for jornada in jornadas_queryset.prefetch_related('dias'):
+            tipo_key = jornada.descripcion
+            tipo_label = jornada.get_descripcion_display()
+            
+            if tipo_key not in jornadas_agrupadas:
+                jornadas_agrupadas[tipo_key] = {
+                    'label': tipo_label,
+                    'jornadas': []
+                }
+            
+            jornadas_agrupadas[tipo_key]['jornadas'].append(jornada)
+        
+        context['jornadas_agrupadas'] = jornadas_agrupadas
+        context['tipos_jornada'] = JornadaLaboral.TIPO_JORNADA
+        
+        return context
 
 
 
@@ -568,11 +725,15 @@ class AsignacionUpdateView(LoginRequiredMixin, UpdateView):
         user = self.request.user
 
         if user.perfil.es_jefe():
-            unidad = user.perfil.id_trabajador.id_unidad
-            trabajador = form.cleaned_data['id_trabajador']
+            if user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
+                unidad = user.perfil.id_trabajador.id_unidad
+                trabajador = form.cleaned_data['id_trabajador']
 
-            if trabajador.id_unidad != unidad:
-                messages.error(self.request, "No puedes editar asignaciones de un trabajador de otra unidad.")
+                if trabajador.id_unidad != unidad:
+                    messages.error(self.request, "No puedes editar asignaciones de un trabajador de otra unidad.")
+                    return redirect('jornadas:asignaciones')
+            else:
+                messages.error(self.request, "No tienes un trabajador asignado.")
                 return redirect('jornadas:asignaciones')
 
         obj = form.save(commit=False)
@@ -589,10 +750,13 @@ class AsignacionUpdateView(LoginRequiredMixin, UpdateView):
         obj = self.get_object()
 
         if request.user.perfil.es_jefe():
-            unidad_jefe = request.user.perfil.id_trabajador.id_unidad
-            
-            if obj.id_trabajador.id_unidad != unidad_jefe:
-                raise Http404("No puedes modificar esta asignación")
+            if request.user.perfil.id_trabajador and request.user.perfil.id_trabajador.id_unidad:
+                unidad_jefe = request.user.perfil.id_trabajador.id_unidad
+                
+                if obj.id_trabajador.id_unidad != unidad_jefe:
+                    raise Http404("No puedes modificar esta asignación")
+            else:
+                raise Http404("No tienes un trabajador asignado")
 
         return super().dispatch(request, *args, **kwargs)
     
@@ -601,21 +765,50 @@ class AsignacionUpdateView(LoginRequiredMixin, UpdateView):
         user = self.request.user
 
         if user.perfil.es_jefe():
-            unidad = user.perfil.id_trabajador.id_unidad
-            form.fields['id_trabajador'].queryset = Trabajador.objects.filter(
-                id_unidad=unidad,
-                activo=True
-            )
-            # Filtrar jornadas: las creadas por el jefe o que tengan trabajadores de su unidad
-            form.fields['id_jornada'].queryset = JornadaLaboral.objects.filter(
-                Q(created_by=user) |
-                Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
-            ).distinct()
+            if user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
+                unidad = user.perfil.id_trabajador.id_unidad
+                form.fields['id_trabajador'].queryset = Trabajador.objects.filter(
+                    id_unidad=unidad,
+                    activo=True
+                )
+                # Filtrar jornadas: las creadas por el jefe o que tengan trabajadores de su unidad
+                form.fields['id_jornada'].queryset = JornadaLaboral.objects.filter(
+                    Q(created_by=user) |
+                    Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
+                ).distinct()
+            else:
+                form.fields['id_trabajador'].queryset = Trabajador.objects.none()
+                form.fields['id_jornada'].queryset = JornadaLaboral.objects.none()
         else:
             form.fields['id_trabajador'].queryset = Trabajador.objects.filter(activo=True)
             form.fields['id_jornada'].queryset = JornadaLaboral.objects.all()
 
         return form
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        
+        # Agrupar jornadas por tipo
+        jornadas_agrupadas = {}
+        jornadas_queryset = self.get_form().fields['id_jornada'].queryset
+        
+        for jornada in jornadas_queryset.prefetch_related('dias'):
+            tipo_key = jornada.descripcion
+            tipo_label = jornada.get_descripcion_display()
+            
+            if tipo_key not in jornadas_agrupadas:
+                jornadas_agrupadas[tipo_key] = {
+                    'label': tipo_label,
+                    'jornadas': []
+                }
+            
+            jornadas_agrupadas[tipo_key]['jornadas'].append(jornada)
+        
+        context['jornadas_agrupadas'] = jornadas_agrupadas
+        context['tipos_jornada'] = JornadaLaboral.TIPO_JORNADA
+        
+        return context
 
 
 
@@ -644,10 +837,13 @@ class AsignacionDeleteView(LoginRequiredMixin, DeleteView):
         obj = self.get_object()
 
         if request.user.perfil.es_jefe():
-            unidad_jefe = request.user.perfil.id_trabajador.id_unidad
-            
-            if obj.id_trabajador.id_unidad != unidad_jefe:
-                raise Http404("No puedes modificar esta asignación")
+            if request.user.perfil.id_trabajador and request.user.perfil.id_trabajador.id_unidad:
+                unidad_jefe = request.user.perfil.id_trabajador.id_unidad
+                
+                if obj.id_trabajador.id_unidad != unidad_jefe:
+                    raise Http404("No puedes modificar esta asignación")
+            else:
+                raise Http404("No tienes un trabajador asignado")
 
         return super().dispatch(request, *args, **kwargs)
 

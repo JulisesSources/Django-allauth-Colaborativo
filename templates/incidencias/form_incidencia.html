@@ -4,127 +4,171 @@
 {% block title %}{{ titulo }} - SCA-B123{% endblock %}
 
 {% block content %}
-<div class="max-w-3xl mx-auto">
-    <!-- Botón Volver -->
-    <div class="mb-6">
-        <a href="{% url 'incidencias:lista_incidencias' %}" 
-           class="inline-flex items-center text-blue-600 hover:text-blue-800">
-            <i class="fas fa-arrow-left mr-2"></i>
-            Volver a la lista
-        </a>
+<div class="space-y-5">
+    <!-- Header -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary-500/10 rounded-lg flex items-center justify-center">
+                <i class="fas fa-calendar-plus text-primary-500 text-base"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-white">{{ titulo }}</h1>
+                <p class="text-xs text-gray-500 dark:text-dark-400">Complete el formulario con la información de la incidencia</p>
+            </div>
+        </div>
     </div>
     
-    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
-        <!-- Header -->
-        <div class="bg-green-600 px-6 py-4">
-            <h2 class="text-2xl font-bold text-white">
-                <i class="fas fa-calendar-plus mr-2"></i>
-                {{ titulo }}
-            </h2>
-        </div>
-        
-        <!-- Formulario -->
-        <div class="p-6">
-            <form method="post" class="space-y-6">
+    <!-- Formulario -->
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5 pt-2">
+        <form method="post" class="space-y-4">
                 {% csrf_token %}
                 
                 {% if form.non_field_errors %}
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                    <ul class="list-disc list-inside">
-                        {% for error in form.non_field_errors %}
-                        <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
+                <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 dark:border-red-400 p-3 rounded-r-lg">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-sm mt-0.5"></i>
+                        <div class="flex-1">
+                            <p class="text-xs font-medium text-red-800 dark:text-red-200 mb-1">Se encontraron errores:</p>
+                            <ul class="list-disc list-inside space-y-0.5 text-xs text-red-700 dark:text-red-300">
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 {% endif %}
                 
                 <!-- Campo Trabajador -->
                 <div>
-                    <label for="{{ form.id_trabajador.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-user mr-1"></i> {{ form.id_trabajador.label }}
+                    <label for="{{ form.id_trabajador.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        {{ form.id_trabajador.label }}
+                        <span class="text-red-500">*</span>
                     </label>
-                    {{ form.id_trabajador }}
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                            <i class="fas fa-user text-gray-400 dark:text-dark-500 text-xs"></i>
+                        </div>
+                        <select name="{{ form.id_trabajador.name }}" 
+                                id="{{ form.id_trabajador.id_for_label }}" 
+                                required
+                                {% if trabajador_bloqueado %}disabled{% endif %}
+                                class="w-full pl-9 pr-8 py-2 {% if trabajador_bloqueado %}bg-gray-100 dark:bg-dark-700 cursor-not-allowed{% else %}bg-gray-50 dark:bg-dark-800{% endif %} border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 appearance-none">
+                            <option value="">Seleccione un trabajador</option>
+                            {% for trabajador in form.id_trabajador.field.queryset %}
+                                <option value="{{ trabajador.pk }}" {% if form.id_trabajador.value == trabajador.pk|stringformat:'s' or form.id_trabajador.initial.pk == trabajador.pk %}selected{% endif %}>
+                                    {{ trabajador.nombre_completo }} - {{ trabajador.numero_empleado }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <!-- Campo oculto para enviar el valor cuando está disabled -->
+                        {% if trabajador_bloqueado %}
+                        <input type="hidden" name="{{ form.id_trabajador.name }}" value="{{ form.id_trabajador.initial.pk }}">
+                        {% endif %}
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fas fa-chevron-down text-gray-400 dark:text-dark-500 text-xs"></i>
+                        </div>
+                    </div>
                     {% if form.id_trabajador.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.id_trabajador.errors.0 }}</p>
+                    <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                        <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.id_trabajador.errors.0 }}
+                    </p>
                     {% endif %}
                 </div>
                 
                 <!-- Campo Tipo de Incidencia -->
                 <div>
-                    <label for="{{ form.id_tipo_incidencia.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-list mr-1"></i> {{ form.id_tipo_incidencia.label }}
+                    <label for="{{ form.id_tipo_incidencia.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        {{ form.id_tipo_incidencia.label }}
+                        <span class="text-red-500">*</span>
                     </label>
-                    {{ form.id_tipo_incidencia }}
+                    <div class="relative">
+                        <select name="{{ form.id_tipo_incidencia.name }}" id="{{ form.id_tipo_incidencia.id_for_label }}" 
+                                required
+                                class="w-full px-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                            <option value="">Seleccione un tipo de incidencia</option>
+                            {% for tipo in form.id_tipo_incidencia.field.queryset %}
+                                <option value="{{ tipo.pk }}" {% if form.id_tipo_incidencia.value == tipo.pk|stringformat:'s' %}selected{% endif %}>{{ tipo.descripcion }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     {% if form.id_tipo_incidencia.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.id_tipo_incidencia.errors.0 }}</p>
+                    <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                        <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.id_tipo_incidencia.errors.0 }}
+                    </p>
                     {% endif %}
                 </div>
                 
                 <!-- Fechas -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="{{ form.fecha_inicio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-calendar-day mr-1"></i> {{ form.fecha_inicio.label }}
+                        <label for="{{ form.fecha_inicio.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                            {{ form.fecha_inicio.label }}
+                            <span class="text-red-500">*</span>
                         </label>
-                        {{ form.fecha_inicio }}
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-calendar text-gray-400 dark:text-dark-500 text-xs"></i>
+                            </div>
+                            <input type="date" name="{{ form.fecha_inicio.name }}" id="{{ form.fecha_inicio.id_for_label }}" 
+                                   value="{{ form.fecha_inicio.value|default:'' }}" required
+                                   class="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                        </div>
                         {% if form.fecha_inicio.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.fecha_inicio.errors.0 }}</p>
+                        <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.fecha_inicio.errors.0 }}
+                        </p>
                         {% endif %}
                     </div>
                     
                     <div>
-                        <label for="{{ form.fecha_fin.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                            <i class="fas fa-calendar-check mr-1"></i> {{ form.fecha_fin.label }}
+                        <label for="{{ form.fecha_fin.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                            {{ form.fecha_fin.label }}
+                            <span class="text-red-500">*</span>
                         </label>
-                        {{ form.fecha_fin }}
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-calendar text-gray-400 dark:text-dark-500 text-xs"></i>
+                            </div>
+                            <input type="date" name="{{ form.fecha_fin.name }}" id="{{ form.fecha_fin.id_for_label }}" 
+                                   value="{{ form.fecha_fin.value|default:'' }}" required
+                                   class="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                        </div>
                         {% if form.fecha_fin.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ form.fecha_fin.errors.0 }}</p>
+                        <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.fecha_fin.errors.0 }}
+                        </p>
                         {% endif %}
                     </div>
                 </div>
                 
                 <!-- Observaciones -->
                 <div>
-                    <label for="{{ form.observaciones.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-comment mr-1"></i> {{ form.observaciones.label }}
+                    <label for="{{ form.observaciones.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        {{ form.observaciones.label }}
                     </label>
-                    {{ form.observaciones }}
+                    <textarea name="{{ form.observaciones.name }}" id="{{ form.observaciones.id_for_label }}" 
+                              rows="3"
+                              placeholder="Ingresa observaciones adicionales (opcional)"
+                              class="w-full px-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-dark-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none">{{ form.observaciones.value|default:'' }}</textarea>
                     {% if form.observaciones.errors %}
-                    <p class="mt-1 text-sm text-red-600">{{ form.observaciones.errors.0 }}</p>
+                    <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                        <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.observaciones.errors.0 }}
+                    </p>
                     {% endif %}
                 </div>
                 
-                <!-- Información adicional -->
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-info-circle text-blue-500 text-xl"></i>
-                        </div>
-                        <div class="ml-3">
-                            <h3 class="text-sm font-medium text-blue-800">
-                                Información importante
-                            </h3>
-                            <div class="mt-2 text-sm text-blue-700">
-                                <ul class="list-disc list-inside space-y-1">
-                                    <li>Asegúrate de que las fechas no se solapen con otras incidencias</li>
-                                    <li>La fecha de fin no puede ser anterior a la fecha de inicio</li>
-                                    <li>Las incidencias que requieren autorización quedarán pendientes hasta ser aprobadas</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- Botones -->
-                <div class="flex space-x-4 pt-4">
+                <div class="flex flex-wrap gap-2 pt-2">
                     <button type="submit" 
-                            class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                        <i class="fas fa-save mr-2"></i>
+                            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save text-xs"></i>
                         {{ boton }}
                     </button>
-                    <a href="{% url 'incidencias:lista_incidencias' %}" 
-                       class="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 text-center">
-                        <i class="fas fa-times mr-2"></i>
+                    <a href="{% if from_mis_incidencias %}{% url 'incidencias:mis_incidencias' %}{% else %}{% url 'incidencias:lista_incidencias' %}{% endif %}" 
+                       class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-times text-xs"></i>
                         Cancelar
                     </a>
                 </div>
@@ -134,6 +178,44 @@
 </div>
 
 <script>
+// Funcionalidad de búsqueda de trabajador con datalist
+const trabajadorSearch = document.getElementById('trabajador-search');
+const trabajadorHidden = document.getElementById('{{ form.id_trabajador.id_for_label }}');
+
+// Mapeo de nombres a IDs
+const trabajadoresMap = {
+    {% for trabajador in form.id_trabajador.field.queryset %}
+        '{{ trabajador.nombre_completo }}': '{{ trabajador.pk }}',
+    {% endfor %}
+};
+
+// Cargar valor inicial si existe
+{% if form.id_trabajador.value %}
+    const initialId = '{{ form.id_trabajador.value }}';
+    const initialName = Object.keys(trabajadoresMap).find(key => trabajadoresMap[key] === initialId);
+    if (initialName) {
+        trabajadorSearch.value = initialName;
+    }
+{% endif %}
+
+// Actualizar el campo oculto cuando se selecciona un trabajador
+trabajadorSearch.addEventListener('input', function() {
+    const selectedName = this.value;
+    if (trabajadoresMap[selectedName]) {
+        trabajadorHidden.value = trabajadoresMap[selectedName];
+    } else if (selectedName === '') {
+        trabajadorHidden.value = '';
+    }
+});
+
+// Limpiar si se borra el campo
+trabajadorSearch.addEventListener('blur', function() {
+    if (!trabajadoresMap[this.value] && this.value !== '') {
+        this.value = '';
+        trabajadorHidden.value = '';
+    }
+});
+
 // Script para calcular automáticamente los días
 document.addEventListener('DOMContentLoaded', function() {
     const fechaInicio = document.querySelector('input[name="fecha_inicio"]');
@@ -149,11 +231,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Mostrar mensaje con los días calculados
                 const mensaje = document.getElementById('mensaje-dias') || document.createElement('div');
                 mensaje.id = 'mensaje-dias';
-                mensaje.className = 'mt-2 text-sm text-blue-600 font-semibold';
-                mensaje.innerHTML = `<i class="fas fa-calendar-alt mr-1"></i> Duración: ${diferencia} día(s)`;
+                mensaje.className = 'mt-2 p-2 bg-emerald-50 dark:bg-emerald-500/10 border-l-4 border-emerald-500 dark:border-emerald-400 rounded-r-lg text-xs text-emerald-700 dark:text-emerald-300 font-medium flex items-center gap-2';
+                mensaje.innerHTML = `<i class="fas fa-calendar-check text-emerald-600 dark:text-emerald-400"></i> Duración: ${diferencia} día(s)`;
                 
                 if (!document.getElementById('mensaje-dias')) {
-                    fechaFin.parentElement.appendChild(mensaje);
+                    fechaFin.parentElement.parentElement.appendChild(mensaje);
+                }
+            } else if (diferencia <= 0) {
+                const mensajeError = document.getElementById('mensaje-dias');
+                if (mensajeError) {
+                    mensajeError.className = 'mt-2 p-2 bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 dark:border-red-400 rounded-r-lg text-xs text-red-700 dark:text-red-300 font-medium flex items-center gap-2';
+                    mensajeError.innerHTML = `<i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400"></i> La fecha de fin debe ser posterior a la fecha de inicio`;
                 }
             }
         }
