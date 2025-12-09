@@ -4,130 +4,138 @@
 {% block title %}Detalle de Incidencia - SCA-B123{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y-5">
 
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-900 dark:to-blue-950 shadow-xl rounded-xl p-6 text-white transition-all duration-300">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="mb-4 md:mb-0">
-                <h1 class="text-3xl md:text-4xl font-bold flex items-center">
-                    <i class="fas fa-file-alt mr-3"></i>
-                    Detalle de Incidencia
-                </h1>
-                <p class="text-blue-100 mt-2">ID: {{ incidencia.id_incidencia }} • {{ incidencia.id_trabajador.nombre_completo }}</p>
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-primary-100 dark:bg-primary-500/10 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400">
+                        <i class="fas fa-file-alt text-base"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Detalle de Incidencia</h1>
+                        <p class="text-xs text-gray-500 dark:text-dark-400"> {{ incidencia.id_trabajador.nombre_completo }} • {{ incidencia.id_trabajador.numero_empleado }} </p>
+                    </div>
+                </div>
             </div>
-            <div class="text-center md:text-right bg-white/20 dark:bg-black/20 rounded-lg px-6 py-4 backdrop-blur-sm">
+            <div>
                 {% if incidencia.estado == 'pendiente' %}
-                    <span class="px-4 py-2 inline-flex text-sm font-bold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700">
-                        <i class="fas fa-clock mr-2 mt-0.5"></i> Pendiente
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                        <i class="fas fa-clock text-xs"></i> Pendiente
                     </span>
                 {% elif incidencia.estado == 'autorizada' %}
-                    <span class="px-4 py-2 inline-flex text-sm font-bold rounded-full bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300 border border-green-200 dark:border-green-700">
-                        <i class="fas fa-check mr-2 mt-0.5"></i> Autorizada
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                        <i class="fas fa-check text-xs"></i> Autorizada
                     </span>
                 {% else %}
-                    <span class="px-4 py-2 inline-flex text-sm font-bold rounded-full bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300 border border-red-200 dark:border-red-700">
-                        <i class="fas fa-times mr-2 mt-0.5"></i> Rechazada
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20">
+                        <i class="fas fa-times text-xs"></i> Rechazada
                     </span>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Información del Trabajador -->
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden transition-colors duration-300">
-        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <i class="fas fa-user-tie text-blue-500"></i>
-                Información del Trabajador
-            </h2>
-        </div>
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Nombre Completo</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.id_trabajador.nombre_completo }}</p>
-                </div>
+    <!-- Grid de 2 columnas: Información del Trabajador y Detalles de la Incidencia -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        
+        <!-- Información del Trabajador -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-dark-800">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-user-tie text-primary-500 text-sm"></i>
+                    Información del Trabajador
+                </h2>
+            </div>
+            <div class="p-5">
+                <div class="space-y-3">
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Nombre Completo</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.id_trabajador.nombre_completo }}</p>
+                    </div>
 
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Número de Empleado</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.id_trabajador.numero_empleado }}</p>
-                </div>
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Número de Empleado</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.id_trabajador.numero_empleado }}</p>
+                    </div>
 
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Unidad Administrativa</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.id_trabajador.id_unidad.nombre }}</p>
-                </div>
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Unidad Administrativa</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.id_trabajador.id_unidad.nombre }}</p>
+                    </div>
 
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Puesto</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.id_trabajador.id_puesto.nombre_puesto }}</p>
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Puesto</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.id_trabajador.id_puesto.nombre_puesto }}</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Detalles de la Incidencia -->
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden transition-colors duration-300">
-        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <i class="fas fa-clipboard-list text-blue-500"></i>
-                Detalles de la Incidencia
-            </h2>
-        </div>
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Tipo de Incidencia</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.id_tipo_incidencia.descripcion }}</p>
-                </div>
-
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Duración</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.duracion_dias }} día(s)</p>
-                </div>
-
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Fecha de Inicio</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.fecha_inicio|date:"d/m/Y" }}</p>
-                </div>
-
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Fecha de Fin</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.fecha_fin|date:"d/m/Y" }}</p>
-                </div>
+        <!-- Detalles de la Incidencia -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-dark-800">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-clipboard-list text-primary-500 text-sm"></i>
+                    Detalles de la Incidencia
+                </h2>
             </div>
+            <div class="p-5">
+                <div class="space-y-3">
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Tipo de Incidencia</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.id_tipo_incidencia.descripcion }}</p>
+                    </div>
 
-            {% if incidencia.observaciones %}
-            <div class="mt-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Observaciones</p>
-                <p class="text-gray-900 dark:text-white">{{ incidencia.observaciones }}</p>
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Duración</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.duracion_dias }} día(s)</p>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Fecha de Inicio</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.fecha_inicio|date:"d/m/Y" }}</p>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Fecha de Fin</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.fecha_fin|date:"d/m/Y" }}</p>
+                    </div>
+                </div>
+
+                {% if incidencia.observaciones %}
+                <div class="mt-3 bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                    <p class="text-xs text-gray-500 dark:text-dark-400 mb-1.5">Observaciones</p>
+                    <p class="text-sm text-gray-900 dark:text-white">{{ incidencia.observaciones }}</p>
+                </div>
+                {% endif %}
             </div>
-            {% endif %}
         </div>
+        
     </div>
 
     <!-- Información de Autorización -->
     {% if incidencia.autorizada_por %}
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden transition-colors duration-300">
-        <div class="p-6 border-b border-gray-100 dark:border-gray-700 {% if incidencia.estado == 'autorizada' %}bg-green-50 dark:bg-green-900/20{% else %}bg-red-50 dark:bg-red-900/20{% endif %}">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 dark:border-dark-800 {% if incidencia.estado == 'autorizada' %}bg-emerald-50 dark:bg-emerald-500/5{% else %}bg-red-50 dark:bg-red-500/5{% endif %}">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                 {% if incidencia.estado == 'autorizada' %}
-                    <i class="fas fa-check-circle text-green-500"></i>
+                    <i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 text-sm"></i>
                 {% else %}
-                    <i class="fas fa-times-circle text-red-500"></i>
+                    <i class="fas fa-times-circle text-red-600 dark:text-red-400 text-sm"></i>
                 {% endif %}
                 Información de {{ incidencia.get_estado_display }}
             </h2>
         </div>
-        <div class="p-6">
+        <div class="p-5">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">{{ incidencia.get_estado_display }} por</p>
+                <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                    <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">{{ incidencia.get_estado_display }} por</p>
 
-                    <p class="font-semibold text-gray-900 dark:text-white">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">
                         {% if incidencia.autorizada_por %}
                             {{ incidencia.autorizada_por.get_full_name|default:incidencia.autorizada_por.email }}
                         {% else %}
@@ -136,16 +144,16 @@
                     </p>
                 </div>
 
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Fecha de {{ incidencia.get_estado_display }}</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.fecha_autorizacion|date:"d/m/Y H:i" }}</p>
+                <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                    <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Fecha de {{ incidencia.get_estado_display }}</p>
+                    <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.fecha_autorizacion|date:"d/m/Y H:i" }}</p>
                 </div>
             </div>
 
             {% if incidencia.comentario_autorizacion %}
-            <div class="mt-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Comentario</p>
-                <p class="text-gray-900 dark:text-white">{{ incidencia.comentario_autorizacion }}</p>
+            <div class="mt-4 bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                <p class="text-xs text-gray-500 dark:text-dark-400 mb-1.5">Comentario</p>
+                <p class="text-sm text-gray-900 dark:text-white">{{ incidencia.comentario_autorizacion }}</p>
             </div>
             {% endif %}
         </div>
@@ -153,37 +161,30 @@
     {% endif %}
 
     <!-- Acciones -->
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 transition-colors duration-300">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center">
-            <i class="fas fa-cog text-blue-600 dark:text-blue-400 mr-2"></i>
-            Acciones Disponibles
-        </h2>
-        <div class="flex flex-wrap gap-3">
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-2 mb-4">
+            <i class="fas fa-bolt text-primary-500 text-sm"></i>
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Acciones</h2>
+        </div>
+        <div class="flex flex-wrap gap-2">
 
             {% if puede_editar %}
             <a href="{% url 'incidencias:editar_incidencia' incidencia.pk %}" 
-               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 dark:from-blue-600 dark:to-blue-800 dark:hover:from-blue-700 dark:hover:to-blue-900 shadow-md transition-all duration-200 transform hover:scale-105 font-medium">
-                <i class="fas fa-edit mr-2"></i> Editar
+               class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                <i class="fas fa-edit text-xs"></i> Editar
             </a>
             {% endif %}
 
             {% if puede_autorizar %}
             <a href="{% url 'incidencias:autorizar_incidencia' incidencia.pk %}" 
-               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 dark:from-green-600 dark:to-green-800 dark:hover:from-green-700 dark:hover:to-green-900 shadow-md transition-all duration-200 transform hover:scale-105 font-medium">
-                <i class="fas fa-check-circle mr-2"></i> Autorizar/Rechazar
+               class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                <i class="fas fa-check-circle text-xs"></i> Autorizar/Rechazar
             </a>
             {% endif %}
 
-            {% if user.perfil.es_admin or incidencia.created_by == user and incidencia.estado == 'pendiente' %}
-            <a href="{% url 'incidencias:eliminar_incidencia' incidencia.pk %}" 
-               class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-lg hover:from-red-700 hover:to-red-800 dark:from-red-600 dark:to-red-800 dark:hover:from-red-700 dark:hover:to-red-900 shadow-md transition-all duration-200 transform hover:scale-105 font-medium">
-                <i class="fas fa-trash mr-2"></i> Eliminar
-            </a>
-            {% endif %}
-
-            <a href="{% url 'incidencias:lista_incidencias' %}" 
-               class="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-200">
-                <i class="fas fa-arrow-left mr-2"></i> Volver a la lista
+            <a href="{% if from_mis_incidencias %}{% url 'incidencias:mis_incidencias' %}{% else %}{% url 'incidencias:lista_incidencias' %}{% endif %}" 
+               class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 text-sm font-medium rounded-lg transition-colors duration-200">
+                <i class="fas fa-arrow-left text-xs"></i> Volver
             </a>
         </div>
     </div>

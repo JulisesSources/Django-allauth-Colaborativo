@@ -4,181 +4,190 @@
 {% block title %}Autorizar Incidencia - SCA-B123{% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y-5">
     
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-purple-600 to-purple-800 dark:from-purple-900 dark:to-purple-950 shadow-xl rounded-xl p-6 text-white transition-all duration-300">
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div class="mb-4 md:mb-0">
-                <h1 class="text-3xl md:text-4xl font-bold flex items-center">
-                    <i class="fas fa-user-check mr-3"></i>
-                    Autorizar o Rechazar Incidencia
-                </h1>
-                <p class="text-purple-100 mt-2">Revisa la información y toma una decisión sobre la incidencia</p>
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-600 dark:text-purple-400">
+                <i class="fas fa-user-check text-base"></i>
             </div>
-        </div>
-    </div>
-    
-    <!-- Resumen de la Incidencia -->
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl overflow-hidden transition-colors duration-300">
-        <div class="p-6 border-b border-gray-100 dark:border-gray-700">
-            <h2 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                <i class="fas fa-info-circle text-purple-500"></i>
-                Resumen de la Incidencia
-            </h2>
-        </div>
-        <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Trabajador</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.id_trabajador.nombre_completo }}</p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ incidencia.id_trabajador.numero_empleado }}</p>
-                </div>
-                
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Tipo de Incidencia</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">{{ incidencia.id_tipo_incidencia.descripcion }}</p>
-                </div>
-                
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Periodo</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">
-                        {{ incidencia.fecha_inicio|date:"d/m/Y" }} - {{ incidencia.fecha_fin|date:"d/m/Y" }}
-                    </p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ incidencia.duracion_dias }} día(s)</p>
-                </div>
-                
-                <div class="bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Solicitado por</p>
-                    <p class="font-semibold text-gray-900 dark:text-white">
-                        {{ incidencia.created_by.get_full_name|default:incidencia.created_by.email }}
-                    </p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">{{ incidencia.created_at|date:"d/m/Y H:i" }}</p>
-                </div>
-            </div>
-            
-            {% if incidencia.observaciones %}
-            <div class="mt-4 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg">
-                <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Observaciones</p>
-                <p class="text-gray-900 dark:text-white">{{ incidencia.observaciones }}</p>
-            </div>
-            {% endif %}
-        </div>
-    </div>
-    
-    <!-- Formulario de Autorización -->
-    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-xl p-6 transition-colors duration-300">
-        <form method="post" class="space-y-6">
-            {% csrf_token %}
-            
-            {% if form.non_field_errors %}
-            <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-r-lg">
-                <div class="flex items-start">
-                    <i class="fas fa-exclamation-circle text-red-500 dark:text-red-400 text-xl mr-3 mt-0.5"></i>
-                    <div class="flex-1">
-                        <p class="text-sm text-red-800 dark:text-red-200">{{ form.non_field_errors }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-            
-            <!-- Acción -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                    <i class="fas fa-check-double mr-2 text-purple-600 dark:text-purple-400"></i> {{ form.accion.label }}
-                </label>
-                
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Autorizar o Rechazar Incidencia</h1>
+                <p class="text-xs text-gray-500 dark:text-dark-400">Revisa la información y toma una decisión</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Grid de 2 columnas: Resumen y Formulario -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        
+        <!-- Resumen de la Incidencia -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-dark-800">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-info-circle text-purple-500 text-sm"></i>
+                    Resumen de la Incidencia
+                </h2>
+            </div>
+            <div class="p-5">
                 <div class="space-y-3">
-                    {% for radio in form.accion %}
-                    <div class="flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200
-                                {% if radio.data.value == 'autorizar' %}
-                                    border-green-200 dark:border-green-800 hover:border-green-400 dark:hover:border-green-600 hover:bg-green-50 dark:hover:bg-green-900/20
-                                {% else %}
-                                    border-red-200 dark:border-red-800 hover:border-red-400 dark:hover:border-red-600 hover:bg-red-50 dark:hover:bg-red-900/20
-                                {% endif %}">
-                        {{ radio.tag }}
-                        <label for="{{ radio.id_for_label }}" class="ml-3 cursor-pointer flex-1">
-                            <span class="block text-sm font-medium 
-                                  {% if radio.data.value == 'autorizar' %}
-                                      text-green-700 dark:text-green-400
-                                  {% else %}
-                                      text-red-700 dark:text-red-400
-                                  {% endif %}">
-                                {% if radio.data.value == 'autorizar' %}
-                                    <i class="fas fa-check-circle mr-1"></i> Autorizar Incidencia
-                                {% else %}
-                                    <i class="fas fa-times-circle mr-1"></i> Rechazar Incidencia
-                                {% endif %}
-                            </span>
-                            <span class="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                {% if radio.data.value == 'autorizar' %}
-                                    La incidencia será aprobada y se registrará en el sistema
-                                {% else %}
-                                    La incidencia será rechazada y no tendrá efecto
-                                {% endif %}
-                            </span>
-                        </label>
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Trabajador</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.id_trabajador.nombre_completo }}</p>
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">{{ incidencia.id_trabajador.numero_empleado }}</p>
                     </div>
-                    {% endfor %}
+                    
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Tipo de Incidencia</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">{{ incidencia.id_tipo_incidencia.descripcion }}</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Periodo</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                            {{ incidencia.fecha_inicio|date:"d/m/Y" }} - {{ incidencia.fecha_fin|date:"d/m/Y" }}
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">{{ incidencia.duracion_dias }} día(s)</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1">Solicitado por</p>
+                        <p class="text-sm font-medium text-gray-900 dark:text-white">
+                            {{ incidencia.created_by.get_full_name|default:incidencia.created_by.email }}
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">{{ incidencia.created_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                    
+                    {% if incidencia.observaciones %}
+                    <div class="bg-gray-50 dark:bg-dark-800 p-3 rounded-lg">
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mb-1.5">Observaciones</p>
+                        <p class="text-sm text-gray-900 dark:text-white">{{ incidencia.observaciones }}</p>
+                    </div>
+                    {% endif %}
                 </div>
-                
-                {% if form.accion.errors %}
-                <p class="mt-2 flex items-center text-sm text-red-600 dark:text-red-400">
-                    <i class="fas fa-exclamation-triangle mr-1"></i>{{ form.accion.errors.0 }}
-                </p>
-                {% endif %}
             </div>
-            
-            <!-- Comentario -->
-            <div class="space-y-2">
-                <label for="{{ form.comentario.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    <i class="fas fa-comment-alt mr-2 text-purple-600 dark:text-purple-400"></i> {{ form.comentario.label }}
-                </label>
-                <textarea name="{{ form.comentario.name }}" id="{{ form.comentario.id_for_label }}" 
-                          rows="4"
-                          placeholder="Agrega un comentario explicando tu decisión (opcional)"
-                          class="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:focus:ring-purple-400 focus:border-transparent text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition-all duration-200 hover:border-purple-400 dark:hover:border-purple-500 resize-none">{{ form.comentario.value|default:'' }}</textarea>
-                {% if form.comentario.errors %}
-                <p class="flex items-center mt-2 text-sm text-red-600 dark:text-red-400">
-                    <i class="fas fa-exclamation-triangle mr-1"></i>{{ form.comentario.errors.0 }}
-                </p>
-                {% endif %}
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                    Puedes agregar un comentario explicando tu decisión (opcional)
-                </p>
+        </div>
+        
+        <!-- Formulario de Autorización -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+            <div class="px-5 py-4 border-b border-gray-200 dark:border-dark-800">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-check-double text-purple-500 text-sm"></i>
+                    Decisión
+                </h2>
             </div>
-            
-            <!-- Advertencia -->
-            <div class="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-l-4 border-yellow-500 dark:border-yellow-400 p-5 rounded-r-lg">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <i class="fas fa-exclamation-triangle text-yellow-600 dark:text-yellow-400 text-2xl"></i>
+            <div class="p-5 pt-0">
+                <form method="post" class="space-y-4">
+                    {% csrf_token %}
+                    
+                    {% if form.non_field_errors %}
+                    <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 dark:border-red-400 p-3 rounded-r-lg">
+                        <div class="flex items-start gap-2">
+                            <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-sm mt-0.5"></i>
+                            <p class="text-xs text-red-800 dark:text-red-200">{{ form.non_field_errors }}</p>
+                        </div>
                     </div>
-                    <div class="ml-4">
-                        <h3 class="text-sm font-bold text-yellow-900 dark:text-yellow-200 mb-2">
-                            Importante
-                        </h3>
-                        <p class="text-sm text-yellow-800 dark:text-yellow-300">
-                            Esta acción no se puede deshacer. Asegúrate de revisar toda la información antes de continuar.
+                    {% endif %}
+                    
+                    <!-- Acción -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-2">
+                            {{ form.accion.label }}
+                        </label>
+                        
+                        <div class="space-y-2">
+                            {% for radio in form.accion %}
+                            <label class="flex items-center p-3 border rounded-lg cursor-pointer transition-all duration-200
+                                        {% if radio.data.value == 'autorizar' %}
+                                            border-emerald-200 dark:border-emerald-500/30 hover:border-emerald-400 dark:hover:border-emerald-500/50 hover:bg-emerald-50 dark:hover:bg-emerald-500/5
+                                        {% else %}
+                                            border-red-200 dark:border-red-500/30 hover:border-red-400 dark:hover:border-red-500/50 hover:bg-red-50 dark:hover:bg-red-500/5
+                                        {% endif %}">
+                                {{ radio.tag }}
+                                <div class="ml-3 flex-1">
+                                    <span class="block text-sm font-medium 
+                                          {% if radio.data.value == 'autorizar' %}
+                                              text-emerald-700 dark:text-emerald-400
+                                          {% else %}
+                                              text-red-700 dark:text-red-400
+                                          {% endif %}">
+                                        {% if radio.data.value == 'autorizar' %}
+                                            <i class="fas fa-check-circle text-xs mr-1"></i> Autorizar
+                                        {% else %}
+                                            <i class="fas fa-times-circle text-xs mr-1"></i> Rechazar
+                                        {% endif %}
+                                    </span>
+                                    <span class="block text-xs text-gray-500 dark:text-dark-400 mt-0.5">
+                                        {% if radio.data.value == 'autorizar' %}
+                                            Aprobar la incidencia
+                                        {% else %}
+                                            No aprobar la incidencia
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        
+                        {% if form.accion.errors %}
+                        <p class="mt-1.5 flex items-center text-xs text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.accion.errors.0 }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Comentario -->
+                    <div>
+                        <label for="{{ form.comentario.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                            {{ form.comentario.label }}
+                        </label>
+                        <textarea name="{{ form.comentario.name }}" id="{{ form.comentario.id_for_label }}" 
+                                  rows="4"
+                                  placeholder="Comentario opcional..."
+                                  class="w-full px-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-dark-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none">{{ form.comentario.value|default:'' }}</textarea>
+                        {% if form.comentario.errors %}
+                        <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.comentario.errors.0 }}
+                        </p>
+                        {% endif %}
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mt-1">
+                            Explica tu decisión (opcional)
                         </p>
                     </div>
-                </div>
-            </div>
             
-            <!-- Botones -->
-            <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                <button type="submit" 
-                        class="flex-1 inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-md text-base font-semibold text-white bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 dark:from-purple-600 dark:to-purple-800 dark:hover:from-purple-700 dark:hover:to-purple-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 transform hover:scale-105">
-                    <i class="fas fa-check mr-2"></i>
-                    Confirmar Decisión
-                </button>
-                <a href="{% url 'incidencias:detalle_incidencia' incidencia.pk %}" 
-                   class="flex-1 inline-flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-base font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all duration-200">
-                    <i class="fas fa-times mr-2"></i>
-                    Cancelar
-                </a>
+                    <!-- Advertencia -->
+                    <div class="bg-amber-50 dark:bg-amber-500/5 border-l-4 border-amber-500 dark:border-amber-400 p-3 rounded-r-lg">
+                        <div class="flex gap-2">
+                            <i class="fas fa-exclamation-triangle text-amber-600 dark:text-amber-400 text-sm mt-0.5"></i>
+                            <div>
+                                <p class="text-xs font-medium text-amber-900 dark:text-amber-200 mb-1">
+                                    Importante
+                                </p>
+                                <p class="text-xs text-amber-800 dark:text-amber-300">
+                                    Esta acción no se puede deshacer.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones -->
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <button type="submit" 
+                                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-check text-xs"></i>
+                            Confirmar
+                        </button>
+                        <a href="{% url 'incidencias:detalle_incidencia' incidencia.pk %}" 
+                           class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-times text-xs"></i>
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
+        
     </div>
 </div>
 {% endblock %}
