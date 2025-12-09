@@ -23,6 +23,7 @@ from .utils import (
 )
 
 from apps.trabajadores.models import Trabajador
+from apps.unidades.models import UnidadAdministrativa
 from apps.accounts.decorators import rol_requerido
 
 
@@ -41,7 +42,7 @@ class AsistenciaListView(ListView):
 
     def get_queryset(self):
         queryset = RegistroAsistencia.objects.select_related(
-            'id_trabajador'
+            'id_trabajador', 'id_trabajador__id_unidad'
         ).order_by('-fecha', 'id_trabajador')
 
         user = self.request.user
@@ -52,11 +53,16 @@ class AsistenciaListView(ListView):
             queryset = queryset.filter(id_trabajador__id_unidad=unidad)
 
         # ----- Filtros -----
+        unidad_id = self.request.GET.get('unidad')
         fecha_inicio = self.request.GET.get('fecha_inicio')
         fecha_fin = self.request.GET.get('fecha_fin')
         estatus = self.request.GET.get('estatus')
         trabajador_id = self.request.GET.get('trabajador')
 
+        # Filtro por unidad (solo admin puede filtrar por unidad)
+        if unidad_id and user.perfil.es_admin():
+            queryset = queryset.filter(id_trabajador__id_unidad_id=unidad_id)
+        
         if fecha_inicio:
             queryset = queryset.filter(fecha__gte=fecha_inicio)
         if fecha_fin:
@@ -66,7 +72,7 @@ class AsistenciaListView(ListView):
         if trabajador_id:
             queryset = queryset.filter(id_trabajador_id=trabajador_id)
 
-        if not any([fecha_inicio, fecha_fin, estatus, trabajador_id]):
+        if not any([unidad_id, fecha_inicio, fecha_fin, estatus, trabajador_id]):
             queryset = queryset.filter(fecha__gte=date.today() - timedelta(days=7))
 
         return queryset
@@ -86,12 +92,18 @@ class AsistenciaListView(ListView):
         form = FiltroAsistenciaForm(self.request.GET or None)
 
         user = self.request.user
-        if user.perfil.es_jefe():
+        
+        # Agregar unidades y trabajadores para el filtro dinámico (solo admin)
+        if user.perfil.es_admin():
+            context['unidades'] = UnidadAdministrativa.objects.all().order_by('nombre')
+            context['todos_trabajadores'] = Trabajador.objects.filter(activo=True).select_related('id_unidad').order_by('nombre')
+        elif user.perfil.es_jefe():
             unidad = user.perfil.id_trabajador.id_unidad
             form.fields['trabajador'].queryset = Trabajador.objects.filter(
                 activo=True,
                 id_unidad=unidad
             )
+            context['trabajadores'] = Trabajador.objects.filter(activo=True, id_unidad=unidad).order_by('nombre')
         elif user.perfil.es_trabajador():
             # Solo él mismo
             form.fields['trabajador'].queryset = Trabajador.objects.filter(
@@ -131,6 +143,14 @@ class RegistroRapidoView(FormView):
         else:
             # Admin ve todos los trabajadores activos
             trabajadores_base = Trabajador.objects.filter(activo=True)
+        
+        # 🔹 Filtrar solo trabajadores que tienen jornadas asignadas
+        from apps.jornadas_laborales.models import TrabajadorJornada
+        trabajadores_con_jornada = TrabajadorJornada.objects.filter(
+            Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
+        ).values_list('id_trabajador', flat=True)
+        
+        trabajadores_base = trabajadores_base.filter(id_trabajador__in=trabajadores_con_jornada)
         
         # Obtener trabajadores que ya completaron su asistencia hoy
         trabajadores_completos_hoy = RegistroAsistencia.objects.filter(
@@ -255,6 +275,15 @@ class RegistroAsistenciaCreateView(CreateView):
             trabajadores_base = Trabajador.objects.filter(id_unidad=unidad, activo=True)
         else:
             trabajadores_base = Trabajador.objects.filter(activo=True)
+        
+        # 🔹 Filtrar solo trabajadores que tienen jornadas asignadas
+        from apps.jornadas_laborales.models import TrabajadorJornada
+        from django.db.models import Q
+        trabajadores_con_jornada = TrabajadorJornada.objects.filter(
+            Q(fecha_fin__isnull=True) | Q(fecha_fin__gte=hoy)
+        ).values_list('id_trabajador', flat=True)
+        
+        trabajadores_base = trabajadores_base.filter(id_trabajador__in=trabajadores_con_jornada)
 
         # Obtener trabajadores que ya completaron su asistencia hoy
         # (tienen entrada Y salida registradas)
