@@ -132,6 +132,8 @@ ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/accounts/login/'
 
 # Para usuarios que ya están logueados
 ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/accounts/dashboard/'
+
+# Solo permitir un email único por usuario
 ACCOUNT_UNIQUE_EMAIL = True
 
 # ==================================
