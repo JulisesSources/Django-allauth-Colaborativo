@@ -24,3 +24,4 @@ urlpatterns = [
     path('nombramientos/<int:pk>/editar/', views.NombramientoUpdateView.as_view(), name='nombramientos-editar'),
     path('nombramientos/<int:pk>/eliminar/', views.NombramientoDeleteView.as_view(), name='nombramientos-eliminar'),
 ]
+
