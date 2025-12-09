@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if form.instance.pk %}Editar Puesto{% else %}Nuevo Puesto{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="space-y-5">
+
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl shadow-sm border border-gray-200 dark:border-dark-800 p-6">
+        <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                <i class="fas fa-{% if form.instance.pk %}edit{% else %}plus{% endif %} text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {% if form.instance.pk %}Editar Puesto{% else %}Nuevo Puesto{% endif %}
+                </h1>
+                <p class="text-sm text-gray-600 dark:text-dark-300">
+                    {% if form.instance.pk %}Modifica los datos del puesto{% else %}Completa el formulario para agregar un nuevo puesto{% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl shadow-sm border border-gray-200 dark:border-dark-800 p-6 pt-2">
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <!-- Nombre del Puesto -->
+                <div>
+                    <label for="{{ form.nombre_puesto.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-dark-300 mb-2">
+                        Nombre del Puesto
+                        {% if form.nombre_puesto.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    <input type="text"
+                           name="{{ form.nombre_puesto.name }}"
+                           id="{{ form.nombre_puesto.id_for_label }}"
+                           {% if form.nombre_puesto.value %}value="{{ form.nombre_puesto.value }}"{% endif %}
+                           {% if form.nombre_puesto.field.required %}required{% endif %}
+                           class="w-full h-11 px-4 py-2.5 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-dark-500">
+                    {% if form.nombre_puesto.errors %}
+                    <p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ form.nombre_puesto.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Nivel -->
+                <div>
+                    <label for="{{ form.nivel.id_for_label }}" class="block text-sm font-medium text-gray-700 dark:text-dark-300 mb-2">
+                        Nivel
+                        {% if form.nivel.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    <select name="{{ form.nivel.name }}"
+                            id="{{ form.nivel.id_for_label }}"
+                            {% if form.nivel.field.required %}required{% endif %}
+                            class="w-full h-11 px-4 py-2.5 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent bg-white dark:bg-dark-800 text-gray-900 dark:text-white">
+                        <option value="">-- Seleccionar --</option>
+                        <option value="Docente" {% if form.nivel.value == 'Docente' %}selected{% endif %}>Docente</option>
+                        <option value="Administrativo" {% if form.nivel.value == 'Administrativo' %}selected{% endif %}>Administrativo</option>
+                        <option value="Directivo" {% if form.nivel.value == 'Directivo' %}selected{% endif %}>Directivo</option>
+                    </select>
+                    {% if form.nivel.errors %}
+                    <p class="mt-1.5 text-sm text-red-600 dark:text-red-400">{{ form.nivel.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex items-center gap-3 pt-3">
+                <button type="submit"
+                        class="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium shadow-sm">
+                    <i class="fas fa-save"></i>
+                    <span>Guardar Puesto</span>
+                </button>
+
+                <a href="{% url 'trabajadores:puestos-lista' %}"
+                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white rounded-lg transition-colors text-sm font-medium shadow-sm">
+                    <i class="fas fa-times"></i>
+                    <span>Cancelar</span>
+                </a>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}

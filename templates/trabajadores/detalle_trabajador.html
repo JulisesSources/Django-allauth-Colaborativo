@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle de Trabajador{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-user text-emerald-600 dark:text-emerald-400 text-base"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Detalle de Trabajador</h1>
+                    <p class="text-xs text-gray-500 dark:text-dark-400">Información completa del trabajador</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="max-w-5xl mx-auto">
+        
+        <!-- Card de Información Personal -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden mb-5">
+            
+            <!-- Header de sección -->
+            <div class="px-5 py-3 border-b border-gray-200 dark:border-dark-800 bg-emerald-50 dark:bg-emerald-500/10">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-user-circle text-emerald-600 dark:text-emerald-400 text-sm"></i>
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Información Personal</h2>
+                </div>
+            </div>
+
+            <!-- Grid de información personal -->
+            <div class="p-5">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Estado -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            Estado
+                        </label>
+                        {% if trabajador.activo %}
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                            <i class="fas fa-check-circle text-xs"></i> Activo
+                        </span>
+                        {% else %}
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-lg bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-500/20">
+                            <i class="fas fa-times-circle text-xs"></i> Inactivo
+                        </span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Número de Empleado -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            Número de Empleado
+                        </label>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ trabajador.numero_empleado }}
+                        </p>
+                    </div>
+
+                    <!-- Nombre -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            Nombre(s)
+                        </label>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ trabajador.nombre }}
+                        </p>
+                    </div>
+
+                    <!-- Apellido Paterno -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            Apellido Paterno
+                        </label>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ trabajador.apellido_paterno }}
+                        </p>
+                    </div>
+
+                    <!-- Apellido Materno -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            Apellido Materno
+                        </label>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ trabajador.apellido_materno|default:"-" }}
+                        </p>
+                    </div>
+
+                    <!-- RFC -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            RFC
+                        </label>
+                        <p class="text-sm font-mono text-gray-900 dark:text-white">
+                            {{ trabajador.rfc }}
+                        </p>
+                    </div>
+
+                    <!-- CURP -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            CURP
+                        </label>
+                        <p class="text-sm font-mono text-gray-900 dark:text-white">
+                            {{ trabajador.curp }}
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Card de Información Laboral -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden mb-5">
+            
+            <!-- Header de sección -->
+            <div class="px-5 py-3 border-b border-gray-200 dark:border-dark-800 bg-blue-50 dark:bg-blue-500/10">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-briefcase text-blue-600 dark:text-blue-400 text-sm"></i>
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Información Laboral</h2>
+                </div>
+            </div>
+
+            <!-- Grid de información laboral -->
+            <div class="p-5">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Unidad Administrativa -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            Unidad Administrativa
+                        </label>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ trabajador.id_unidad.nombre }}
+                        </p>
+                    </div>
+
+                    <!-- Puesto -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            Puesto
+                        </label>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ trabajador.id_puesto.nombre_puesto }}
+                        </p>
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">
+                            Nivel: {{ trabajador.id_puesto.get_nivel_display }}
+                        </p>
+                    </div>
+
+                    <!-- Tipo de Nombramiento -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            Tipo de Nombramiento
+                        </label>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ trabajador.id_tipo_nombramiento.descripcion }}
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Card de Auditoría -->
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+            
+            <!-- Header de sección -->
+            <div class="px-5 py-3 border-b border-gray-200 dark:border-dark-800 bg-gray-50 dark:bg-dark-800/50">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-history text-gray-600 dark:text-gray-400 text-sm"></i>
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Información de Auditoría</h2>
+                </div>
+            </div>
+
+            <!-- Grid de información de auditoría -->
+            <div class="p-5">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- Fecha de Creación -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            Fecha de Creación
+                        </label>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ trabajador.created_at|date:"d/m/Y H:i" }}
+                        </p>
+                        {% if trabajador.created_by %}
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">
+                            <i class="fas fa-user text-xs mr-1"></i>
+                            {{ trabajador.created_by.get_full_name|default:trabajador.created_by.username }}
+                        </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Última Actualización -->
+                    <div>
+                        <label class="block text-xs font-medium text-gray-500 dark:text-dark-400 mb-1">
+                            Última Actualización
+                        </label>
+                        <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                            {{ trabajador.updated_at|date:"d/m/Y H:i" }}
+                        </p>
+                        {% if trabajador.updated_by %}
+                        <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">
+                            <i class="fas fa-user text-xs mr-1"></i>
+                            {{ trabajador.updated_by.get_full_name|default:trabajador.updated_by.username }}
+                        </p>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="flex flex-col sm:flex-row gap-3 mt-5">
+            {% if request.user.perfil.rol == 'admin' or request.user.perfil.rol == 'jefe' %}
+            <a href="{% url 'trabajadores:editar' trabajador.pk %}"
+               class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+                <i class="fas fa-edit text-xs"></i>
+                <span>Editar Trabajador</span>
+            </a>
+            {% endif %}
+            <a href="{% url 'trabajadores:index' %}"
+               class="flex-1 inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
+                <i class="fas fa-arrow-left text-xs"></i>
+                <span>Volver</span>
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
