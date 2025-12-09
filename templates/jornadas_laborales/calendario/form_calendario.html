@@ -1,111 +1,125 @@
-{% extends "base.html" %}
+<!-- templates/jornadas_laborales/calendario/form_calendario.html -->
+{% extends 'base.html' %}
 
-{% block title %}{{ form.instance.pk|yesno:"Editar Día,Nuevo Día" }} - Calendario{% endblock %}
-{% block page_title %}{{ form.instance.pk|yesno:"Editar Día,Nuevo Día" }}{% endblock %}
-{% block page_subtitle %}{{ form.instance.pk|yesno:"Modifica el día del calendario,Agrega un día al calendario laboral" }}{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar Día{% else %}Nuevo Día{% endif %} - SCA-B123{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto">
-    
-    <!-- Botón volver -->
-    <div class="mb-6">
-        <a href="{% url 'jornadas:list' %}" 
-           class="inline-flex items-center text-gray-400 hover:text-white transition">
-            <i class="fas fa-arrow-left mr-2"></i>Volver a jornadas
-        </a>
-    </div>
-
-    <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-lg overflow-hidden">
-        
-        <!-- Header del formulario -->
-        <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-5">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-calendar-alt text-white text-xl"></i>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold text-white">
-                        {{ form.instance.pk|yesno:"Editar Día del Calendario,Nuevo Día del Calendario" }}
-                    </h2>
-                    <p class="text-purple-100 text-sm">
-                        {{ form.instance.pk|yesno:"Modifica la configuración del día,Registra días inhábiles o festivos" }}
-                    </p>
-                </div>
+<div class="space-y-5">
+    <!-- Header -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                <i class="fas fa-calendar-alt text-purple-500 text-base"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-white">{% if form.instance.pk %}Editar Día del Calendario{% else %}Nuevo Día del Calendario{% endif %}</h1>
+                <p class="text-xs text-gray-500 dark:text-dark-400">Complete el formulario con la información del día</p>
             </div>
         </div>
-
-        <form method="POST" class="p-6 space-y-5">
-            {% csrf_token %}
-
-            <!-- Fecha -->
-            <div class="space-y-2">
-                <label class="flex items-center text-sm font-medium text-gray-300">
-                    <i class="fas fa-calendar-day text-blue-400 mr-2"></i>Fecha
-                </label>
-                <div class="relative">
-                    {{ form.fecha }}
-                </div>
-                {% for error in form.fecha.errors %}
-                    <p class="text-red-400 text-sm flex items-center">
-                        <i class="fas fa-exclamation-circle mr-1"></i>{{ error }}
-                    </p>
-                {% endfor %}
-            </div>
-
-            <!-- Es inhábil - Switch estilizado -->
-            <div class="space-y-2">
-                <label class="flex items-center text-sm font-medium text-gray-300 mb-3">
-                    <i class="fas fa-toggle-on text-yellow-400 mr-2"></i>Tipo de día
-                </label>
+    </div>
+    
+    <!-- Formulario -->
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5 pt-2">
+        <form method="post" class="space-y-4">
+                {% csrf_token %}
                 
-                <div class="bg-gray-900/50 border border-gray-700 rounded-xl p-4">
-                    <label class="flex items-center justify-between cursor-pointer">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-red-900/50 rounded-lg flex items-center justify-center">
-                                <i class="fas fa-times-circle text-red-400"></i>
-                            </div>
-                            <div>
-                                <p class="text-white font-medium">Marcar como día inhábil</p>
-                                <p class="text-xs text-gray-500">El sistema no contará este día como laborable</p>
-                            </div>
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 dark:border-red-400 p-3 rounded-r-lg">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-sm mt-0.5"></i>
+                        <div class="flex-1">
+                            <p class="text-xs font-medium text-red-800 dark:text-red-200 mb-1">Se encontraron errores:</p>
+                            <ul class="list-disc list-inside space-y-0.5 text-xs text-red-700 dark:text-red-300">
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
                         </div>
-                        <div class="relative">
-                            {{ form.es_inhabil }}
-                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Fecha -->
+                <div>
+                    <label for="{{ form.fecha.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        {{ form.fecha.label }}
+                        <span class="text-red-500">*</span>
                     </label>
-                </div>
-            </div>
-
-            <!-- Descripción -->
-            <div class="space-y-2">
-                <label class="flex items-center text-sm font-medium text-gray-300">
-                    <i class="fas fa-comment-alt text-green-400 mr-2"></i>Descripción
-                </label>
-                <div class="relative">
-                    {{ form.descripcion }}
-                </div>
-                <p class="text-xs text-gray-500">Ej: Día de la Independencia, Navidad, etc.</p>
-                {% for error in form.descripcion.errors %}
-                    <p class="text-red-400 text-sm flex items-center">
-                        <i class="fas fa-exclamation-circle mr-1"></i>{{ error }}
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-calendar text-gray-400 dark:text-dark-500 text-xs"></i>
+                        </div>
+                        <input type="date" name="{{ form.fecha.name }}" id="{{ form.fecha.id_for_label }}" 
+                               value="{% if request.GET.fecha %}{{ request.GET.fecha }}{% else %}{{ form.fecha.value|default:'' }}{% endif %}" required
+                               class="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                    </div>
+                    {% if form.fecha.errors %}
+                    <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                        <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.fecha.errors.0 }}
                     </p>
-                {% endfor %}
-            </div>
+                    {% endif %}
+                </div>
 
-            <!-- Botones -->
-            <div class="flex items-center justify-between pt-6 border-t border-gray-700">
-                <a href="{% url 'jornadas:list' %}"
-                   class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded-lg font-medium transition flex items-center">
-                    <i class="fas fa-times mr-2"></i>Cancelar
-                </a>
+                <!-- Es inhábil -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Tipo de día
+                    </label>
+                    
+                    <div class="bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-4">
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-red-100 dark:bg-red-500/10 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-times-circle text-red-600 dark:text-red-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-900 dark:text-white font-medium text-sm">Marcar como día inhábil</p>
+                                    <p class="text-xs text-gray-500 dark:text-dark-500">El sistema no contará este día como laborable</p>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" name="{{ form.es_inhabil.name }}" id="{{ form.es_inhabil.id_for_label }}"
+                                       {% if form.es_inhabil.value %}checked{% endif %}
+                                       class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 dark:bg-dark-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
 
-                <button type="submit"
-                        class="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition flex items-center shadow-lg shadow-purple-600/20">
-                    <i class="fas fa-save mr-2"></i>Guardar
-                </button>
-            </div>
-
-        </form>
+                <!-- Descripción -->
+                <div>
+                    <label for="{{ form.descripcion.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        {{ form.descripcion.label }}
+                    </label>
+                    <textarea name="{{ form.descripcion.name }}" id="{{ form.descripcion.id_for_label }}" 
+                              rows="3"
+                              placeholder="Ej: Día de la Independencia, Navidad, etc."
+                              class="w-full px-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-dark-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none">{{ form.descripcion.value|default:'' }}</textarea>
+                    {% if form.descripcion.errors %}
+                    <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                        <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.descripcion.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="text-xs text-gray-500 dark:text-dark-500 mt-1">Opcional: Agrega una descripción para identificar este día</p>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="flex flex-col sm:flex-row items-center gap-3 pt-5 border-t border-gray-200 dark:border-dark-800">
+                    <button type="submit" 
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save text-xs"></i>
+                        Guardar Día
+                    </button>
+                    <a href="{% url 'jornadas:calendario' %}" 
+                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-times text-xs"></i>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
