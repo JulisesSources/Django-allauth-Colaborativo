@@ -1,113 +1,211 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ titulo }} - SCA-B123{% endblock %}
+{% block title %}Gestión de Tipos de Incidencia - SCA-B123{% endblock %}
 
 {% block content %}
 <div class="space-y-5">
     <!-- Header Card -->
     <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-600 dark:text-purple-400">
-                <i class="fas fa-tags text-base"></i>
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-600 dark:text-purple-400">
+                    <i class="fas fa-tags text-base"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Gestión de Tipos de Incidencia</h1>
+                    <p class="text-xs text-gray-500 dark:text-dark-400">Configure los tipos de incidencias del sistema</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-xl font-semibold text-gray-900 dark:text-white">{{ titulo }}</h1>
-                <p class="text-xs text-gray-500 dark:text-dark-400">Configure los tipos de incidencias del sistema</p>
-            </div>
+            <a href="{% url 'incidencias:lista_incidencias' %}" 
+               class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 text-sm font-medium rounded-lg transition-colors duration-200">
+                <i class="fas fa-arrow-left text-xs"></i>
+                Volver a Incidencias
+            </a>
         </div>
     </div>
     
-    <!-- Formulario -->
-    <div class="max-w-2xl mx-auto">
-        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5 pt-2">
-            <form method="post" class="space-y-4">
-                    {% csrf_token %}
+    <!-- Grid Layout: Formulario + Lista -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- Formulario (1/3 del ancho en lg) -->
+        <div class="lg:col-span-1">
+            <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+                <div class="px-5 py-4 border-b border-gray-200 dark:border-dark-800 bg-purple-50 dark:bg-purple-500/5">
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-{% if editando %}edit{% else %}plus{% endif %} text-purple-500"></i>
+                        {% if editando %}Editar Tipo{% else %}Nuevo Tipo{% endif %}
+                    </h2>
+                </div>
+                <div class="p-5">
+                    <form method="post" class="space-y-4">
+                        {% csrf_token %}
 
-                    {% if form.non_field_errors %}
-                    <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 dark:border-red-400 p-3 rounded-r-lg">
-                        <div class="flex items-start gap-2">
-                            <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-sm mt-0.5"></i>
-                            <div class="flex-1">
-                                <p class="text-xs font-medium text-red-800 dark:text-red-200 mb-1">Se encontraron errores:</p>
-                                <ul class="list-disc list-inside space-y-0.5 text-xs text-red-700 dark:text-red-300">
-                                    {% for error in form.non_field_errors %}
-                                    <li>{{ error }}</li>
-                                    {% endfor %}
-                                </ul>
+                        {% if form.non_field_errors %}
+                        <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 dark:border-red-400 p-3 rounded-r-lg">
+                            <div class="flex items-start gap-2">
+                                <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-sm mt-0.5"></i>
+                                <div class="flex-1">
+                                    <p class="text-xs font-medium text-red-800 dark:text-red-200 mb-1">Se encontraron errores:</p>
+                                    <ul class="list-disc list-inside space-y-0.5 text-xs text-red-700 dark:text-red-300">
+                                        {% for error in form.non_field_errors %}
+                                        <li>{{ error }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    {% endif %}
-
-                    <!-- Descripción -->
-                    <div>
-                        <label for="{{ form.descripcion.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
-                            {{ form.descripcion.label }}
-                            <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" name="{{ form.descripcion.name }}" id="{{ form.descripcion.id_for_label }}" 
-                               value="{{ form.descripcion.value|default:'' }}" required
-                               placeholder="Ej: Permiso por enfermedad, Vacaciones, etc."
-                               class="w-full px-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-dark-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
-                        {% if form.descripcion.errors %}
-                        <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
-                            <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.descripcion.errors.0 }}
-                        </p>
                         {% endif %}
-                    </div>
 
-                    <!-- Requiere Autorización -->
-                    <div class="bg-gray-50 dark:bg-dark-800 rounded-lg p-3">
-                        <div class="flex items-start gap-3">
-                            <div class="flex items-center h-5">
-                                <input type="checkbox" name="{{ form.requiere_autorizacion.name }}" id="{{ form.requiere_autorizacion.id_for_label }}"
-                                       {% if form.requiere_autorizacion.value %}checked{% endif %}
-                                       class="w-4 h-4 text-purple-600 bg-white dark:bg-dark-700 border-gray-300 dark:border-dark-600 rounded focus:ring-2 focus:ring-purple-500 transition-all duration-200">
-                            </div>
-                            <div class="flex-1">
-                                <label for="{{ form.requiere_autorizacion.id_for_label }}" class="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
-                                    {{ form.requiere_autorizacion.label }}
-                                </label>
-                                <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">
-                                    Las incidencias de este tipo deberán ser autorizadas
-                                </p>
+                        <!-- Descripción -->
+                        <div>
+                            <label for="{{ form.descripcion.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                                {{ form.descripcion.label }}
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" name="{{ form.descripcion.name }}" id="{{ form.descripcion.id_for_label }}" 
+                                   value="{{ form.descripcion.value|default:'' }}" required
+                                   placeholder="Ej: Permiso por enfermedad"
+                                   class="w-full px-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-dark-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                            {% if form.descripcion.errors %}
+                            <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                                <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.descripcion.errors.0 }}
+                            </p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Requiere Autorización -->
+                        <div class="bg-gray-50 dark:bg-dark-800 rounded-lg p-3">
+                            <div class="flex items-start gap-3">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" name="{{ form.requiere_autorizacion.name }}" id="{{ form.requiere_autorizacion.id_for_label }}"
+                                           {% if form.requiere_autorizacion.value %}checked{% endif %}
+                                           class="w-4 h-4 text-purple-600 bg-white dark:bg-dark-700 border-gray-300 dark:border-dark-600 rounded focus:ring-2 focus:ring-purple-500 transition-all duration-200">
+                                </div>
+                                <div class="flex-1">
+                                    <label for="{{ form.requiere_autorizacion.id_for_label }}" class="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
+                                        Requiere Autorización
+                                    </label>
+                                    <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">
+                                        Necesitará aprobación de un jefe
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Activo -->
-                    <div class="bg-gray-50 dark:bg-dark-800 rounded-lg p-3">
-                        <div class="flex items-start gap-3">
-                            <div class="flex items-center h-5">
-                                <input type="checkbox" name="{{ form.activo.name }}" id="{{ form.activo.id_for_label }}"
-                                       {% if form.activo.value %}checked{% endif %}
-                                       class="w-4 h-4 text-emerald-600 bg-white dark:bg-dark-700 border-gray-300 dark:border-dark-600 rounded focus:ring-2 focus:ring-emerald-500 transition-all duration-200">
-                            </div>
-                            <div class="flex-1">
-                                <label for="{{ form.activo.id_for_label }}" class="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
-                                    {{ form.activo.label }}
-                                </label>
-                                <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">
-                                    Los tipos inactivos no estarán disponibles
-                                </p>
+                        <!-- Activo -->
+                        <div class="bg-gray-50 dark:bg-dark-800 rounded-lg p-3">
+                            <div class="flex items-start gap-3">
+                                <div class="flex items-center h-5">
+                                    <input type="checkbox" name="{{ form.activo.name }}" id="{{ form.activo.id_for_label }}"
+                                           {% if form.activo.value %}checked{% endif %}
+                                           class="w-4 h-4 text-emerald-600 bg-white dark:bg-dark-700 border-gray-300 dark:border-dark-600 rounded focus:ring-2 focus:ring-emerald-500 transition-all duration-200">
+                                </div>
+                                <div class="flex-1">
+                                    <label for="{{ form.activo.id_for_label }}" class="text-sm font-medium text-gray-900 dark:text-white cursor-pointer">
+                                        Activo
+                                    </label>
+                                    <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">
+                                        Disponible para usar
+                                    </p>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Botones -->
-                    <div class="flex flex-wrap gap-2 pt-2">
-                        <button type="submit" 
-                                class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
-                            <i class="fas fa-save text-xs"></i>
-                            {{ boton }}
-                        </button>
-                        <a href="{% url 'incidencias:lista_incidencias' %}" 
-                           class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 text-sm font-medium rounded-lg transition-colors duration-200">
-                            <i class="fas fa-times text-xs"></i>
-                            Cancelar
-                        </a>
+                        <!-- Botones -->
+                        <div class="flex flex-col gap-2 pt-2">
+                            <button type="submit" 
+                                    class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-save text-xs"></i>
+                                {% if editando %}Actualizar{% else %}Guardar{% endif %}
+                            </button>
+                            {% if editando %}
+                            <a href="{% url 'incidencias:crear_tipo_incidencia' %}" 
+                               class="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-times text-xs"></i>
+                                Cancelar Edición
+                            </a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Tipos (2/3 del ancho en lg) -->
+        <div class="lg:col-span-2">
+            <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden h-full">
+                <div class="px-5 py-4 border-b border-gray-200 dark:border-dark-800 flex items-center justify-between">
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-list text-purple-500"></i>
+                        Tipos Registrados
+                    </h2>
+                    {% if tipos %}
+                    <span class="text-xs text-gray-500 dark:text-dark-400">{{ tipos|length }} tipo{{ tipos|length|pluralize:"s" }}</span>
+                    {% endif %}
+                </div>
+                
+                {% if tipos %}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-700">
+                        <thead class="bg-gray-50 dark:bg-dark-800">
+                            <tr>
+                                <th class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">Descripción</th>
+                                <th class="px-5 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">Autorización</th>
+                                <th class="px-5 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">Estado</th>
+                                <th class="px-5 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-dark-900 divide-y divide-gray-200 dark:divide-dark-700">
+                            {% for tipo in tipos %}
+                            <tr class="hover:bg-gray-50 dark:hover:bg-dark-800 transition-colors duration-150 {% if editando and editando.pk == tipo.pk %}bg-purple-50 dark:bg-purple-500/10 border-l-4 border-purple-500{% endif %}">
+                                <td class="px-5 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-tag text-purple-500 text-xs"></i>
+                                        <span class="text-sm text-gray-900 dark:text-white font-medium">{{ tipo.descripcion }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-3 text-center">
+                                    {% if tipo.requiere_autorizacion %}
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400">
+                                        <i class="fas fa-check-circle mr-1"></i> Sí
+                                    </span>
+                                    {% else %}
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 dark:bg-dark-700 text-gray-600 dark:text-dark-400">
+                                        No
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-5 py-3 text-center">
+                                    {% if tipo.activo %}
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400">
+                                        <i class="fas fa-circle text-[6px] mr-1"></i> Activo
+                                    </span>
+                                    {% else %}
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-500/10 text-red-800 dark:text-red-400">
+                                        <i class="fas fa-circle text-[6px] mr-1"></i> Inactivo
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-5 py-3 text-center">
+                                    <a href="{% url 'incidencias:editar_tipo_incidencia' tipo.pk %}" 
+                                       class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors duration-200"
+                                       title="Editar">
+                                        <i class="fas fa-edit text-sm"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 mx-auto bg-gray-100 dark:bg-dark-800 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-tags text-gray-400 dark:text-dark-500 text-2xl"></i>
                     </div>
-                </form>
+                    <p class="text-sm text-gray-500 dark:text-dark-400 font-medium">No hay tipos de incidencia</p>
+                    <p class="text-xs text-gray-400 dark:text-dark-500 mt-1">Usa el formulario para crear el primero</p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
