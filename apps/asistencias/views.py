@@ -81,17 +81,25 @@ class AsistenciaListView(ListView):
         context = super().get_context_data(**kwargs)
 
         hoy = date.today()
+        user = self.request.user
 
         context['filtro_form'] = FiltroAsistenciaForm(self.request.GET or None)
 
         context['fecha_actual'] = hoy
-        context['asistencias_hoy'] = RegistroAsistencia.objects.filter(fecha=hoy, estatus='ASI').count()
-        context['retardos_hoy'] = RegistroAsistencia.objects.filter(fecha=hoy, estatus='RET').count()
-        context['faltas_hoy'] = RegistroAsistencia.objects.filter(fecha=hoy, estatus='FAL').count()
+        
+        # Filtrar contadores por unidad si es jefe
+        if user.perfil.es_jefe() and user.perfil.id_trabajador and user.perfil.id_trabajador.id_unidad:
+            unidad = user.perfil.id_trabajador.id_unidad
+            context['asistencias_hoy'] = RegistroAsistencia.objects.filter(fecha=hoy, estatus='ASI', id_trabajador__id_unidad=unidad).count()
+            context['retardos_hoy'] = RegistroAsistencia.objects.filter(fecha=hoy, estatus='RET', id_trabajador__id_unidad=unidad).count()
+            context['faltas_hoy'] = RegistroAsistencia.objects.filter(fecha=hoy, estatus='FAL', id_trabajador__id_unidad=unidad).count()
+        else:
+            # Admin ve estadísticas globales
+            context['asistencias_hoy'] = RegistroAsistencia.objects.filter(fecha=hoy, estatus='ASI').count()
+            context['retardos_hoy'] = RegistroAsistencia.objects.filter(fecha=hoy, estatus='RET').count()
+            context['faltas_hoy'] = RegistroAsistencia.objects.filter(fecha=hoy, estatus='FAL').count()
 
         form = FiltroAsistenciaForm(self.request.GET or None)
-
-        user = self.request.user
         
         # Agregar unidades y trabajadores para el filtro dinámico (solo admin)
         if user.perfil.es_admin():
