@@ -1,10 +1,23 @@
 # CHANGELOG — SCA-B123
-Historial completo de cambios en el sistema de control de asistencia SCA-B123.  
-Todas las versiones listadas aquí corresponden a la rama `develop` y se consideran **pre-releases** antes del lanzamiento oficial `v1.0.0` a `main`.
+
+Historial completo de cambios del sistema de control de asistencia **SCA-B123**.
+
+Este documento se divide en dos secciones principales:
+
+- **Versiones estables** (a partir de `v1.0.0`, publicadas en la rama `main`)
+- **Versiones pre-release** (todas las `v0.x.x`, desarrolladas en la rama `develop` antes del lanzamiento oficial)
+
+A continuación se listan los cambios más relevantes de cada versión.
+
 
 ---
 
 ## 📚 Índice
+
+### 🟩 Versiones Estables
+- [v1.0.0 — Lanzamiento Oficial a Producción](#v100--lanzamiento-oficial-a-producción)
+
+### 🟨 Versiones Pre-Release (develop)
 - [v0.6.0 — Administración de Tipos de Incidencia (#8)](#v060--administración-de-tipos-de-incidencia-8)
 - [v0.5.0 — Jornadas, Asistencias y Rediseño en Tema Oscuro (#1)](#v050--jornadas-asistencias-y-rediseño-en-tema-oscuro-1)
 - [v0.4.0 — Trabajadores, Unidades, Puestos y Nombramientos (#7)](#v040--trabajadores-unidades-puestos-y-nombramientos-7)
@@ -12,7 +25,31 @@ Todas las versiones listadas aquí corresponden a la rama `develop` y se conside
 - [v0.2.0 — Mejoras en Autorización y Filtros de Incidencias (#4)](#v020--mejoras-en-autorización-y-filtros-de-incidencias-4)
 - [v0.1.0 — Autenticación y Gestión Inicial de Incidencias (#2)](#v010--autenticación-y-gestión-inicial-de-incidencias-2)
 
+
 ---
+
+---
+
+## **v1.0.0 — Lanzamiento Oficial a Producción**
+**Branch:** `main`  
+**Tag:** `v1.0.0`  
+**Fecha:** 10/12/2025
+
+### 🎉 Resumen del Lanzamiento
+Primera versión estable del sistema SCA-B123.  
+Incluye todos los módulos completos y totalmente funcionales:
+
+- Autenticación y control de acceso con django-allauth.  
+- Gestión integral de trabajadores, unidades, puestos y nombramientos.  
+- Módulo de incidencias con filtros, autorizaciones y auditoría.  
+- Jornadas laborales, asignaciones y calendario laboral.  
+- Registro de asistencias (rápido y manual).  
+- Tema oscuro unificado y rediseño completo del sistema.  
+- Contenedorización con Docker (Django + PostgreSQL + MailHog).  
+- Documentación final y README para despliegue.  
+
+### 💠 Estado
+Versión **estable**, recomendada para despliegues reales.
 
 ---
 
