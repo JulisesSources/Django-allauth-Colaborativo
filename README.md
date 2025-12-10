@@ -345,6 +345,6 @@ docker compose exec web python manage.py loaddata nombre_del_archivo.json
 *SCA-B123* - Sistema de Control de Asistencias
 Instituto Tecnológico de Ciudad Guzmán
 
-Desarrollado con Django 5.0 + PostgreSQL 15 + Docker
+Desarrollado con Django 5.0 + PostgreSQL 15 + Docker
 
 </div>
