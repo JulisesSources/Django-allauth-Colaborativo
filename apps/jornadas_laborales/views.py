@@ -647,11 +647,8 @@ class AsignacionCreateView(LoginRequiredMixin, CreateView):
                     id_unidad=unidad,
                     activo=True
                 )
-                # Filtrar jornadas: las creadas por el jefe o que tengan trabajadores de su unidad
-                form.fields['id_jornada'].queryset = JornadaLaboral.objects.filter(
-                    Q(created_by=user) |
-                    Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
-                ).distinct()
+                # Permitir que el jefe vea todas las jornadas disponibles
+                form.fields['id_jornada'].queryset = JornadaLaboral.objects.all()
             else:
                 form.fields['id_trabajador'].queryset = Trabajador.objects.none()
                 form.fields['id_jornada'].queryset = JornadaLaboral.objects.none()
@@ -771,11 +768,8 @@ class AsignacionUpdateView(LoginRequiredMixin, UpdateView):
                     id_unidad=unidad,
                     activo=True
                 )
-                # Filtrar jornadas: las creadas por el jefe o que tengan trabajadores de su unidad
-                form.fields['id_jornada'].queryset = JornadaLaboral.objects.filter(
-                    Q(created_by=user) |
-                    Q(trabajadores_asignados__id_trabajador__id_unidad=unidad)
-                ).distinct()
+                # Permitir que el jefe vea todas las jornadas disponibles
+                form.fields['id_jornada'].queryset = JornadaLaboral.objects.all()
             else:
                 form.fields['id_trabajador'].queryset = Trabajador.objects.none()
                 form.fields['id_jornada'].queryset = JornadaLaboral.objects.none()
