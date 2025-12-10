@@ -1,0 +1,10 @@
+from django.apps import AppConfig
+
+
+class IncidenciasConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'apps.incidencias'
+    verbose_name = 'Gestión de Incidencias'
+    
+    def ready(self):
+        import apps.incidencias.signals

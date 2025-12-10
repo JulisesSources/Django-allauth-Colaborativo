@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}{{ jornada.get_descripcion_display }} - Detalle{% endblock %}
+
+{% block page_title %}Detalle de Jornada{% endblock %}
+{% block page_subtitle %}{{ jornada.get_descripcion_display }}{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-clock text-blue-600 dark:text-blue-400 text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white">{{ jornada.get_descripcion_display }}</h1>
+                    <p class="text-xs text-gray-500 dark:text-dark-400">ID: {{ jornada.pk }} • Jornada laboral</p>
+                </div>
+            </div>
+
+            {% if user.perfil.es_admin or user.perfil.es_jefe %}
+            <div class="flex items-center gap-2">
+                <a href="{% url 'jornadas:update' jornada.pk %}"
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors">
+                    <i class="fas fa-edit text-xs"></i>
+                    <span>Editar</span>
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Información de horario y días en un solo card compacto -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 dark:border-dark-800">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="fas fa-business-time text-blue-500 text-sm"></i>
+                Información de la Jornada
+            </h2>
+        </div>
+        
+        <div class="p-5">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <!-- Horario -->
+                <div>
+                    <p class="text-xs font-medium text-gray-500 dark:text-dark-400 mb-3 flex items-center gap-2">
+                        <i class="fas fa-clock text-blue-500"></i>
+                        Horario de Trabajo
+                    </p>
+                    <div class="flex items-center justify-center gap-6 bg-gray-50 dark:bg-dark-800 rounded-lg p-4">
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg mb-2">
+                                <i class="fas fa-sign-in-alt text-emerald-600 dark:text-emerald-400"></i>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-dark-400 uppercase font-medium mb-1">Entrada</p>
+                            <p class="text-xl font-bold text-gray-900 dark:text-white font-mono">{{ jornada.hora_entrada|time:"H:i" }}</p>
+                        </div>
+                        <div class="text-gray-300 dark:text-dark-600">
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                        <div class="text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 bg-red-100 dark:bg-red-500/10 rounded-lg mb-2">
+                                <i class="fas fa-sign-out-alt text-red-600 dark:text-red-400"></i>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-dark-400 uppercase font-medium mb-1">Salida</p>
+                            <p class="text-xl font-bold text-gray-900 dark:text-white font-mono">{{ jornada.hora_salida|time:"H:i" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Días laborales -->
+                <div>
+                    <p class="text-xs font-medium text-gray-500 dark:text-dark-400 mb-3 flex items-center gap-2">
+                        <i class="fas fa-calendar-week text-blue-500"></i>
+                        Días Laborales
+                    </p>
+                    {% if dias_asignados %}
+                    <div class="grid grid-cols-4 gap-2">
+                        {% for dia_obj in dias_asignados %}
+                        <div class="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-500/10 dark:to-blue-600/5 border border-blue-200 dark:border-blue-500/30 rounded-lg p-2 text-center">
+                            <div class="w-6 h-6 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-1">
+                                <i class="fas fa-check text-white text-xs"></i>
+                            </div>
+                            <p class="text-xs font-semibold text-blue-700 dark:text-blue-400">
+                                {{ dia_obj.get_numero_dia_display|slice:":3" }}
+                            </p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-6 bg-gray-50 dark:bg-dark-800 rounded-lg">
+                        <div class="w-12 h-12 bg-gray-100 dark:bg-dark-700 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-calendar-times text-gray-400 dark:text-dark-500"></i>
+                        </div>
+                        <p class="text-xs text-gray-500 dark:text-dark-400">Sin días asignados</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trabajadores vigentes -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-200 dark:border-dark-800">
+            <div class="flex items-center justify-between">
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-users text-blue-500 text-sm"></i>
+                    Trabajadores Activos
+                    <span class="inline-flex items-center justify-center min-w-[1.5rem] h-6 px-2 bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-full">
+                        {{ trabajadores_vigentes.count }}
+                    </span>
+                </h2>
+                {% if user.perfil.es_admin or user.perfil.es_jefe %}
+                <a href="{% url 'jornadas:asignacion_crear' %}?jornada={{ jornada.pk }}"
+                   class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded-lg text-xs font-medium transition-colors">
+                    <i class="fas fa-user-plus text-xs"></i>
+                    <span>Asignar</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="p-5">
+            {% if trabajadores_vigentes %}
+            <div class="space-y-3">
+                {% for asignacion in trabajadores_vigentes %}
+                <div class="bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-xl p-4 hover:border-blue-300 dark:hover:border-blue-600 transition-colors">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-start gap-3 flex-1">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 dark:from-blue-500 dark:to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+                                <span class="text-white font-bold text-sm">
+                                    {{ asignacion.id_trabajador.nombre_completo|slice:":1"|upper }}
+                                </span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                                    {{ asignacion.id_trabajador.nombre_completo }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-dark-400 mt-0.5">
+                                    {{ asignacion.id_trabajador.numero_empleado }}
+                                </p>
+                                <div class="flex flex-wrap items-center gap-2 mt-2 text-xs text-gray-600 dark:text-dark-400">
+                                    <span class="inline-flex items-center gap-1">
+                                        <i class="fas fa-calendar-alt text-xs"></i>
+                                        {{ asignacion.fecha_inicio|date:"d/m/Y" }}
+                                    </span>
+                                    {% if asignacion.fecha_fin %}
+                                    <span class="text-gray-400 dark:text-dark-500">•</span>
+                                    {% if asignacion.fecha_fin < hoy %}
+                                    <span class="inline-flex items-center gap-1 text-red-600 dark:text-red-400">
+                                        <i class="fas fa-times-circle text-xs"></i>
+                                        Finalizó: {{ asignacion.fecha_fin|date:"d/m/Y" }}
+                                    </span>
+                                    {% else %}
+                                    <span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400">
+                                        <i class="fas fa-hourglass-half text-xs"></i>
+                                        Hasta: {{ asignacion.fecha_fin|date:"d/m/Y" }}
+                                    </span>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex-shrink-0">
+                            {% if asignacion.fecha_fin and asignacion.fecha_fin >= hoy %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+                                <i class="fas fa-clock text-xs"></i>
+                                Por finalizar
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-lg bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                                <i class="fas fa-check-circle text-xs"></i>
+                                Vigente
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-8">
+                <div class="w-16 h-16 bg-gray-100 dark:bg-dark-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-slash text-gray-400 dark:text-dark-500 text-2xl"></i>
+                </div>
+                <p class="text-sm font-medium text-gray-900 dark:text-white mb-1">No hay trabajadores asignados</p>
+                <p class="text-xs text-gray-500 dark:text-dark-400">Asigna trabajadores a esta jornada para comenzar</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Botón volver -->
+    <div class="flex justify-center">
+        <a href="{% url 'jornadas:list' %}" 
+           class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 rounded-lg text-sm font-medium transition-colors">
+            <i class="fas fa-arrow-left text-xs"></i>
+            <span>Volver a Jornadas</span>
+        </a>
+    </div>
+
+</div>
+{% endblock %}

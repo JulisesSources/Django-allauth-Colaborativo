@@ -1,0 +1,362 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Usuarios - SCA-B123{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+    
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl shadow-sm border border-gray-200 dark:border-dark-800 p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                    <i class="fas fa-users-cog text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                        Gestión de Usuarios
+                    </h1>
+                    <p class="text-sm text-gray-600 dark:text-dark-300 mt-1">
+                        Administra y controla los usuarios del sistema
+                    </p>
+                </div>
+            </div>
+            <div class="text-center bg-indigo-50 dark:bg-indigo-500/10 rounded-lg px-6 py-3 border border-indigo-200 dark:border-indigo-500/20">
+                <p class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{{ usuarios.count }}</p>
+                <p class="text-xs text-gray-600 dark:text-dark-400 mt-1">Total usuarios</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Filtros y Búsqueda Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl shadow-sm border border-gray-200 dark:border-dark-800 p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
+            <i class="fas fa-filter text-indigo-600 dark:text-indigo-400"></i>
+            Filtros y Búsqueda
+        </h2>
+        <form method="get" class="space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="md:col-span-2">
+                    <label for="q" class="block text-sm font-medium text-gray-700 dark:text-dark-300 mb-2">
+                        Buscar Usuario
+                    </label>
+                    <input type="text" 
+                           name="q" 
+                           id="q" 
+                           value="{{ query }}"
+                           placeholder="Buscar por username o email..."
+                           class="w-full h-11 px-4 py-2.5 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-dark-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-dark-500">
+                </div>
+                
+                <div>
+                    <label for="rol" class="block text-sm font-medium text-gray-700 dark:text-dark-300 mb-2">
+                        Filtrar por Rol
+                    </label>
+                    <select name="rol" 
+                            id="rol"
+                            class="w-full h-11 px-4 py-2.5 border border-gray-300 dark:border-dark-700 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-transparent bg-white dark:bg-dark-800 text-gray-900 dark:text-white">
+                        <option value="">Todos los roles</option>
+                        {% for codigo, nombre in roles %}
+                        <option value="{{ codigo }}" {% if rol_filtro == codigo %}selected{% endif %}>
+                            {{ nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button type="submit" 
+                        class="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium shadow-sm">
+                    <i class="fas fa-search"></i>
+                    <span>Buscar</span>
+                </button>
+                <a href="{% url 'accounts:lista_usuarios' %}" 
+                   class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white rounded-lg transition-colors text-sm font-medium shadow-sm">
+                    <i class="fas fa-times"></i>
+                    <span>Limpiar</span>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de Usuarios -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+        
+        <!-- Header -->
+        <div class="px-5 py-3 border-b border-gray-200 dark:border-dark-800">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-users text-indigo-600 dark:text-indigo-400 text-sm"></i>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Lista de Usuarios</h2>
+            </div>
+        </div>
+
+        {% if usuarios %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-50 dark:bg-dark-800/50 text-gray-700 dark:text-dark-300 border-b border-gray-200 dark:border-dark-700">
+                    <tr>
+                        <th scope="col" class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Usuario
+                        </th>
+                        <th scope="col" class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Rol
+                        </th>
+                        <th scope="col" class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Trabajador
+                        </th>
+                        <th scope="col" class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Estado
+                        </th>
+                        <th scope="col" class="px-5 py-3 text-left text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Registro
+                        </th>
+                        <th scope="col" class="px-5 py-3 text-center text-xs font-medium text-gray-500 dark:text-dark-400 uppercase tracking-wider">
+                            Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-dark-900 divide-y divide-gray-200 dark:divide-dark-800">
+                    {% for usuario in usuarios %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-800/50 transition-colors duration-150">
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    {% if usuario.perfil.avatar %}
+                                    <img class="h-10 w-10 rounded-full object-cover border-2 border-gray-200 dark:border-dark-700" 
+                                         src="{{ usuario.perfil.avatar.url }}" 
+                                         alt="{{ usuario.username }}">
+                                    {% else %}
+                                    <div class="h-10 w-10 rounded-full bg-indigo-100 dark:bg-indigo-500/10 flex items-center justify-center border-2 border-indigo-200 dark:border-indigo-500/20">
+                                        <i class="fas fa-user text-indigo-600 dark:text-indigo-400"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ usuario.username }}
+                                    </div>
+                                    <div class="text-sm text-gray-500 dark:text-dark-400">
+                                        {{ usuario.email }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            {% if usuario.perfil.rol == 'admin' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-500/10 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20">
+                                <i class="fas fa-crown"></i>
+                                Administrador
+                            </span>
+                            {% elif usuario.perfil.rol == 'jefe' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-500/10 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/20">
+                                <i class="fas fa-user-tie"></i>
+                                Jefe de Área / Supervisor
+                            </span>
+                            {% elif usuario.perfil.rol == 'trabajador' %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                                <i class="fas fa-user"></i>
+                                Trabajador
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-500/10 dark:text-gray-400 border border-gray-200 dark:border-gray-500/20">
+                                <i class="fas fa-question"></i>
+                                Sin rol
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            {% if usuario.perfil.id_trabajador %}
+                            <span class="text-sm text-gray-900 dark:text-white font-medium">
+                                {{ usuario.perfil.id_trabajador.nombre }} {{ usuario.perfil.id_trabajador.apellido_paterno }}
+                            </span>
+                            {% else %}
+                            <span class="text-sm text-gray-400 dark:text-dark-500 italic">
+                                No asignado
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            {% if usuario.is_active %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+                                <i class="fas fa-check-circle"></i>
+                                Activo
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-500/10 dark:text-red-400 border border-red-200 dark:border-red-500/20">
+                                <i class="fas fa-times-circle"></i>
+                                Inactivo
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500 dark:text-dark-400">
+                            {{ usuario.date_joined|date:"d/m/Y" }}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <a href="{% url 'accounts:asignar_rol' usuario.id %}" 
+                                   class="inline-flex items-center justify-center w-8 h-8 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors duration-200"
+                                   title="Editar rol">
+                                    <i class="fas fa-user-edit text-sm"></i>
+                                </a>
+                                
+                                {% if usuario.is_active %}
+                                <button onclick="confirmarCambioEstado({{ usuario.id }}, '{{ usuario.username }}', false)"
+                                        class="inline-flex items-center justify-center w-8 h-8 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-500/10 rounded-lg transition-colors duration-200"
+                                        title="Desactivar usuario">
+                                    <i class="fas fa-user-slash text-sm"></i>
+                                </button>
+                                {% else %}
+                                <button onclick="confirmarCambioEstado({{ usuario.id }}, '{{ usuario.username }}', true)"
+                                        class="inline-flex items-center justify-center w-8 h-8 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 rounded-lg transition-colors duration-200"
+                                        title="Activar usuario">
+                                    <i class="fas fa-check text-sm"></i>
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-12">
+            <div class="flex justify-center mb-4">
+                <div class="flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                    <i class="fas fa-users text-2xl"></i>
+                </div>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">No hay usuarios</h3>
+            <p class="text-gray-500 dark:text-dark-400 mb-6">
+                {% if query or rol_filtro %}
+                    No se encontraron usuarios con los criterios especificados.
+                {% else %}
+                    No hay usuarios registrados en el sistema.
+                {% endif %}
+            </p>
+            <a href="{% url 'accounts:lista_usuarios' %}" 
+               class="inline-flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors text-sm font-medium shadow-sm">
+                <i class="fas fa-users"></i>
+                <span>Ver todos los usuarios</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Modal de Confirmación de Cambio de Estado -->
+    <div id="modalCambioEstado" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 shadow-2xl max-w-md w-full overflow-hidden">
+            <!-- Header -->
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-dark-800">
+                <div class="flex items-center gap-3">
+                    <div id="modalIcon" class="w-10 h-10 rounded-lg flex items-center justify-center">
+                        <i id="modalIconElement" class="text-base"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white" id="modalTitulo"></h3>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 py-4">
+                <p class="text-sm text-gray-600 dark:text-dark-300 mb-2" id="modalMensaje"></p>
+                
+                <div class="bg-gray-50 dark:bg-dark-800 rounded-lg p-3 my-4">
+                    <div class="text-sm">
+                        <p class="text-gray-500 dark:text-dark-400 text-xs mb-1">Usuario</p>
+                        <p class="text-gray-900 dark:text-white font-medium" id="nombreUsuario"></p>
+                    </div>
+                </div>
+
+                <p class="text-xs mt-3" id="modalAdvertencia">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    <span id="modalAdvertenciaTexto"></span>
+                </p>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-gray-50 dark:bg-dark-800/50 rounded-b-xl flex items-center gap-3">
+                <button onclick="cerrarModal()"
+                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white rounded-lg transition-colors text-sm font-medium">
+                    <i class="fas fa-times text-xs"></i>
+                    <span>Cancelar</span>
+                </button>
+                <form id="formCambioEstado" method="post" class="flex-1">
+                    {% csrf_token %}
+                    <button type="submit" id="btnConfirmar"
+                            class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg transition-colors text-sm font-medium">
+                        <i id="btnConfirmarIcon" class="text-xs"></i>
+                        <span id="btnConfirmarTexto"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function confirmarCambioEstado(usuarioId, nombreUsuario, activar) {
+    const modal = document.getElementById('modalCambioEstado');
+    const modalIcon = document.getElementById('modalIcon');
+    const modalIconElement = document.getElementById('modalIconElement');
+    const modalTitulo = document.getElementById('modalTitulo');
+    const modalMensaje = document.getElementById('modalMensaje');
+    const modalAdvertencia = document.getElementById('modalAdvertencia');
+    const modalAdvertenciaTexto = document.getElementById('modalAdvertenciaTexto');
+    const btnConfirmar = document.getElementById('btnConfirmar');
+    const btnConfirmarIcon = document.getElementById('btnConfirmarIcon');
+    const btnConfirmarTexto = document.getElementById('btnConfirmarTexto');
+    
+    document.getElementById('nombreUsuario').textContent = nombreUsuario;
+    
+    if (activar) {
+        // Configuración para ACTIVAR
+        document.getElementById('formCambioEstado').action = `/accounts/usuarios/${usuarioId}/activar/`;
+        modalIcon.className = 'w-10 h-10 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center';
+        modalIconElement.className = 'fas fa-user-check text-emerald-600 dark:text-emerald-400 text-base';
+        modalTitulo.textContent = 'Activar Usuario';
+        modalMensaje.textContent = '¿Estás seguro de que deseas activar este usuario?';
+        modalAdvertencia.className = 'text-xs text-emerald-600 dark:text-emerald-400 mt-3';
+        modalAdvertenciaTexto.textContent = 'El usuario podrá acceder al sistema nuevamente.';
+        btnConfirmar.className = 'w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600 text-white rounded-lg transition-colors text-sm font-medium';
+        btnConfirmarIcon.className = 'fas fa-check text-xs';
+        btnConfirmarTexto.textContent = 'Activar';
+    } else {
+        // Configuración para DESACTIVAR
+        document.getElementById('formCambioEstado').action = `/accounts/usuarios/${usuarioId}/desactivar/`;
+        modalIcon.className = 'w-10 h-10 bg-orange-100 dark:bg-orange-500/10 rounded-lg flex items-center justify-center';
+        modalIconElement.className = 'fas fa-user-slash text-orange-600 dark:text-orange-400 text-base';
+        modalTitulo.textContent = 'Desactivar Usuario';
+        modalMensaje.textContent = '¿Estás seguro de que deseas desactivar este usuario?';
+        modalAdvertencia.className = 'text-xs text-orange-600 dark:text-orange-400 mt-3';
+        modalAdvertenciaTexto.textContent = 'El usuario no podrá acceder al sistema.';
+        btnConfirmar.className = 'w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-medium';
+        btnConfirmarIcon.className = 'fas fa-user-slash text-xs';
+        btnConfirmarTexto.textContent = 'Desactivar';
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+function cerrarModal() {
+    document.getElementById('modalCambioEstado').classList.add('hidden');
+}
+
+// Cerrar modal al hacer clic fuera de él
+document.getElementById('modalCambioEstado').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModal();
+    }
+});
+
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModal();
+    }
+});
+</script>
+{% endblock %}

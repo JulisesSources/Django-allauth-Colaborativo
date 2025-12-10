@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Registrar Asistencia - SCA-B123{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+    
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-primary-100 dark:bg-primary-500/10 rounded-lg flex items-center justify-center text-primary-600 dark:text-primary-400">
+                <i class="fas fa-user-clock text-base"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Registrar Asistencia</h1>
+                <p class="text-xs text-gray-500 dark:text-dark-400">Formulario completo de registro</p>
+            </div>
+        </div>
+    </div>
+
+    {% if es_dia_inhabil %}
+    <!-- Mensaje: Día festivo/inhábil -->
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white dark:bg-dark-900 border-l-4 border-amber-500 dark:border-amber-400 rounded-xl p-6">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 bg-amber-100 dark:bg-amber-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-calendar-times text-amber-600 dark:text-amber-400 text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Día Festivo / Inhábil</h2>
+                    <p class="text-sm text-gray-600 dark:text-dark-300 mb-4">Hoy es un día festivo según el calendario laboral. No se puede registrar asistencia.</p>
+                    <a href="{% url 'asistencias:lista' %}" 
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-list text-xs"></i>
+                        Ver lista de asistencias
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% elif todos_asistieron %}
+    <!-- Mensaje: Todos asistieron -->
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white dark:bg-dark-900 border-l-4 border-emerald-500 dark:border-emerald-400 rounded-xl p-6">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i class="fas fa-check-double text-emerald-600 dark:text-emerald-400 text-xl"></i>
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">¡Todos han asistido hoy!</h2>
+                    <p class="text-sm text-gray-600 dark:text-dark-300 mb-4">Todos los trabajadores ya completaron su registro de asistencia (entrada y salida).</p>
+                    <a href="{% url 'asistencias:lista' %}" 
+                       class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-list text-xs"></i>
+                        Ver lista de asistencias
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+
+    <!-- Trabajadores con registro parcial (solo entrada) -->
+    {% if registros_parciales %}
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white dark:bg-dark-900 border-l-4 border-amber-500 dark:border-amber-400 rounded-xl p-5">
+            <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                <i class="fas fa-clock text-amber-600 dark:text-amber-400 text-sm"></i>
+                Pendientes de salida
+            </h3>
+            <p class="text-xs text-gray-600 dark:text-dark-300 mb-3">Estos trabajadores ya registraron entrada pero falta su salida:</p>
+            <div class="flex flex-wrap gap-2">
+                {% for reg in registros_parciales %}
+                <span class="px-3 py-1.5 bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-300 rounded-lg text-xs">
+                    {{ reg.id_trabajador.nombre_completo }} ({{ reg.hora_entrada|time:"H:i" }})
+                </span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Formulario -->
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5 pt-2">
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 dark:border-red-400 p-3 rounded-r-lg">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-sm mt-0.5"></i>
+                        <div class="flex-1">
+                            <p class="text-xs font-medium text-red-800 dark:text-red-200 mb-1">Se encontraron errores:</p>
+                            <ul class="list-disc list-inside space-y-0.5 text-xs text-red-700 dark:text-red-300">
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Trabajador -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Trabajador
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <select name="id_trabajador" 
+                            class="w-full px-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                        <option value="">-- Selecciona un trabajador --</option>
+                        {% for trabajador in form.id_trabajador.field.queryset %}
+                        <option value="{{ trabajador.pk }}" {% if form.id_trabajador.value == trabajador.pk|stringformat:"s" %}selected{% endif %}>
+                            {{ trabajador.numero_empleado }} - {{ trabajador.nombre_completo }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.id_trabajador.errors %}
+                    <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                        <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.id_trabajador.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>                <!-- Fecha -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Fecha
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <i class="fas fa-calendar absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs"></i>
+                        <input type="date" name="fecha" value="{{ form.fecha.value|date:'Y-m-d'|default:fecha_actual|date:'Y-m-d' }}"
+                               class="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                    </div>
+                    {% if form.fecha.errors %}
+                    <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                        <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.fecha.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>                <!-- Horas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                            Hora de Entrada
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-sign-in-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs"></i>
+                            <input type="time" name="hora_entrada" value="{{ form.hora_entrada.value|time:'H:i' }}"
+                                   class="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                        </div>
+                        {% if form.hora_entrada.errors %}
+                        <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.hora_entrada.errors.0 }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                            Hora de Salida
+                        </label>
+                        <div class="relative">
+                            <i class="fas fa-sign-out-alt absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-xs"></i>
+                            <input type="time" name="hora_salida" value="{{ form.hora_salida.value|time:'H:i' }}"
+                                   class="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                        </div>
+                        {% if form.hora_salida.errors %}
+                        <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                            <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.hora_salida.errors.0 }}
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Estatus -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Estatus (opcional)
+                    </label>
+                    <select name="estatus"
+                            class="w-full px-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200">
+                        {% for value, label in form.estatus.field.choices %}
+                        <option value="{{ value }}" {% if form.estatus.value == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="text-xs text-gray-500 dark:text-dark-400 mt-1.5">
+                        Si no se especifica, el sistema calculará el estatus automáticamente.
+                    </p>
+                </div>
+
+                <!-- Botones -->
+                <div class="flex flex-wrap gap-2 pt-2">
+                    <button type="submit"
+                            class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save text-xs"></i>
+                        Guardar Registro
+                    </button>
+                    <a href="{% url 'asistencias:lista' %}"
+                       class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-times text-xs"></i>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Ayuda -->
+    <div class="max-w-3xl mx-auto">
+        <div class="bg-blue-50 dark:bg-blue-500/10 border-l-4 border-blue-500 dark:border-blue-400 rounded-r-lg p-4">
+            <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2 flex items-center gap-2">
+                <i class="fas fa-lightbulb text-amber-500 dark:text-amber-400 text-xs"></i>
+                Ayuda
+            </h3>
+            <ul class="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+                <li>• El estatus se calcula automáticamente según la hora de entrada y la jornada del trabajador</li>
+                <li>• Se considera retardo si llega más de 10 minutos después de la hora de entrada</li>
+                <li>• Si no hay hora de entrada, se marca como falta</li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

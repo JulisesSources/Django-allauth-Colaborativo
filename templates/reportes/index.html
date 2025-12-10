@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  Reportes - Sistema de Control
+{% endblock %}
+
+{% block content %}
+  <div class="space-y-5">
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-600 dark:text-purple-400">
+          <i class="fas fa-chart-bar text-base"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Módulo de Reportes</h1>
+          <p class="text-xs text-gray-500 dark:text-dark-400">Genera y exporta reportes detallados del sistema</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid de Reportes -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Reporte de Asistencias -->
+      <a href="{% url 'reportes:reporte_asistencias' %}" class="group block">
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5 hover:border-purple-500 dark:hover:border-purple-500 transition-all h-full">
+          <div class="flex items-start justify-between mb-3">
+            <div class="w-10 h-10 bg-emerald-100 dark:bg-emerald-500/10 rounded-lg flex items-center justify-center">
+              <i class="fas fa-chart-line text-emerald-600 dark:text-emerald-400 text-lg"></i>
+            </div>
+            <div class="text-purple-600 dark:text-purple-400 group-hover:translate-x-1 transition-transform">
+              <i class="fas fa-arrow-right text-sm"></i>
+            </div>
+          </div>
+          <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-2">Reporte de Asistencias</h3>
+          <p class="text-xs text-gray-500 dark:text-dark-400 mb-3">Análisis detallado de asistencias con tendencias y estadísticas</p>
+          <div class="space-y-1.5">
+            <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-dark-400">
+              <i class="fas fa-check text-emerald-500 text-xs"></i>
+              <span>Estadísticas por día de semana</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-dark-400">
+              <i class="fas fa-check text-emerald-500 text-xs"></i>
+              <span>Tendencias mensuales</span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-gray-600 dark:text-dark-400">
+              <i class="fas fa-check text-emerald-500 text-xs"></i>
+              <span>Exportación a CSV</span>
+            </div>
+          </div>
+        </div>
+      </a>
+
+      <!-- Información adicional -->
+      <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+            <i class="fas fa-info-circle text-purple-600 dark:text-purple-400 text-base"></i>
+          </div>
+          <div>
+            <h4 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Acerca de los Reportes</h4>
+            <ul class="space-y-2 text-sm text-gray-600 dark:text-dark-400">
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-purple-500 dark:text-purple-400 text-xs mt-1"></i>
+                <span>Los reportes se generan en tiempo real con la información más actualizada del sistema.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-purple-500 dark:text-purple-400 text-xs mt-1"></i>
+                <span>Puedes exportar cualquier reporte a formato CSV para análisis externo en Excel u otras herramientas.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <i class="fas fa-check text-purple-500 dark:text-purple-400 text-xs mt-1"></i>
+                <span>Los filtros te permiten personalizar la información que necesitas visualizar o exportar.</span>
+              </li>
+              {% if not user.perfil.es_admin %}
+                <li class="flex items-start gap-2">
+                  <i class="fas fa-check text-purple-500 dark:text-purple-400 text-xs mt-1"></i>
+                  <span>Como jefe de unidad, solo puedes ver reportes de tu unidad administrativa.</span>
+                </li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

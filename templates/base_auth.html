@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SCA-B123{% endblock %}</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Configuración básica de Tailwind -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .dark .glass {
+            background: rgba(17, 24, 39, 0.7);
+        }
+    </style>
+
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>">
+
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body
+    class="bg-gray-50 dark:bg-gray-900 font-sans text-gray-600 dark:text-gray-300 transition-colors duration-300 min-h-screen flex flex-col">
+
+    <main class="flex-grow flex items-center justify-center p-4">
+        {% if messages %}
+        <div class="fixed top-4 right-4 z-50 space-y-2 max-w-sm w-full">
+            {% for message in messages %}
+            <div
+                class="p-4 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 {% if message.tags == 'success' %}bg-green-100 text-green-800 border-l-4 border-green-500{% elif message.tags == 'error' %}bg-red-100 text-red-800 border-l-4 border-red-500{% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border-l-4 border-yellow-500{% else %}bg-blue-100 text-blue-800 border-l-4 border-blue-500{% endif %}">
+                <div class="flex justify-between items-start">
+                    <p>{{ message }}</p>
+                    <button onclick="this.parentElement.parentElement.remove()"
+                        class="text-gray-500 hover:text-gray-700">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <script>
+        // Check local storage or system preference for dark mode
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,125 @@
+<!-- templates/jornadas_laborales/calendario/form_calendario.html -->
+{% extends 'base.html' %}
+
+{% block title %}{% if form.instance.pk %}Editar Día{% else %}Nuevo Día{% endif %} - SCA-B123{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+    <!-- Header -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                <i class="fas fa-calendar-alt text-purple-500 text-base"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-white">{% if form.instance.pk %}Editar Día del Calendario{% else %}Nuevo Día del Calendario{% endif %}</h1>
+                <p class="text-xs text-gray-500 dark:text-dark-400">Complete el formulario con la información del día</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Formulario -->
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5 pt-2">
+        <form method="post" class="space-y-4">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 dark:border-red-400 p-3 rounded-r-lg">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-exclamation-circle text-red-600 dark:text-red-400 text-sm mt-0.5"></i>
+                        <div class="flex-1">
+                            <p class="text-xs font-medium text-red-800 dark:text-red-200 mb-1">Se encontraron errores:</p>
+                            <ul class="list-disc list-inside space-y-0.5 text-xs text-red-700 dark:text-red-300">
+                                {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Fecha -->
+                <div>
+                    <label for="{{ form.fecha.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        {{ form.fecha.label }}
+                        <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-calendar text-gray-400 dark:text-dark-500 text-xs"></i>
+                        </div>
+                        <input type="date" name="{{ form.fecha.name }}" id="{{ form.fecha.id_for_label }}" 
+                               value="{% if request.GET.fecha %}{{ request.GET.fecha }}{% else %}{{ form.fecha.value|default:'' }}{% endif %}" required
+                               class="w-full pl-9 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200">
+                    </div>
+                    {% if form.fecha.errors %}
+                    <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                        <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.fecha.errors.0 }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- Es inhábil -->
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        Tipo de día
+                    </label>
+                    
+                    <div class="bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg p-4">
+                        <label class="flex items-center justify-between cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-red-100 dark:bg-red-500/10 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-times-circle text-red-600 dark:text-red-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-gray-900 dark:text-white font-medium text-sm">Marcar como día inhábil</p>
+                                    <p class="text-xs text-gray-500 dark:text-dark-500">El sistema no contará este día como laborable</p>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <input type="checkbox" name="{{ form.es_inhabil.name }}" id="{{ form.es_inhabil.id_for_label }}"
+                                       {% if form.es_inhabil.value %}checked{% endif %}
+                                       class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 dark:bg-dark-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 dark:peer-focus:ring-purple-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Descripción -->
+                <div>
+                    <label for="{{ form.descripcion.id_for_label }}" class="block text-xs font-medium text-gray-700 dark:text-dark-300 mb-1.5">
+                        {{ form.descripcion.label }}
+                    </label>
+                    <textarea name="{{ form.descripcion.name }}" id="{{ form.descripcion.id_for_label }}" 
+                              rows="3"
+                              placeholder="Ej: Día de la Independencia, Navidad, etc."
+                              class="w-full px-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-dark-500 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 resize-none">{{ form.descripcion.value|default:'' }}</textarea>
+                    {% if form.descripcion.errors %}
+                    <p class="flex items-center mt-1.5 text-xs text-red-600 dark:text-red-400">
+                        <i class="fas fa-exclamation-triangle text-xs mr-1"></i>{{ form.descripcion.errors.0 }}
+                    </p>
+                    {% endif %}
+                    <p class="text-xs text-gray-500 dark:text-dark-500 mt-1">Opcional: Agrega una descripción para identificar este día</p>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="flex flex-col sm:flex-row items-center gap-3 pt-5 border-t border-gray-200 dark:border-dark-800">
+                    <button type="submit" 
+                            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-save text-xs"></i>
+                        Guardar Día
+                    </button>
+                    <a href="{% url 'jornadas:calendario' %}" 
+                       class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gray-100 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-dark-700 text-sm font-medium rounded-lg transition-colors duration-200">
+                        <i class="fas fa-times text-xs"></i>
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

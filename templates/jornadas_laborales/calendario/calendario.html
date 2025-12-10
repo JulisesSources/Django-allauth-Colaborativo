@@ -1,0 +1,724 @@
+{% extends 'base.html' %}
+
+{% block title %}Calendario Laboral - SCA-B123{% endblock %}
+
+{% block extra_head %}
+<!-- FullCalendar CSS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css' rel='stylesheet' />
+<style>
+    /* Estilos personalizados para FullCalendar */
+    .fc {
+        background: transparent;
+    }
+    
+    .fc .fc-toolbar-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: rgb(17 24 39);
+    }
+    
+    .dark .fc .fc-toolbar-title {
+        color: rgb(255 255 255);
+    }
+    
+    .fc .fc-button {
+        background-color: rgb(249 250 251);
+        border-color: rgb(229 231 235);
+        color: rgb(55 65 81);
+        font-size: 0.875rem;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+    }
+    
+    .dark .fc .fc-button {
+        background-color: rgb(30 41 59);
+        border-color: rgb(51 65 85);
+        color: rgb(226 232 240);
+    }
+    
+    .fc .fc-button:hover {
+        background-color: rgb(243 244 246);
+        border-color: rgb(209 213 219);
+    }
+    
+    .dark .fc .fc-button:hover {
+        background-color: rgb(51 65 85);
+        border-color: rgb(71 85 105);
+    }
+    
+    .fc .fc-button-primary:not(:disabled).fc-button-active {
+        background-color: rgb(147 51 234);
+        border-color: rgb(147 51 234);
+        color: white;
+    }
+    
+    .fc .fc-col-header-cell {
+        background-color: rgb(249 250 251);
+        border-color: rgb(229 231 235);
+        padding: 0.75rem 0.5rem;
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: rgb(107 114 128);
+    }
+    
+    .dark .fc .fc-col-header-cell {
+        background-color: rgb(30 41 59);
+        border-color: rgb(51 65 85);
+        color: rgb(148 163 184);
+    }
+    
+    .fc .fc-daygrid-day {
+        background-color: white;
+        border-color: rgb(209 213 219);
+    }
+    
+    .dark .fc .fc-daygrid-day {
+        background-color: rgb(15 23 42);
+        border-color: rgb(51 65 85);
+    }
+    
+    .fc .fc-daygrid-day:hover {
+        background-color: rgb(243 244 246);
+        cursor: pointer;
+    }
+    
+    .dark .fc .fc-daygrid-day:hover {
+        background-color: rgb(30 41 59);
+    }
+    
+    .fc .fc-daygrid-day-number {
+        color: rgb(17 24 39);
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.5rem;
+    }
+    
+    .dark .fc .fc-daygrid-day-number {
+        color: rgb(255 255 255);
+    }
+    
+    .fc .fc-daygrid-day.fc-day-other .fc-daygrid-day-number {
+        color: rgb(156 163 175);
+        opacity: 0.4;
+    }
+    
+    .dark .fc .fc-daygrid-day.fc-day-other .fc-daygrid-day-number {
+        color: rgb(71 85 105);
+        opacity: 0.5;
+    }
+    
+    /* Estilos para vista de año */
+    .fc-multimonth-title {
+        background-color: rgb(249 250 251) !important;
+        border-color: rgb(209 213 219) !important;
+        font-weight: 700 !important;
+        font-size: 0.875rem !important;
+        padding: 0.5rem !important;
+        color: rgb(17 24 39) !important;
+        text-transform: uppercase !important;
+    }
+    
+    .dark .fc-multimonth-title {
+        background-color: rgb(30 41 59) !important;
+        color: rgb(255 255 255) !important;
+        border-color: rgb(51 65 85) !important;
+    }
+    
+    .fc-multimonth {
+        border: 1px solid rgb(209 213 219) !important;
+        border-radius: 0.5rem !important;
+        overflow: hidden !important;
+        background-color: white !important;
+    }
+    
+    .dark .fc-multimonth {
+        border-color: rgb(51 65 85) !important;
+        background-color: rgb(15 23 42) !important;
+    }
+    
+    .fc-multimonth-daygrid {
+        background-color: white !important;
+    }
+    
+    .dark .fc-multimonth-daygrid {
+        background-color: rgb(15 23 42) !important;
+    }
+    
+    .fc .fc-event {
+        border-radius: 0.375rem;
+        border: none;
+        padding: 0.125rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-bottom: 0.125rem;
+        cursor: pointer;
+    }
+    
+    .fc .fc-event:hover {
+        opacity: 0.9;
+    }
+    
+    .fc .fc-daygrid-day-top {
+        flex-direction: row;
+        justify-content: center;
+    }
+    
+    .fc .fc-h-event {
+        border: none;
+        background-color: transparent;
+    }
+    
+    .fc .fc-h-event .fc-event-main {
+        color: inherit;
+    }
+    
+    /* Badge de día inhábil */
+    .fc-event.evento-inhabil {
+        background-color: rgb(254 202 202);
+        color: rgb(153 27 27);
+        border-left: 4px solid rgb(220 38 38);
+        font-weight: 600;
+        box-shadow: 0 1px 2px 0 rgba(220, 38, 38, 0.1);
+    }
+    
+    .dark .fc-event.evento-inhabil {
+        background-color: rgba(239, 68, 68, 0.15);
+        color: rgb(252 165 165);
+        border-left: 4px solid rgb(239 68 68);
+        font-weight: 600;
+    }
+    
+    /* Badge de día hábil especial */
+    .fc-event.evento-habil {
+        background-color: rgb(187 247 208);
+        color: rgb(20 83 45);
+        border-left: 4px solid rgb(34 197 94);
+        font-weight: 600;
+        box-shadow: 0 1px 2px 0 rgba(34, 197, 94, 0.1);
+    }
+    
+    .dark .fc-event.evento-habil {
+        background-color: rgba(34, 197, 94, 0.15);
+        color: rgb(134 239 172);
+        border-left: 4px solid rgb(34 197 94);
+        font-weight: 600;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-5">
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-5">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-purple-100 dark:bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-600 dark:text-purple-400">
+                    <i class="fas fa-calendar-alt text-base"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-900 dark:text-white">Calendario Laboral</h1>
+                    <p class="text-xs text-gray-500 dark:text-dark-400">Gestiona los días inhábiles, festivos y excepciones</p>
+                </div>
+            </div>
+            {% if es_admin %}
+            <a href="{% url 'jornadas:calendario_crear' %}" 
+               class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600 text-white rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-plus text-xs"></i>
+                <span>Nuevo Día</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Vista de Calendario -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 p-6">
+        <div id='calendar'></div>
+    </div>
+
+    <!-- Tabla de Días del Calendario (opcional, colapsable) -->
+    <div class="bg-white dark:bg-dark-900 rounded-xl border border-gray-200 dark:border-dark-800 overflow-hidden">
+        <div class="px-5 py-3 border-b border-gray-200 dark:border-dark-800">
+            <button onclick="toggleTabla()" class="flex items-center justify-between w-full text-left">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-list text-purple-600 dark:text-purple-400 text-sm"></i>
+                    <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Vista de Lista</h2>
+                    <span class="text-xs text-gray-500 dark:text-dark-400">({{ dias_calendario|length }} días registrados)</span>
+                </div>
+                <i id="toggle-icon" class="fas fa-chevron-down text-gray-400 dark:text-dark-500 transition-transform"></i>
+            </button>
+        </div>
+        
+        <div id="tabla-container" class="hidden">
+        {% if dias_calendario %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-dark-800">
+                <thead class="bg-gray-50 dark:bg-dark-800">
+                    <tr>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">
+                            Fecha
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">
+                            Descripción
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">
+                            Estado
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">
+                            Creado por
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">
+                            Última modificación
+                        </th>
+                        <th scope="col" class="px-4 py-3 text-center text-xs font-semibold text-gray-700 dark:text-dark-300 uppercase tracking-wider">
+                            Acciones
+                        </th>
+                    </tr>
+                </thead>
+
+                <tbody class="bg-white dark:bg-dark-900 divide-y divide-gray-200 dark:divide-dark-800">
+                    {% for dia in dias_calendario %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-800/50 transition-colors duration-150">
+
+                        <!-- Fecha -->
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <div class="flex items-center gap-3">
+                                <div class="h-12 w-12 rounded-lg {% if dia.es_inhabil %}bg-red-100 dark:bg-red-500/10{% else %}bg-emerald-100 dark:bg-emerald-500/10{% endif %} flex flex-col items-center justify-center">
+                                    <span class="text-xs {% if dia.es_inhabil %}text-red-600 dark:text-red-400{% else %}text-emerald-600 dark:text-emerald-400{% endif %} uppercase font-semibold">{{ dia.fecha|date:"M" }}</span>
+                                    <span class="{% if dia.es_inhabil %}text-red-700 dark:text-red-300{% else %}text-emerald-700 dark:text-emerald-300{% endif %} font-bold text-lg leading-none">{{ dia.fecha|date:"d" }}</span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                        {{ dia.fecha|date:"l" }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-dark-400">
+                                        {{ dia.fecha|date:"d/m/Y" }}
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Descripción -->
+                        <td class="px-4 py-3">
+                            {% if dia.descripcion %}
+                            <div class="text-sm text-gray-900 dark:text-white">
+                                {{ dia.descripcion }}
+                            </div>
+                            {% else %}
+                            <span class="text-sm text-gray-400 dark:text-dark-500">—</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Estado -->
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            {% if dia.es_inhabil %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400">
+                                <i class="fas fa-times-circle mr-1.5"></i>
+                                Día Inhábil
+                            </span>
+                            {% else %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
+                                <i class="fas fa-check-circle mr-1.5"></i>
+                                Día Hábil
+                            </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Creado por -->
+                        <td class="px-4 py-3">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-500/10 flex items-center justify-center">
+                                    <i class="fas fa-user text-blue-600 dark:text-blue-400 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-gray-900 dark:text-white">
+                                        {{ dia.created_by.get_full_name|default:dia.created_by.username|default:"Sistema" }}
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-dark-400">
+                                        {{ dia.created_at|date:"d/m/Y H:i" }}
+                                    </p>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Última modificación -->
+                        <td class="px-4 py-3">
+                            {% if dia.updated_by %}
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-full bg-amber-100 dark:bg-amber-500/10 flex items-center justify-center">
+                                    <i class="fas fa-edit text-amber-600 dark:text-amber-400 text-xs"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-medium text-gray-900 dark:text-white">
+                                        {{ dia.updated_by.get_full_name|default:dia.updated_by.username }}
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-dark-400">
+                                        {{ dia.updated_at|date:"d/m/Y H:i" }}
+                                    </p>
+                                </div>
+                            </div>
+                            {% else %}
+                            <span class="text-xs text-gray-400 dark:text-dark-500 italic">Sin modificaciones</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Acciones -->
+                        <td class="px-4 py-3 whitespace-nowrap text-center">
+                            {% if es_admin %}
+                            <div class="flex items-center justify-center gap-2">
+                                <a href="{% url 'jornadas:calendario_editar' dia.pk %}"
+                                   class="inline-flex items-center justify-center w-8 h-8 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/10 rounded-lg transition-colors duration-150"
+                                   title="Editar">
+                                    <i class="fas fa-edit text-sm"></i>
+                                </a>
+                                <button onclick="mostrarModalConfirmacion('{{ dia.pk }}', '{{ dia.descripcion|default:"Sin descripción"|escapejs }}')"
+                                   class="inline-flex items-center justify-center w-8 h-8 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/10 rounded-lg transition-colors duration-150"
+                                   title="Eliminar">
+                                    <i class="fas fa-trash-alt text-sm"></i>
+                                </button>
+                            </div>
+                            {% else %}
+                            <span class="text-gray-400 dark:text-dark-500 text-xs italic">
+                                <i class="fas fa-eye mr-1"></i>Solo lectura
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="flex flex-col items-center justify-center py-16 px-4">
+            <div class="w-16 h-16 bg-purple-100 dark:bg-purple-500/10 rounded-full flex items-center justify-center mb-4">
+                <i class="fas fa-calendar-times text-purple-500 dark:text-purple-400 text-2xl"></i>
+            </div>
+            <h3 class="text-base font-medium text-gray-900 dark:text-white mb-1">No hay días especiales registrados</h3>
+            <p class="text-sm text-gray-500 dark:text-dark-400 mb-5">Agrega días inhábiles o festivos al calendario</p>
+            {% if user.perfil.es_admin or user.perfil.es_jefe %}
+            <a href="{% url 'jornadas:calendario_crear' %}" 
+               class="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors duration-200">
+                <i class="fas fa-plus text-xs"></i>
+                Nuevo Día
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- FullCalendar JS -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales/es.global.min.js'></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    
+    // Datos de eventos desde Django
+    var eventos = [
+        {% for dia in dias_calendario %}
+        {
+            id: '{{ dia.pk }}',
+            title: '{{ dia.descripcion|default:"Sin descripción"|escapejs }}',
+            start: '{{ dia.fecha|date:"Y-m-d" }}',
+            allDay: true,
+            classNames: ['{% if dia.es_inhabil %}evento-inhabil{% else %}evento-habil{% endif %}'],
+            extendedProps: {
+                esInhabil: {{ dia.es_inhabil|yesno:"true,false" }},
+                descripcion: '{{ dia.descripcion|default:""|escapejs }}',
+                createdBy: '{{ dia.created_by.get_full_name|default:dia.created_by.username|default:"Sistema"|escapejs }}',
+                createdAt: '{{ dia.created_at|date:"d/m/Y H:i"|escapejs }}',
+                updatedBy: '{% if dia.updated_by %}{{ dia.updated_by.get_full_name|default:dia.updated_by.username|escapejs }}{% else %}{% endif %}',
+                updatedAt: '{{ dia.updated_at|date:"d/m/Y H:i"|escapejs }}'
+            }
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'es',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,multiMonthYear'
+        },
+        buttonText: {
+            today: 'Hoy',
+            month: 'Mes',
+            year: 'Año'
+        },
+        events: eventos,
+        eventDisplay: 'block',
+        height: 'auto',
+        
+        // Al hacer clic en un día vacío
+        dateClick: function(info) {
+            {% if es_admin %}
+            // Redirigir al formulario de creación con la fecha pre-seleccionada
+            var fecha = info.dateStr;
+            window.location.href = "{% url 'jornadas:calendario_crear' %}?fecha=" + fecha;
+            {% endif %}
+        },
+        
+        // Al hacer clic en un evento existente
+        eventClick: function(info) {
+            info.jsEvent.preventDefault();
+            
+            var eventoId = info.event.id;
+            var titulo = info.event.title;
+            var esInhabil = info.event.extendedProps.esInhabil;
+            var createdBy = info.event.extendedProps.createdBy;
+            var createdAt = info.event.extendedProps.createdAt;
+            var updatedBy = info.event.extendedProps.updatedBy;
+            var updatedAt = info.event.extendedProps.updatedAt;
+            
+            // Mostrar modal de opciones (con o sin botones de edición según el rol)
+            mostrarModalEvento(eventoId, titulo, esInhabil, createdBy, createdAt, updatedBy, updatedAt);
+        },
+        
+        // Personalizar el contenido del evento
+        eventContent: function(arg) {
+            let icon = arg.event.extendedProps.esInhabil ? 
+                '<i class="fas fa-times-circle mr-1"></i>' : 
+                '<i class="fas fa-check-circle mr-1"></i>';
+            
+            return {
+                html: icon + arg.event.title
+            };
+        }
+    });
+    
+    calendar.render();
+    
+    // Ajustar tema según modo oscuro
+    if (document.documentElement.classList.contains('dark')) {
+        calendarEl.classList.add('dark-mode');
+    }
+});
+
+// Función para mostrar modal de opciones del evento
+function mostrarModalEvento(eventoId, titulo, esInhabil, createdBy, createdAt, updatedBy, updatedAt) {
+    const modal = document.getElementById('modalEvento');
+    const esAdmin = {{ es_admin|yesno:"true,false" }};
+    
+    document.getElementById('eventoTitulo').textContent = titulo;
+    document.getElementById('eventoTipo').textContent = esInhabil ? 'Día Inhábil' : 'Día Hábil';
+    document.getElementById('eventoTipo').className = esInhabil ? 
+        'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400' :
+        'inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400';
+    
+    // Mostrar información de auditoría
+    document.getElementById('eventoCreatedBy').textContent = createdBy;
+    document.getElementById('eventoCreatedAt').textContent = createdAt;
+    
+    if (updatedBy && updatedBy !== '') {
+        document.getElementById('eventoUpdatedInfo').classList.remove('hidden');
+        document.getElementById('eventoUpdatedBy').textContent = updatedBy;
+        document.getElementById('eventoUpdatedAt').textContent = updatedAt;
+    } else {
+        document.getElementById('eventoUpdatedInfo').classList.add('hidden');
+    }
+    
+    // Mostrar u ocultar botones según el rol
+    const botonesAdmin = document.getElementById('botonesAdmin');
+    const mensajeJefe = document.getElementById('mensajeJefe');
+    
+    if (esAdmin) {
+        botonesAdmin.classList.remove('hidden');
+        mensajeJefe.classList.add('hidden');
+        
+        document.getElementById('btnEditar').onclick = function() {
+            window.location.href = `/jornadas/calendario/${eventoId}/editar/`;
+        };
+        
+        document.getElementById('btnEliminar').onclick = function() {
+            cerrarModalEvento();
+            mostrarModalConfirmacion(eventoId, titulo);
+        };
+    } else {
+        botonesAdmin.classList.add('hidden');
+        mensajeJefe.classList.remove('hidden');
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+// Función para mostrar modal de confirmación de eliminación
+function mostrarModalConfirmacion(eventoId, titulo) {
+    const modal = document.getElementById('modalConfirmacion');
+    document.getElementById('confirmacionTitulo').textContent = titulo;
+    document.getElementById('formEliminarEvento').action = `/jornadas/calendario/${eventoId}/eliminar/`;
+    modal.classList.remove('hidden');
+}
+
+function cerrarModalConfirmacion() {
+    document.getElementById('modalConfirmacion').classList.add('hidden');
+}
+
+function cerrarModalEvento() {
+    document.getElementById('modalEvento').classList.add('hidden');
+}
+
+// Función para toggle de la tabla
+function toggleTabla() {
+    const tabla = document.getElementById('tabla-container');
+    const icon = document.getElementById('toggle-icon');
+    
+    if (tabla.classList.contains('hidden')) {
+        tabla.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+    } else {
+        tabla.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+    }
+}
+
+// Cerrar modal al hacer clic fuera
+document.addEventListener('click', function(e) {
+    const modalEvento = document.getElementById('modalEvento');
+    const modalConfirmacion = document.getElementById('modalConfirmacion');
+    
+    if (e.target === modalEvento) {
+        cerrarModalEvento();
+    }
+    if (e.target === modalConfirmacion) {
+        cerrarModalConfirmacion();
+    }
+});
+
+// Cerrar modal con ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModalEvento();
+        cerrarModalConfirmacion();
+    }
+});
+</script>
+
+<!-- Modal para opciones de evento -->
+<div id="modalEvento" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-dark-900 rounded-xl shadow-xl max-w-md w-full border border-gray-200 dark:border-dark-800">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-dark-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white" id="eventoTitulo"></h3>
+                    <span id="eventoTipo" class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium mt-2"></span>
+                </div>
+                <button onclick="cerrarModalEvento()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Body -->
+        <div class="px-6 py-5">
+            <p class="text-sm text-gray-600 dark:text-dark-300 mb-4">
+                ¿Qué deseas hacer con este día del calendario?
+            </p>
+            
+            <!-- Información de Auditoría -->
+            <div class="space-y-3 mb-4">
+                <div class="bg-gray-50 dark:bg-dark-800 rounded-lg p-3 border border-gray-200 dark:border-dark-700">
+                    <div class="flex items-start gap-2 mb-2">
+                        <i class="fas fa-user-plus text-blue-600 dark:text-blue-400 text-xs mt-0.5"></i>
+                        <div class="flex-1">
+                            <p class="text-xs font-medium text-gray-500 dark:text-dark-400">Creado por</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white" id="eventoCreatedBy"></p>
+                            <p class="text-xs text-gray-600 dark:text-dark-400" id="eventoCreatedAt"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="eventoUpdatedInfo" class="bg-gray-50 dark:bg-dark-800 rounded-lg p-3 border border-gray-200 dark:border-dark-700 hidden">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-user-edit text-amber-600 dark:text-amber-400 text-xs mt-0.5"></i>
+                        <div class="flex-1">
+                            <p class="text-xs font-medium text-gray-500 dark:text-dark-400">Última modificación por</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white" id="eventoUpdatedBy"></p>
+                            <p class="text-xs text-gray-600 dark:text-dark-400" id="eventoUpdatedAt"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="px-6 py-4 bg-gray-50 dark:bg-dark-800/50 rounded-b-xl">
+            <!-- Botones para Admin -->
+            <div id="botonesAdmin" class="flex items-center gap-3">
+                <button id="btnEditar"
+                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg transition-colors text-sm font-medium">
+                    <i class="fas fa-edit text-xs"></i>
+                    <span>Editar</span>
+                </button>
+                <button id="btnEliminar"
+                        class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-lg transition-colors text-sm font-medium">
+                    <i class="fas fa-trash-alt text-xs"></i>
+                    <span>Eliminar</span>
+                </button>
+            </div>
+            
+            <!-- Mensaje para Jefe -->
+            <div id="mensajeJefe" class="hidden text-center py-2">
+                <p class="text-sm text-gray-500 dark:text-dark-400 italic">
+                    <i class="fas fa-eye mr-1"></i>Solo lectura - Contacta al administrador para modificar
+                </p>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div id="modalConfirmacion" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-dark-900 rounded-xl shadow-xl max-w-md w-full border border-gray-200 dark:border-dark-800">
+        <!-- Header -->
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-dark-800">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-red-100 dark:bg-red-500/10 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 text-base"></i>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Confirmar Eliminación</h3>
+            </div>
+        </div>
+        
+        <!-- Body -->
+        <div class="px-6 py-5">
+            <p class="text-sm text-gray-600 dark:text-dark-300 mb-2">
+                ¿Estás seguro de que deseas eliminar este día del calendario?
+            </p>
+            <div class="bg-gray-50 dark:bg-dark-800 rounded-lg p-3 space-y-1 mb-3">
+                <p class="text-sm font-semibold text-gray-900 dark:text-white" id="confirmacionTitulo"></p>
+            </div>
+            <p class="text-xs text-red-600 dark:text-red-400">
+                <i class="fas fa-exclamation-circle mr-1"></i>
+                Esta acción no se puede deshacer.
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div class="px-6 py-4 bg-gray-50 dark:bg-dark-800/50 rounded-b-xl flex items-center gap-3">
+            <button onclick="cerrarModalConfirmacion()"
+                    class="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-500 hover:bg-gray-600 dark:bg-dark-700 dark:hover:bg-dark-600 text-white rounded-lg transition-colors text-sm font-medium">
+                <i class="fas fa-times text-xs"></i>
+                <span>Cancelar</span>
+            </button>
+            <form id="formEliminarEvento" method="post" class="flex-1">
+                {% csrf_token %}
+                <button type="submit"
+                        class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white rounded-lg transition-colors text-sm font-medium">
+                    <i class="fas fa-trash-alt text-xs"></i>
+                    <span>Eliminar</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

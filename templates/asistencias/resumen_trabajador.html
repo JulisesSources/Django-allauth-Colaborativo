@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block title %}Resumen de Asistencias - SCA-B123{% endblock %}
+
+{% block content %}
+
+<div class="max-w-5xl mx-auto space-y-5">
+
+    <!-- Header -->
+    <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl shadow-sm p-5">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 bg-primary-100 dark:bg-primary-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <i class="fas fa-chart-pie text-primary-600 dark:text-primary-400 text-xl"></i>
+            </div>
+            <div class="flex-1">
+                <h1 class="text-xl font-bold text-gray-900 dark:text-white">Resumen de Asistencia</h1>
+                <p class="text-sm text-gray-600 dark:text-dark-300">{{ trabajador.nombre_completo }} ({{ trabajador.numero_empleado }})</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tarjeta de estadísticas -->
+    <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+            <i class="fas fa-chart-bar text-primary-600 dark:text-primary-400 text-base"></i>Estadísticas Generales
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+            <div class="bg-gradient-to-br from-emerald-900/40 to-gray-900 dark:to-black border border-emerald-700/50 dark:border-emerald-700/30 p-5 rounded-xl">
+                <p class="text-sm text-emerald-400 font-medium">Asistencias</p>
+                <p class="text-3xl font-bold text-emerald-400">{{ asistencias|default:0 }}</p>
+                <p class="text-sm text-emerald-500/80">{{ porcentaje_asistencia|default:0 }}%</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-amber-900/40 to-gray-900 dark:to-black border border-amber-700/50 dark:border-amber-700/30 p-5 rounded-xl">
+                <p class="text-sm text-amber-400 font-medium">Retardos</p>
+                <p class="text-3xl font-bold text-amber-400">{{ retardos|default:0 }}</p>
+                <p class="text-sm text-amber-500/80">{{ porcentaje_retardos|default:0 }}%</p>
+            </div>
+
+            <div class="bg-gradient-to-br from-red-900/40 to-gray-900 dark:to-black border border-red-700/50 dark:border-red-700/30 p-5 rounded-xl">
+                <p class="text-sm text-red-400 font-medium">Faltas</p>
+                <p class="text-3xl font-bold text-red-400">{{ faltas|default:0 }}</p>
+                <p class="text-sm text-red-500/80">{{ porcentaje_faltas|default:0 }}%</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Resumen semanal -->
+    <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-gray-200 dark:border-dark-700">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="fas fa-calendar-week text-indigo-600 dark:text-indigo-400 text-base"></i>Resumen de la Semana
+            </h2>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 dark:bg-dark-800">
+                    <tr>
+                        <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-700 dark:text-dark-300">Fecha</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-700 dark:text-dark-300">Entrada</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-700 dark:text-dark-300">Salida</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-700 dark:text-dark-300">Estatus</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-dark-700">
+                    {% for a in resumen_semana %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-800/50 transition-colors">
+                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ a.fecha|date:"d/m/Y" }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                            {% if a.hora_entrada %}
+                                <span class="font-mono">{{ a.hora_entrada|time:"H:i" }}</span>
+                            {% else %}
+                                <span class="text-gray-400 dark:text-dark-500">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                            {% if a.hora_salida %}
+                                <span class="font-mono">{{ a.hora_salida|time:"H:i" }}</span>
+                            {% else %}
+                                <span class="text-gray-400 dark:text-dark-500">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full
+                                {% if a.estatus == 'ASI' %}bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400
+                                {% elif a.estatus == 'RET' %}bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400
+                                {% elif a.estatus == 'JUS' %}bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400
+                                {% else %}bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400{% endif %}">
+                                {{ a.get_estatus_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-8 text-gray-500 dark:text-dark-400">
+                            <i class="fas fa-calendar-times text-3xl mb-2"></i>
+                            <p>Sin registros esta semana</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Historial completo -->
+    <div class="bg-white dark:bg-dark-900 border border-gray-200 dark:border-dark-800 rounded-xl shadow-sm overflow-hidden">
+        <div class="p-5 border-b border-gray-200 dark:border-dark-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <h2 class="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <i class="fas fa-history text-primary-600 dark:text-primary-400 text-base"></i>Historial de Asistencias
+            </h2>
+            
+            <!-- Filtros -->
+            <form method="get" class="flex flex-wrap gap-2 items-center">
+                <div class="relative">
+                    <i class="fas fa-calendar absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-sm"></i>
+                    <input type="date" name="fecha_inicio" value="{{ fecha_inicio|date:'Y-m-d' }}"
+                           class="pl-10 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-900 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-600 focus:border-transparent">
+                </div>
+                <span class="text-gray-500 dark:text-dark-400 text-sm">a</span>
+                <div class="relative">
+                    <i class="fas fa-calendar absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-dark-500 text-sm"></i>
+                    <input type="date" name="fecha_fin" value="{{ fecha_fin|date:'Y-m-d' }}"
+                           class="pl-10 pr-3 py-2 bg-gray-50 dark:bg-dark-800 border border-gray-200 dark:border-dark-700 text-gray-900 dark:text-white rounded-lg text-sm focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-600 focus:border-transparent">
+                </div>
+                <button type="submit" 
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 dark:bg-primary-600 dark:hover:bg-primary-700 text-white rounded-lg text-sm font-medium transition-colors duration-200">
+                    <i class="fas fa-filter text-xs"></i>Filtrar
+                </button>
+            </form>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 dark:bg-dark-800">
+                    <tr>
+                        <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-700 dark:text-dark-300">Fecha</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-700 dark:text-dark-300">Día</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-700 dark:text-dark-300">Entrada</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-700 dark:text-dark-300">Salida</th>
+                        <th class="px-6 py-3.5 text-left text-xs font-medium text-gray-700 dark:text-dark-300">Estatus</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 dark:divide-dark-700">
+                    {% for registro in registros %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-dark-800/50 transition-colors">
+                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">{{ registro.fecha|date:"d/m/Y" }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-dark-400">{{ registro.fecha|date:"l" }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                            {% if registro.hora_entrada %}
+                                <span class="font-mono">{{ registro.hora_entrada|time:"H:i" }}</span>
+                            {% else %}
+                                <span class="text-gray-400 dark:text-dark-500">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900 dark:text-white">
+                            {% if registro.hora_salida %}
+                                <span class="font-mono">{{ registro.hora_salida|time:"H:i" }}</span>
+                            {% else %}
+                                <span class="text-gray-400 dark:text-dark-500">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full
+                                {% if registro.estatus == 'ASI' %}bg-emerald-100 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400
+                                {% elif registro.estatus == 'RET' %}bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400
+                                {% elif registro.estatus == 'JUS' %}bg-blue-100 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400
+                                {% else %}bg-red-100 dark:bg-red-500/10 text-red-700 dark:text-red-400{% endif %}">
+                                {{ registro.get_estatus_display }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-12 text-gray-500 dark:text-dark-400">
+                            <i class="fas fa-inbox text-4xl mb-3"></i>
+                            <p class="font-medium">No hay registros en este período</p>
+                            <p class="text-sm">Ajusta las fechas del filtro para ver más registros</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
